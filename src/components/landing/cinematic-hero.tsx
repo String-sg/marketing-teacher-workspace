@@ -92,7 +92,7 @@ export function CinematicHero() {
         />
 
         <motion.div
-          className="absolute inset-x-0 top-[10svh] z-10 mx-auto flex max-w-5xl flex-col items-center px-5 text-center text-white sm:top-[12svh]"
+          className="absolute inset-x-0 top-[14svh] z-10 mx-auto flex max-w-5xl flex-col items-center px-5 text-center text-white sm:top-[15svh]"
           style={
             prefersReducedMotion
               ? undefined
