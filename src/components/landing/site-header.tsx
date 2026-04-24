@@ -5,7 +5,7 @@ import { navItems } from "@/content/landing"
 
 export function SiteHeader() {
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-white/10 bg-[color:var(--nav-surface)] text-white backdrop-blur-xl">
+    <header className="absolute inset-x-0 top-0 z-50 border-white/10 bg-[color:var(--nav-surface)] text-white backdrop-blur-xl">
       <nav
         aria-label="Primary navigation"
         className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8"
