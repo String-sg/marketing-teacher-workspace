@@ -14,3 +14,4 @@ __unconfig*
 todos.json
 
 .compound-engineering/*.local.yaml
+.gstack/

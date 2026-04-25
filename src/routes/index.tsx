@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router"
 
-import { CinematicHero } from "@/components/landing/cinematic-hero"
 import { FinalCta } from "@/components/landing/final-cta"
+import { PaperHero } from "@/components/landing/paper-hero"
 import { ProductSection } from "@/components/landing/product-section"
 import { ProofStrip } from "@/components/landing/proof-strip"
 import { SiteHeader } from "@/components/landing/site-header"
@@ -13,7 +13,7 @@ function HomePage() {
     <>
       <SiteHeader />
       <main>
-        <CinematicHero />
+        <PaperHero />
         <ProductSection />
         <ProofStrip />
         <FinalCta />
