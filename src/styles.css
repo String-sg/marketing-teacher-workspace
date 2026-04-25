@@ -178,22 +178,33 @@
       var(--paper-card);
   }
 
+  .hero-media {
+    filter: brightness(1.06) contrast(1.04);
+    mix-blend-mode: multiply;
+    -webkit-mask-image:
+      radial-gradient(ellipse 78% 88% at 50% 52%, #000 60%, transparent 96%);
+    mask-image:
+      radial-gradient(ellipse 78% 88% at 50% 52%, #000 60%, transparent 96%);
+  }
+
   .cloud-drift-left {
-    animation: cloud-drift-left 28s ease-in-out infinite;
+    animation: cloud-drift-left 18s ease-in-out infinite;
   }
 
   .cloud-drift-right {
-    animation: cloud-drift-right 34s ease-in-out infinite;
+    animation: cloud-drift-right 22s ease-in-out infinite;
   }
 
   @keyframes cloud-drift-left {
-    0%, 100% { transform: translate3d(0, 0, 0); }
-    50%      { transform: translate3d(18px, -10px, 0); }
+    0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
+    50%  { transform: translate3d(56px, -22px, 0) rotate(1.2deg); }
+    100% { transform: translate3d(0, 0, 0) rotate(0deg); }
   }
 
   @keyframes cloud-drift-right {
-    0%, 100% { transform: translate3d(0, 0, 0); }
-    50%      { transform: translate3d(-22px, 8px, 0); }
+    0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
+    50%  { transform: translate3d(-64px, 18px, 0) rotate(-1.4deg); }
+    100% { transform: translate3d(0, 0, 0) rotate(0deg); }
   }
 
   @media (prefers-reduced-motion: reduce) {

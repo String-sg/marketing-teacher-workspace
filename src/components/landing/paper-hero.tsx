@@ -128,14 +128,14 @@ export function PaperHero() {
               {reduced ? (
                 <img
                   alt="Teacher working at her desk with a laptop and lamp"
-                  className="block h-auto max-h-full w-auto max-w-full mix-blend-multiply select-none"
+                  className="hero-media block h-auto max-h-full w-auto max-w-full select-none"
                   src="/hero/teacher-illustration.png"
                 />
               ) : (
                 <video
                   aria-label="A teacher slowly working at her desk"
                   autoPlay
-                  className="block h-auto max-h-full w-auto max-w-full mix-blend-multiply select-none"
+                  className="hero-media block h-auto max-h-full w-auto max-w-full select-none"
                   loop
                   muted
                   playsInline
