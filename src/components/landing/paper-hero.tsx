@@ -123,19 +123,19 @@ export function PaperHero() {
             </Button>
           </motion.div>
 
-          <div className="relative z-0 mt-auto flex w-full min-h-0 flex-1 justify-center pb-2 sm:pb-4">
-            <div className="relative flex h-full w-full max-w-[520px] items-end justify-center px-4">
+          <div className="relative z-0 mt-auto flex w-full justify-center pb-10 sm:pb-14 lg:pb-16">
+            <div className="relative w-full max-w-[340px] px-4 sm:max-w-[360px]">
               {reduced ? (
                 <img
                   alt="Teacher working at her desk with a laptop and lamp"
-                  className="hero-media block h-auto max-h-full w-auto max-w-full select-none"
+                  className="hero-media block h-auto w-full select-none"
                   src="/hero/teacher-illustration.png"
                 />
               ) : (
                 <video
                   aria-label="A teacher slowly working at her desk"
                   autoPlay
-                  className="hero-media block h-auto max-h-full w-auto max-w-full select-none"
+                  className="hero-media block h-auto w-full select-none"
                   loop
                   muted
                   playsInline
