@@ -109,7 +109,7 @@
     --paper-ink: #1a1a1a;
     --paper-muted: color-mix(in oklab, var(--mauve-11) 72%, var(--grass-10));
     --paper-rule: color-mix(in oklab, var(--mauve-7) 68%, var(--amber-6));
-    --paper-card: #fafaf7;
+    --paper-card: #ffffff;
     --cta-ground: color-mix(in oklab, var(--mauve-12) 88%, var(--blue-12));
 }
 
@@ -173,18 +173,12 @@
   }
 
   .paper-card {
-    background-image:
-      radial-gradient(120% 60% at 50% 100%, rgb(255 255 255 / 0%), rgb(255 255 255 / 70%) 60%, rgb(255 255 255 / 100%) 100%),
-      var(--paper-card);
+    background-color: #ffffff;
   }
 
   .hero-media {
-    filter: brightness(1.06) contrast(1.04);
+    filter: brightness(1.05) contrast(1.03);
     mix-blend-mode: multiply;
-    -webkit-mask-image:
-      radial-gradient(ellipse 78% 88% at 50% 52%, #000 60%, transparent 96%);
-    mask-image:
-      radial-gradient(ellipse 78% 88% at 50% 52%, #000 60%, transparent 96%);
   }
 
   .cloud-drift-left {
