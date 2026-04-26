@@ -82,7 +82,7 @@ export function PaperHero() {
           >
             <img
               alt=""
-              className="cloud-drift-left block w-full opacity-80 select-none"
+              className="cloud-drift-left block w-full opacity-80 mix-blend-multiply select-none"
               src="/hero/cloud-halftone.png"
             />
           </motion.div>
@@ -93,7 +93,7 @@ export function PaperHero() {
           >
             <img
               alt=""
-              className="cloud-drift-right block w-full opacity-80 select-none"
+              className="cloud-drift-right block w-full opacity-80 mix-blend-multiply select-none"
               src="/hero/cloud-halftone.png"
             />
           </motion.div>
