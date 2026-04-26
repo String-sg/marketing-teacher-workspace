@@ -5,11 +5,11 @@ import { heroCopy, navItems } from "@/content/landing"
 
 export function SiteHeader() {
   return (
-    <header className="absolute inset-x-0 top-0 z-50">
-      <div className="mx-auto mt-4 max-w-[110rem] px-4">
+    <header className="relative z-30 flex w-full justify-center pt-8 sm:pt-10">
+      <div className="px-4">
         <nav
           aria-label="Primary navigation"
-          className="flex items-center rounded-2xl border border-black/5 bg-white/95 px-4 py-3 shadow-[0_8px_30px_-12px_rgb(15_23_42/0.18)] backdrop-blur-sm sm:px-6"
+          className="flex w-fit items-center gap-12 rounded-full border border-slate-300 bg-white px-4 py-2.5 sm:gap-16 sm:px-6"
         >
           <a
             className="flex items-center gap-2.5 font-heading text-[color:var(--paper-ink)]"

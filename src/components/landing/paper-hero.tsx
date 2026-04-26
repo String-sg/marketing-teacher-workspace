@@ -8,6 +8,7 @@ import {
 import { useRef, useState } from "react"
 
 import { Button } from "@/components/ui/button"
+import { SiteHeader } from "@/components/landing/site-header"
 import { heroCopy } from "@/content/landing"
 
 const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v)
@@ -59,12 +60,12 @@ export function PaperHero() {
       <div
         className={
           reduced
-            ? "relative px-4 pt-[6.125rem] pb-4"
-            : "sticky top-0 flex h-svh items-stretch overflow-hidden px-4 pt-[6.125rem] pb-4"
+            ? "relative p-3"
+            : "sticky top-0 flex h-svh items-stretch overflow-hidden p-3"
         }
       >
         <motion.div
-          className="paper-card relative mx-auto flex w-full max-w-[110rem] flex-1 flex-col items-center overflow-hidden rounded-[2rem] bg-[color:var(--paper-card)] shadow-[0_10px_60px_-30px_rgb(15_23_42/0.18)]"
+          className="paper-card relative mx-auto flex w-full max-w-[110rem] flex-1 flex-col items-center overflow-hidden rounded-[20px] bg-[color:var(--paper-card)] shadow-[0_10px_60px_-30px_rgb(15_23_42/0.18)]"
           style={
             reduced
               ? undefined
@@ -98,12 +99,14 @@ export function PaperHero() {
             />
           </motion.div>
 
+          <SiteHeader />
+
           <motion.div
-            className="relative z-10 mt-6 flex w-full max-w-5xl flex-col items-center px-5 text-center sm:mt-8"
+            className="relative z-10 mt-12 flex w-full max-w-5xl flex-col items-center px-5 text-center sm:mt-16"
             style={reduced ? undefined : { opacity: copyOpacity, y: copyY }}
           >
             <h1
-              className="font-heading text-[clamp(1.75rem,4.4vw,4rem)] leading-[1.05] font-semibold tracking-tight text-[color:var(--paper-ink)]"
+              className="font-heading text-[clamp(1.75rem,4.4vw,4rem)] leading-[1.05] font-medium tracking-tight text-[color:var(--paper-ink)]"
               id="hero-title"
             >
               <span className="block whitespace-nowrap">
