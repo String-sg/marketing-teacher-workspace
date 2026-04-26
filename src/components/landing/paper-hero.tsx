@@ -99,32 +99,34 @@ export function PaperHero() {
             />
           </motion.div>
 
-          <SiteHeader />
+          <div className="relative z-10 mx-auto flex w-fit flex-col pt-8 sm:pt-10">
+            <SiteHeader />
 
-          <motion.div
-            className="relative z-10 mt-12 flex w-full max-w-5xl flex-col items-center px-5 text-center sm:mt-16"
-            style={reduced ? undefined : { opacity: copyOpacity, y: copyY }}
-          >
-            <h1
-              className="font-heading text-[clamp(1.75rem,4.4vw,4rem)] leading-[1.05] font-medium tracking-tight text-[color:var(--paper-ink)]"
-              id="hero-title"
+            <motion.div
+              className="mt-14 flex flex-col items-center text-center sm:mt-20"
+              style={reduced ? undefined : { opacity: copyOpacity, y: copyY }}
             >
-              <span className="block whitespace-nowrap">
-                {heroCopy.headline}
-              </span>
-              <span className="block whitespace-nowrap">
-                {heroCopy.headlineSecond}
-              </span>
-            </h1>
-            <Button
-              asChild
-              className="mt-6 h-11 rounded-full bg-primary px-7 text-base text-primary-foreground hover:bg-primary/90 sm:mt-7"
-            >
-              <a href={heroCopy.ctaHref} rel="noreferrer">
-                {heroCopy.cta}
-              </a>
-            </Button>
-          </motion.div>
+              <h1
+                className="font-heading text-[clamp(1.75rem,4.4vw,4rem)] leading-[1.05] font-medium tracking-tight text-[color:var(--paper-ink)]"
+                id="hero-title"
+              >
+                <span className="block whitespace-nowrap">
+                  {heroCopy.headline}
+                </span>
+                <span className="block whitespace-nowrap">
+                  {heroCopy.headlineSecond}
+                </span>
+              </h1>
+              <Button
+                asChild
+                className="mt-6 h-11 rounded-full bg-primary px-7 text-base text-primary-foreground hover:bg-primary/90 sm:mt-7"
+              >
+                <a href={heroCopy.ctaHref} rel="noreferrer">
+                  {heroCopy.cta}
+                </a>
+              </Button>
+            </motion.div>
+          </div>
 
           <div className="relative z-0 mt-auto flex w-full justify-center pb-0">
             <div className="relative w-full max-w-[360px] px-4 sm:max-w-[400px]">

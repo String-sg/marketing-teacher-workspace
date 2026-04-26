@@ -5,12 +5,11 @@ import { heroCopy, navItems } from "@/content/landing"
 
 export function SiteHeader() {
   return (
-    <header className="relative z-30 flex w-full justify-center pt-8 sm:pt-10">
-      <div className="px-4">
-        <nav
-          aria-label="Primary navigation"
-          className="flex w-fit items-center gap-12 rounded-full border border-slate-300 bg-white px-4 py-2.5 sm:gap-16 sm:px-6"
-        >
+    <header className="relative z-30 w-full">
+      <nav
+        aria-label="Primary navigation"
+        className="flex w-full items-center gap-12 rounded-full border border-slate-300 bg-white px-4 py-2.5 sm:gap-16 sm:px-6"
+      >
           <a
             className="flex items-center gap-2.5 font-heading text-[color:var(--paper-ink)]"
             href="/"
@@ -50,9 +49,8 @@ export function SiteHeader() {
                 <ArrowRightIcon data-icon="inline-end" />
               </a>
             </Button>
-          </div>
-        </nav>
-      </div>
+        </div>
+      </nav>
     </header>
   )
 }
