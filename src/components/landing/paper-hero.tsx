@@ -7,6 +7,7 @@ import {
 } from "motion/react"
 import { useEffect, useRef, useState } from "react"
 
+import { useIsDesktop } from "@/components/landing/scroll-choreography/use-is-desktop"
 import { Button } from "@/components/ui/button"
 import {
   finalCtaCopy,
@@ -27,6 +28,7 @@ export function PaperHero() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const videoDurationRef = useRef(0)
   const prefersReducedMotion = useReducedMotion()
+  const isDesktop = useIsDesktop()
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end end"],
@@ -81,7 +83,11 @@ export function PaperHero() {
     return () => video.removeEventListener("loadedmetadata", handleMeta)
   }, [])
 
-  const reduced = prefersReducedMotion === true
+  // Mobile users get the static fallback layout (per CLAUDE.md "Mobile: Static
+  // fallback only" + static-choreography-fallback.tsx docstring). Reduced-motion
+  // users likewise get the static branch. Mirrors the orchestrator-mode contract
+  // documented for Phase 2: `mode === "static"` when mobile OR reduced-motion.
+  const reduced = prefersReducedMotion === true || !isDesktop
 
   return (
     <section
