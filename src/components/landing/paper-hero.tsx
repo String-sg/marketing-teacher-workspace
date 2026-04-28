@@ -199,7 +199,7 @@ export function PaperHero() {
                 <span className="size-3 rounded-full bg-[#febc2e]" />
                 <span className="size-3 rounded-full bg-[#28c840]" />
                 <span className="ml-4 truncate text-xs text-black/55">
-                  teacherworkspace-alpha.vercel.app/students
+                  {TEACHER_WORKSPACE_APP_URL.replace("https://", "")}
                 </span>
               </div>
               <img
@@ -220,7 +220,7 @@ export function PaperHero() {
               <span className="size-3 rounded-full bg-[#febc2e]" />
               <span className="size-3 rounded-full bg-[#28c840]" />
               <span className="ml-4 truncate text-xs text-black/55">
-                teacherworkspace-alpha.vercel.app/students
+                {TEACHER_WORKSPACE_APP_URL.replace("https://", "")}
               </span>
             </div>
             <img

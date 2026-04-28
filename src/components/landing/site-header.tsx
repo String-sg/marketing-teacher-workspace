@@ -1,7 +1,11 @@
 import { ArrowRightIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { heroCopy, navItems } from "@/content/landing"
+import {
+  finalCtaCopy,
+  navItems,
+  TEACHER_WORKSPACE_APP_URL,
+} from "@/content/landing"
 
 export function SiteHeader() {
   return (
@@ -44,8 +48,8 @@ export function SiteHeader() {
               className="h-10 rounded-full border-primary/40 px-5 text-primary hover:bg-primary/5"
               variant="outline"
             >
-              <a href={heroCopy.ctaHref} rel="noreferrer">
-                {heroCopy.cta}
+              <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
+                {finalCtaCopy.cta}
                 <ArrowRightIcon data-icon="inline-end" />
               </a>
             </Button>
