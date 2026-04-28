@@ -36,7 +36,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   - [x] 01-02-PLAN.md — Wave 1: typed StageDef data model (types.ts + stages.ts)
   - [x] 01-03-PLAN.md — Wave 2: src/content/landing.ts reshape (delete legacy + add stages/proofCopy/finalCtaCopy/footerCopy/TEACHER_WORKSPACE_APP_URL)
   - [x] 01-04-PLAN.md — Wave 3: SSR primitives (useIsDesktop, ScrollChoreographyContext stub, ScrollChoreography stub) + consumer migrations (paper-hero data swap, feature-section, proof-strip, final-cta, email-capture, site-header)
-  - [ ] 01-05-PLAN.md — Wave 4: StaticChoreographyFallback shell + SiteFooter + SkipLink + CSS backstop + routes wire-in + product-section.tsx shim deletion
+  - [x] 01-05-PLAN.md — Wave 4: StaticChoreographyFallback shell + SiteFooter + SkipLink + CSS backstop + routes wire-in + product-section.tsx shim deletion
 **UI hint**: yes
 
 ### Phase 2: Orchestrator Shell + Backdrop Migration
