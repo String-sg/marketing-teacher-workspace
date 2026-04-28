@@ -5,7 +5,7 @@ import {
   useScroll,
   useTransform,
 } from "motion/react"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { SiteHeader } from "@/components/landing/site-header"
@@ -15,6 +15,8 @@ const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v)
 
 export function PaperHero() {
   const sectionRef = useRef<HTMLElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const videoDurationRef = useRef(0)
   const prefersReducedMotion = useReducedMotion()
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -43,7 +45,24 @@ export function PaperHero() {
     setStageOpacity(p < 0.6 ? 1 : clamp01(1 - (p - 0.6) / 0.18))
     setScreenOpacity(p < 0.55 ? 0 : clamp01((p - 0.55) / 0.23))
     setCopyOpacity(p < 0.06 ? 1 : clamp01(1 - (p - 0.06) / 0.08))
+
+    const video = videoRef.current
+    const duration = videoDurationRef.current
+    if (video && duration > 0) {
+      video.currentTime = clamp01(p / 0.6) * duration
+    }
   })
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+    const handleMeta = () => {
+      videoDurationRef.current = video.duration || 0
+    }
+    if (video.readyState >= 1) handleMeta()
+    else video.addEventListener("loadedmetadata", handleMeta)
+    return () => video.removeEventListener("loadedmetadata", handleMeta)
+  }, [])
 
   const reduced = prefersReducedMotion === true
 
@@ -52,8 +71,8 @@ export function PaperHero() {
       aria-labelledby="hero-title"
       className={
         reduced
-          ? "paper-page relative min-h-svh overflow-hidden"
-          : "paper-page relative h-[280vh]"
+          ? "relative min-h-svh overflow-hidden"
+          : "relative h-[280vh]"
       }
       ref={sectionRef}
     >
@@ -139,12 +158,12 @@ export function PaperHero() {
               ) : (
                 <video
                   aria-label="A teacher slowly working at her desk"
-                  autoPlay
                   className="hero-media block h-auto w-full select-none"
-                  loop
                   muted
                   playsInline
                   poster="/hero/teacher-illustration.png"
+                  preload="auto"
+                  ref={videoRef}
                   src="/hero/teacher-working.mp4"
                 />
               )}

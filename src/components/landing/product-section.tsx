@@ -1,40 +1,41 @@
 import { ArrowUpRightIcon, CheckIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { ProductInterfaceFrame } from "@/components/landing/product-interface-frame"
 import { modules, productCopy } from "@/content/landing"
 
 export function ProductSection() {
   return (
     <section
-      className="bg-[color:var(--interface-ink)] px-5 py-24 text-white sm:px-8 lg:py-32"
+      className="relative px-5 py-24 sm:px-8 lg:py-32"
       id="today"
     >
-      <div className="mx-auto grid max-w-7xl gap-14 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
+      <div className="mx-auto grid max-w-[110rem] gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:items-center lg:gap-20">
         <div className="max-w-xl">
-          <p className="text-sm font-medium tracking-[0.16em] text-[color:var(--interface-accent)] uppercase">
+          <p className="text-xs font-medium tracking-[0.18em] text-[color:var(--paper-muted)] uppercase sm:text-sm">
             {productCopy.kicker}
           </p>
-          <h2 className="mt-5 font-heading text-4xl leading-tight font-semibold text-balance sm:text-6xl">
+          <h2 className="mt-4 font-heading text-[clamp(1.5rem,3.6vw,3.25rem)] leading-[1.08] font-medium tracking-tight text-balance text-[color:var(--paper-ink)]">
             {productCopy.headline}
           </h2>
-          <p className="mt-6 text-lg leading-8 text-white/64">
+          <p className="mt-6 text-base leading-7 text-[color:var(--paper-muted)] sm:text-lg sm:leading-8">
             {productCopy.body}
           </p>
 
-          <div className="mt-12 flex flex-col gap-5">
+          <div className="mt-10 flex flex-col">
             {modules.map((module) => (
               <article
-                className="border-t border-white/12 pt-5"
+                className="border-t border-[color:var(--paper-rule)]/55 py-5 first:border-t-0 first:pt-0"
                 key={module.title}
               >
                 <div className="flex gap-4">
-                  <span className="mt-1 grid size-6 shrink-0 place-items-center rounded-full bg-[color:var(--interface-accent-soft)] text-[color:var(--interface-accent)]">
+                  <span className="mt-1 grid size-6 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
                     <CheckIcon aria-hidden className="size-3.5" />
                   </span>
                   <div>
-                    <h3 className="text-lg font-medium">{module.title}</h3>
-                    <p className="mt-2 leading-7 text-white/58">
+                    <h3 className="text-lg font-medium text-[color:var(--paper-ink)]">
+                      {module.title}
+                    </h3>
+                    <p className="mt-2 leading-7 text-[color:var(--paper-muted)]">
                       {module.body}
                     </p>
                   </div>
@@ -43,16 +44,32 @@ export function ProductSection() {
             ))}
           </div>
 
-          <Button className="mt-10 h-11 rounded-full bg-white text-[color:var(--interface-ink)] hover:bg-white/90">
-            {productCopy.cta}
-            <ArrowUpRightIcon data-icon="inline-end" />
+          <Button
+            asChild
+            className="mt-10 h-11 rounded-full bg-primary px-7 text-base text-primary-foreground hover:bg-primary/90"
+          >
+            <a href="#today">
+              {productCopy.cta}
+              <ArrowUpRightIcon data-icon="inline-end" />
+            </a>
           </Button>
         </div>
 
         <div className="relative">
-          <div className="absolute inset-8 bg-[radial-gradient(circle,var(--interface-accent-soft),transparent_62%)] blur-3xl" />
-          <div className="relative translate-x-0 lg:translate-x-8">
-            <ProductInterfaceFrame />
+          <div className="paper-card relative overflow-hidden rounded-[20px] border border-black/10 bg-white shadow-[0_30px_120px_-40px_rgb(15_23_42/0.45)]">
+            <div className="flex items-center gap-2 border-b border-black/5 bg-[#f7f7f5] px-4 py-2.5">
+              <span className="size-3 rounded-full bg-[#ff5f57]" />
+              <span className="size-3 rounded-full bg-[#febc2e]" />
+              <span className="size-3 rounded-full bg-[#28c840]" />
+              <span className="ml-4 truncate text-xs text-black/55">
+                teacherworkspace-alpha.vercel.app/students
+              </span>
+            </div>
+            <img
+              alt="Teacher Workspace student insights dashboard"
+              className="block h-auto w-full select-none"
+              src="/hero/profiles-screen.png"
+            />
           </div>
         </div>
       </div>

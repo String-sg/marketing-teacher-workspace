@@ -6,36 +6,36 @@ export const navItems = [
 export const heroCopy = {
   headline: "See every student's full picture.",
   headlineSecond: "One screen.",
-  body: "Your plan, classes, grading queue, and the parent email you have been meaning to send, all in one calm place.",
+  body: "Grades, attendance, notes, and family conversations on one profile per student — so you walk in tomorrow already knowing what each kid needs.",
   emailPlaceholder: "Enter your school email",
   cta: "Start",
   ctaHref: "https://teacherworkspace-alpha.vercel.app/students",
 }
 
 export const productCopy = {
-  kicker: "A calmer teaching day",
-  headline: "One tab for the work around teaching.",
-  body: "See today's classes, take attendance, clear the grading queue, message home, and pull tomorrow's lesson materials without opening seven different tools.",
-  cta: "See today's workspace",
+  kicker: "A profile for every student",
+  headline: "Every student, in context.",
+  body: "Open a name and see the term so far — the assignments, the missing days, the parent message you sent last Tuesday. The patterns that matter, before they become problems.",
+  cta: "See a student profile",
 }
 
 export const modules = [
   {
-    title: "Today's classes, surfaced automatically",
-    body: "Start the morning with the right schedule, lesson notes, attendance prompts, and reminders already in view.",
+    title: "One profile, every signal",
+    body: "Grades, attendance, behavior notes, and messages home, gathered on a single page per student.",
   },
   {
-    title: "Grading queue with rubrics built in",
-    body: "Move through assignments faster with reusable rubrics and optional AI pre-checks you can accept, edit, or ignore.",
+    title: "Trends you can act on",
+    body: "Mastery curves and attendance dips surface early, so the student who's slipping doesn't slip past you.",
   },
   {
-    title: "Parent comms, translated and logged",
-    body: "Draft a message, translate it, send it, and keep the conversation attached to the student record.",
+    title: "Notes that travel with the student",
+    body: "What you noticed in class, what worked last term, what the family asked for — all attached to the profile, not buried in a doc.",
   },
 ]
 
 export const proofPoints = [
-  "Plan lessons and reuse them across terms",
-  "Track attendance before the bell stops ringing",
-  "Close the laptop with nothing hiding in another tab",
+  "Spot a struggling student before the next quiz",
+  "Walk into class already knowing the room",
+  "Hand off context cleanly when the year ends",
 ]

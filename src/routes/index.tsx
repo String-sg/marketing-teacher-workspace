@@ -9,7 +9,7 @@ export const Route = createFileRoute("/")({ component: HomePage })
 
 function HomePage() {
   return (
-    <main>
+    <main className="paper-page">
       <PaperHero />
       <ProductSection />
       <ProofStrip />
