@@ -215,3 +215,16 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Scroll-choreography mobile gate — Phase 2 will tag the choreography
+ * subtree with this class so mobile users (<1024px) never see a one-frame
+ * flash of the desktop choreography during hydration. Pairs with the
+ * useIsDesktop() hook's optimistic-desktop default. See:
+ *   - src/components/landing/scroll-choreography/use-is-desktop.ts
+ *   - .planning/phases/01-foundation-types-static-fallback-ssr-contract/01-RESEARCH.md
+ *     § "CSS backstop" */
+@media (max-width: 1023px) {
+  .scroll-choreography-only {
+    display: none !important;
+  }
+}

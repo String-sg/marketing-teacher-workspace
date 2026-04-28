@@ -1,19 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router"
 
-import { FinalCta } from "@/components/landing/final-cta"
-import { PaperHero } from "@/components/landing/paper-hero"
-import { ProductSection } from "@/components/landing/product-section"
-import { ProofStrip } from "@/components/landing/proof-strip"
+import { SiteFooter } from "@/components/landing/footer"
+import { SiteHeader } from "@/components/landing/site-header"
+import { StaticChoreographyFallback } from "@/components/landing/scroll-choreography/static-choreography-fallback"
 
 export const Route = createFileRoute("/")({ component: HomePage })
 
 function HomePage() {
   return (
-    <main className="paper-page">
-      <PaperHero />
-      <ProductSection />
-      <ProofStrip />
-      <FinalCta />
-    </main>
+    <>
+      <SiteHeader />
+      <main id="main" className="paper-page">
+        <StaticChoreographyFallback />
+      </main>
+      <SiteFooter />
+    </>
   )
 }
