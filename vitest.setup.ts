@@ -1,4 +1,4 @@
-import { afterEach } from "vitest"
+import { afterEach, vi } from "vitest"
 import { cleanup } from "@testing-library/react"
 
 // Vitest setup for Phase 1 tests.
@@ -13,18 +13,20 @@ afterEach(cleanup)
 // jsdom does not implement window.matchMedia. Provide a minimal stub so that
 // hooks calling window.matchMedia (e.g. useIsDesktop) do not throw in tests.
 // Returns matches: true (desktop) so useIsDesktop() stays at its optimistic
-// default in the test environment. Individual tests can override via
-// vi.spyOn(window, "matchMedia") when they need specific behavior.
+// default in the test environment. Individual tests can override by
+// reassigning `window.matchMedia` to a different vi.fn() for the duration of
+// the test (see use-is-desktop.test.ts). The deprecated `addListener` /
+// `removeListener` shims are intentionally omitted — useIsDesktop uses
+// `addEventListener("change", ...)` and shipping the deprecated handlers
+// would only encourage future tests to take a deprecated dependency.
 Object.defineProperty(window, "matchMedia", {
   writable: true,
-  value: (query: string) => ({
+  value: vi.fn((query: string) => ({
     matches: true,
     media: query,
     onchange: null,
-    addListener: () => {},
-    removeListener: () => {},
-    addEventListener: () => {},
-    removeEventListener: () => {},
-    dispatchEvent: () => false,
-  }),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(() => false),
+  })),
 })
