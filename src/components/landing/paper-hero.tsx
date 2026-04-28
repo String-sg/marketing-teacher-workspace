@@ -29,6 +29,11 @@ export function PaperHero() {
   const videoDurationRef = useRef(0)
   const prefersReducedMotion = useReducedMotion()
   const isDesktop = useIsDesktop()
+  // Mobile users get the static fallback layout (per CLAUDE.md "Mobile: Static
+  // fallback only" + static-choreography-fallback.tsx docstring). Reduced-motion
+  // users likewise get the static branch. Mirrors the orchestrator-mode contract
+  // documented for Phase 2: `mode === "static"` when mobile OR reduced-motion.
+  const reduced = prefersReducedMotion === true || !isDesktop
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end end"],
@@ -72,7 +77,13 @@ export function PaperHero() {
     }
   })
 
+  // Re-runs when `reduced` flips so a no-reduce-motion → reduce-motion → back
+  // toggle (or a viewport resize past the desktop breakpoint) re-attaches the
+  // loadedmetadata listener against the freshly-mounted <video>. With an empty
+  // dep array the duration captured at first mount stays at 0 in that path
+  // and the scroll-driven scrubber in useMotionValueEvent silently no-ops.
   useEffect(() => {
+    if (reduced) return
     const video = videoRef.current
     if (!video) return
     const handleMeta = () => {
@@ -81,21 +92,13 @@ export function PaperHero() {
     if (video.readyState >= 1) handleMeta()
     else video.addEventListener("loadedmetadata", handleMeta)
     return () => video.removeEventListener("loadedmetadata", handleMeta)
-  }, [])
-
-  // Mobile users get the static fallback layout (per CLAUDE.md "Mobile: Static
-  // fallback only" + static-choreography-fallback.tsx docstring). Reduced-motion
-  // users likewise get the static branch. Mirrors the orchestrator-mode contract
-  // documented for Phase 2: `mode === "static"` when mobile OR reduced-motion.
-  const reduced = prefersReducedMotion === true || !isDesktop
+  }, [reduced])
 
   return (
     <section
       aria-labelledby="hero-title"
       className={
-        reduced
-          ? "relative min-h-svh overflow-hidden"
-          : "relative h-[280vh]"
+        reduced ? "relative min-h-svh overflow-hidden" : "relative h-[280vh]"
       }
       ref={sectionRef}
     >
@@ -152,7 +155,7 @@ export function PaperHero() {
               >
                 {hero.headline}
               </h1>
-              <p className="mt-3 max-w-xl text-balance text-base leading-7 text-[color:var(--paper-muted)] sm:text-lg sm:leading-8">
+              <p className="mt-3 max-w-xl text-base leading-7 text-balance text-[color:var(--paper-muted)] sm:text-lg sm:leading-8">
                 {hero.subline}
               </p>
               <Button
