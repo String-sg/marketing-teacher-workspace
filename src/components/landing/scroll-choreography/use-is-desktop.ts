@@ -6,10 +6,19 @@ const DESKTOP_MQ = "(min-width: 1024px)"
 /**
  * Optimistic-desktop SSR hook.
  *
- * - Returns `true` on the server and during the first client render so SSR
- *   markup matches the first hydrated render (no "did not match" warnings).
- * - After hydration, an effect reads `window.matchMedia(DESKTOP_MQ)` and
- *   subscribes to media-query changes for live updates.
+ * Mechanism:
+ * - `useHydrated()` from @tanstack/react-router is implemented as
+ *   `useSyncExternalStore(subscribe, () => true, () => false)`. Its server
+ *   snapshot is `false`, its client snapshot is `true`. During hydration React
+ *   uses the server snapshot first to keep markup in sync, then transitions
+ *   the value to `true`.
+ * - During SSR and the hydrating first client render `useHydrated()` is
+ *   therefore `false`; the outer ternary short-circuits to the literal `true`
+ *   so server and client render the same desktop layout (no "did not match"
+ *   warning).
+ * - Once `useHydrated()` flips to `true`, the `useState` value (driven by the
+ *   effect's `matchMedia(DESKTOP_MQ)` read + change subscription) becomes
+ *   authoritative.
  *
  * Pairs with the `.scroll-choreography-only { display: none }` CSS backstop
  * Plan 05 lands in styles.css so mobile users never see a one-frame flash
