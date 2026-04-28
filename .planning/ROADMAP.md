@@ -31,7 +31,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Mobile viewport (< 1024px) renders the static fallback by default; the choreography tree is never instantiated on mobile (no orphan `useScroll` observers).
   4. A keyboard user can Tab from the address bar through the entire page in reading order, hit a visible "skip to main content" focusable as the first stop, and see focus rings on every interactive element.
   5. Semantic landmarks (`<header>`, `<main>`, `<footer>`) exist with one `<h1>` and consistent `<h2>`/`<h3>` per stage; a footer with privacy / terms / support links renders on every render path.
-**Plans**: TBD
+**Plans**: 5 plans
+  - [ ] 01-01-PLAN.md — Wave 0: vitest scaffold + 7 fail-loudly test stubs
+  - [ ] 01-02-PLAN.md — Wave 1: typed StageDef data model (types.ts + stages.ts)
+  - [ ] 01-03-PLAN.md — Wave 2: src/content/landing.ts reshape (delete legacy + add stages/proofCopy/finalCtaCopy/footerCopy/TEACHER_WORKSPACE_APP_URL)
+  - [ ] 01-04-PLAN.md — Wave 3: SSR primitives (useIsDesktop, ScrollChoreographyContext stub, ScrollChoreography stub) + consumer migrations (paper-hero data swap, feature-section, proof-strip, final-cta, email-capture, site-header)
+  - [ ] 01-05-PLAN.md — Wave 4: StaticChoreographyFallback shell + SiteFooter + SkipLink + CSS backstop + routes wire-in + product-section.tsx shim deletion
 **UI hint**: yes
 
 ### Phase 2: Orchestrator Shell + Backdrop Migration
@@ -115,7 +120,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation — Types, Static Fallback, SSR Contract | 0/TBD | Not started | - |
+| 1. Foundation — Types, Static Fallback, SSR Contract | 0/5 | Not started | - |
 | 2. Orchestrator Shell + Backdrop Migration | 0/TBD | Not started | - |
 | 3. Product Screen — The Single Shared Element | 0/TBD | Not started | - |
 | 4. Stage Copy, Bullet Reveals, Trust Signals, Meta | 0/TBD | Not started | - |

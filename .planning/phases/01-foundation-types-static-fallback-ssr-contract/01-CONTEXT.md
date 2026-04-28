@@ -64,13 +64,54 @@ Out of scope for Phase 1: any choreography motion, the orchestrator's `<ScrollCh
 - **Planner concern surfaced during discussion (not yet decided):** `Record<StageId, StageDef>` loses iteration order. The planner should choose between (a) `STAGES: readonly StageDef[]` (ordered) + a `byId(id)` helper, or (b) `STAGES: Record<StageId, StageDef>` + a separate `STAGE_ORDER: readonly StageId[]` constant. Either is fine; pick one and stay consistent.
 
 ### `paper-hero.tsx` Interim Treatment
-- **D-13:** Minimal data swap only in Phase 1. PaperHero's only Phase 1 edit: replace `import { heroCopy } from "@/content/landing"` with `import { stages, TEACHER_WORKSPACE_APP_URL } from "@/content/landing"` and pull `hero = stages.find((s) => s.id === "hero")!.copy`. ~5-line edit. Visuals unchanged.
+- **D-13 (REVISED 2026-04-28):** PaperHero gets a small, scoped Phase 1 edit — bigger than the original "~5 line" framing because two Phase 1 user decisions force it:
+  1. Data swap: replace `import { heroCopy }` with `import { stages, TEACHER_WORKSPACE_APP_URL } from "@/content/landing"` and pull `hero = stages.find((s) => s.id === "hero")!.copy`. (Original D-13 mandate.)
+  2. **Hero subline visual update (D-15):** sublime renders as a separate `<p class="text-paper-muted ...">` below the `<h1>` (small, muted typography), not as a same-size second `<span class="block">` inside the `<h1>`. The new `subline` field on `stages.hero.copy` makes this rendering explicit. This overrides the original D-13 "visuals unchanged" clause; the user accepted the visual change on 2026-04-28.
+  3. **SiteHeader extraction (D-16):** the `<SiteHeader/>` markup currently inside `paper-hero.tsx` (line 122) is removed from PaperHero and mounted at the route level in `routes/index.tsx` as a sibling of `<main>`. This adds ~10 lines of removal in PaperHero and matching `<SiteHeader/>` import + mount in `routes/index.tsx` — see D-17 for the A11Y-04 motivation. Site-header CTA uses `finalCtaCopy.cta` for label.
 - **D-14:** PaperHero's existing `useState`-on-scroll re-render storm (lines 40–54: `setStageOpacity / setScreenOpacity / setCopyOpacity` driven from `useMotionValueEvent`) and magic-number `useTransform` keyframes (lines 26–38) **stay** in Phase 1. Both are explicitly punted to Phase 2 (CHOREO-06, MIGRATE-02, MIGRATE-03, PERF-04). Add an inline code comment + CONTEXT note so reviewers don't try to fix them in Phase 1.
+
+### Hero Subline Rendering (2026-04-28 user decision)
+- **D-15:** Hero `subline` ships as a separate `<p class="text-paper-muted text-base/relaxed mt-3 max-w-[40ch]">` (or equivalent paper-token muted typography) below the `<h1>`. This overrides D-13's "visuals unchanged" clause for the subline only — the headline `<h1>` typography is preserved verbatim. User accepted the visual change knowing it diverges from the current paper-hero rendering.
+
+### A11Y-04 Landmark Structure (2026-04-28 user decision)
+- **D-16:** `<SiteHeader/>` extracts from `paper-hero.tsx` to `routes/index.tsx` in Phase 1 (overriding OQ-2's "defer to Phase 2" recommendation). Final route DOM:
+  ```tsx
+  <>
+    <SkipLink />               {/* mounted in __root.tsx */}
+    <SiteHeader />              {/* sibling of <main> */}
+    <main id="main">
+      <StaticChoreographyFallback />
+    </main>
+    <SiteFooter />              {/* sibling of <main> */}
+  </>
+  ```
+  This satisfies A11Y-04 (semantic landmarks as siblings: `<header>` outside `<main>`, `<main>`, `<footer>`). Phase 5's cutover swaps `<StaticChoreographyFallback/>` for `<ScrollChoreography/>` only — landmark structure stays.
+- **D-17:** `<SiteFooter/>` mounts at the route level (sibling of `<main>`), NOT inside `<StaticChoreographyFallback/>`. Same reason as D-16: footer is a top-level landmark.
+
+### `landing.ts` Reshape — D-08 Schema Extension (2026-04-28 user decision)
+- **D-18:** D-08's locked content shapes are extended in Phase 1 to absorb existing in-component hardcoded strings. The new shapes:
+  ```ts
+  export const proofCopy: {
+    heading: string;       // existing
+    subheading: string;    // NEW — captures the proof-strip h2 subhead currently hardcoded in JSX
+    points: readonly string[];
+  }
+  export const finalCtaCopy: {
+    kicker: string;        // NEW — captures the "Free for individual teachers" kicker currently hardcoded in final-cta:32
+    headline: string;
+    body: string;
+    cta: string;
+    emailPlaceholder: string;
+  }
+  ```
+  Rationale: FOUND-05's "single typed source of truth" is undermined if production-visible strings live as inline JSX. User accepted the schema extension on 2026-04-28.
+
+### Footer Support Email (2026-04-28 user decision)
+- **D-19:** `footerCopy.supportEmail` defaults to `support@teacherworkspace.app` for Phase 1. Marked `[CONFIRM]` in plan acceptance criteria so the executor surfaces it during the Wave 2 checkpoint — user can override before ship without replanning.
 
 ### Claude's Discretion
 - Skip-link visual styling (treatment when focused — paper card vs flat banner): default to a sr-only-until-focused link with a paper-aesthetic focus ring. Planner can refine.
 - `useIsDesktop` exact gate: research recommends optimistic-desktop default + CSS `@media (max-width: 1023px)` backstop on the choreography subtree, no `<ClientOnly>`. Adopt that unless Phase 2 proves it insufficient.
-- Whether to fold `<SiteHeader>` inside `<StaticChoreographyFallback>` or keep it at the route level — planner picks based on Phase 5 cutover ergonomics.
 
 </decisions>
 

@@ -787,39 +787,39 @@ The codebase has zero existing tests `[VERIFIED: find . -name "*.test.*" returne
 
 **Estimated test surface:** ~7 test files, ~20–30 assertions total. Small. Fits in a single Wave 0 task before any feature work.
 
-## Open Questions for the Planner
+## Open Questions (RESOLVED 2026-04-28)
 
-### OQ-1: `STAGES` data structure ordering — recommendation already given
+### OQ-1: `STAGES` data structure ordering — RESOLVED
 
-This research recommends **Option B** (`readonly StageDef[]` + `byId()` helper). The planner should adopt this unless the wave-0 implementation surfaces a reason to switch. **Tradeoff:** Option A (`Record<StageId, StageDef>`) would give marginally faster O(1) lookup but requires the parallel `STAGE_ORDER` constant. The 4-element array is so small that lookup performance is irrelevant; iteration ergonomics dominates. **No further user input needed.**
+Decision: **Option B** (`readonly StageDef[]` + `byId()` helper). Planner adopted this in Plan 02. **No user input was needed.**
 
-### OQ-2: `<SiteHeader>` location — Phase 1 vs Phase 2
+### OQ-2: `<SiteHeader>` location — RESOLVED
 
-Research recommends **route-level `<SiteHeader>` mount** (extract from PaperHero in Phase 1). Tradeoff: ~10-line touch on `paper-hero.tsx` instead of the ~5-line minimum D-13 specifies. **Cost-benefit favors extracting now** because Pitfall #2 (sticky-parent transform breaks z-index) makes the in-PaperHero header an architectural debt — and Phase 1's "set the SSR contract" framing is the right moment to fix it. **Planner decision:** if the broader Phase 1 surface area is already contentious, defer to Phase 2 (when `<PaperBackdrop>` is extracted, which is the more natural moment).
+Decision: **Extract `<SiteHeader/>` from `paper-hero.tsx` to `routes/index.tsx` in Phase 1** (route-level mount as a sibling of `<main>`). User accepted on 2026-04-28 to satisfy A11Y-04. CONTEXT.md D-16 now locks this decision. The extraction is ~10 lines of removal in PaperHero plus the matching `<SiteHeader/>` mount in the route.
 
-### OQ-3: Skip-link mount location — recommendation given
+### OQ-3: Skip-link mount location — RESOLVED
 
-Research recommends **`__root.tsx`** (Option A). Mount once for site-wide coverage; no route-level discipline required. **No further user input needed.**
+Decision: **`__root.tsx`** (Option A). Mount once for site-wide coverage; no route-level discipline required. CONTEXT.md captures this implicitly via the "skip-link target id" line. **No further user input needed.**
 
-### OQ-4: Footer support email exact value
+### OQ-4: Footer support email exact value — RESOLVED
 
-`[ASSUMED]` `hello@teacherworkspace.app` placeholder. The CONTEXT.md does not specify the exact mailto target. **Planner action:** surface this in plan-check for user confirmation before Phase 1 commits. If unknown, ship a deliberately obvious placeholder (`support@example.com`) with a TODO comment so it's visible in code review.
+Decision: **`support@teacherworkspace.app`** as the Phase 1 default. User accepted on 2026-04-28. CONTEXT.md D-19 locks the value with a `[CONFIRM]` flag in Plan 03 Task 1 acceptance criteria so the executor surfaces it for last-mile confirmation.
 
-### OQ-5: Hero "subline" semantic treatment
+### OQ-5: Hero "subline" semantic treatment — RESOLVED
 
-Research recommends rendering `hero.subline` as a separate `<p>` below the `<h1>`, NOT as a second line of the `<h1>`. This is a minor visual change vs. the current 2-line `<h1>` aesthetic. **Planner decision:** confirm with the user before implementing — this affects the hero visual that CLAUDE.md explicitly protects ("if everything else regresses, this transition must feel intentional and on-brand"). The visual change is small but non-zero. Alternative: keep the 2-line `<h1>` visual by rendering `hero.subline` inside the `<h1>` as a second `<span class="block">` — visually identical to today, semantically slightly off but A11Y-04 is still passable (the rule is "one `<h1>`," and one `<h1>` containing two `<span>`s is still one `<h1>`).
+Decision: **Render `hero.subline` as a separate `<p class="text-paper-muted ...">` below the `<h1>`** (research-recommended option). User accepted on 2026-04-28 to swap the visual now (small, muted typography) rather than preserve the current 2-line `<h1>` look. CONTEXT.md D-13 (revised) and D-15 lock this. The headline `<h1>` typography stays unchanged; only the subline element changes.
 
-### OQ-6: Site-header CTA label source
+### OQ-6: Site-header CTA label source — RESOLVED
 
-Research recommends **`finalCtaCopy.cta`** for the SiteHeader outline button label. Alternative: dedicated `siteHeaderCopy.cta` export. **Planner decision:** go with `finalCtaCopy.cta` for now; promote to dedicated export if Phase 4 differentiates them.
+Decision: **`finalCtaCopy.cta`** (research-recommended). Adopted by planner in Plan 04 Task 3.
 
-### OQ-7: Email-capture input focus-ring fix — Phase 1 or Phase 6?
+### OQ-7: Email-capture input focus-ring fix — RESOLVED
 
-Email-capture's input has `focus-visible:ring-0` (focus ring explicitly disabled). A11Y-07 is in Phase 1's requirement set. **Recommendation:** fix in Phase 1 (1-line edit). Defer-to-Phase-6 is also defensible.
+Decision: **Fix in Phase 1** (1-line edit removing `focus-visible:ring-0` and adding paper-token focus ring). A11Y-07 is in Phase 1's requirement set; deferral was rejected. Planner already wired this into Plan 04 Task 3.
 
-### OQ-8: Uncommitted working tree
+### OQ-8: Uncommitted working tree — RESOLVED
 
-Per CONTEXT.md `<specifics>`: the user has uncommitted edits to `email-capture.tsx`, `final-cta.tsx`, `paper-hero.tsx`, `product-section.tsx`, `proof-strip.tsx`, `landing.ts`, `routes/index.tsx`, `styles.css`, plus a deletion of `product-interface-frame.tsx`. **The planner MUST surface these uncommitted changes to the user before Phase 1 commits land.** They may be in-flight Phase 1 work that should ship with Phase 1, or stale work that should be reverted. Research read on-disk versions (which are the user-grounded versions); the diff against HEAD is documented in `git diff` output and shows the bulk of changes are the ProductSection paper-card visual reskin + the PaperHero video-scrub-on-scroll wiring (lines 44–65) + the ProofStrip / FinalCta cosmetic adjustments. None of these conflict with Phase 1 goals — they look like prep work for the new visuals — but the planner should explicitly confirm with the user.
+Decision: **Treat the 9 uncommitted file changes as in-flight Phase 1 prep work** (user confirmed on 2026-04-28). Plans operate on the on-disk versions; the executor commits the existing edits as part of Phase 1's first wave or carries them forward into the per-task commits. The deletion of `product-interface-frame.tsx` is already done; no plan re-deletes it.
 
 ## Assumptions Log
 
