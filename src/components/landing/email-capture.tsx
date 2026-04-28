@@ -2,7 +2,7 @@ import { ArrowRightIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { heroCopy } from "@/content/landing"
+import { finalCtaCopy } from "@/content/landing"
 
 export function EmailCapture() {
   return (
@@ -12,15 +12,15 @@ export function EmailCapture() {
     >
       <Input
         aria-label="School email"
-        className="h-12 flex-1 border-transparent bg-transparent px-5 text-[color:var(--paper-ink)] placeholder:text-[color:var(--paper-muted)] focus-visible:border-transparent focus-visible:ring-0"
-        placeholder={heroCopy.emailPlaceholder}
+        className="h-12 flex-1 border-transparent bg-transparent px-5 text-[color:var(--paper-ink)] placeholder:text-[color:var(--paper-muted)] focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/40"
+        placeholder={finalCtaCopy.emailPlaceholder}
         type="email"
       />
       <Button
         className="h-12 rounded-full bg-primary px-6 text-base text-primary-foreground hover:bg-primary/90"
         type="submit"
       >
-        {heroCopy.cta}
+        {finalCtaCopy.cta}
         <ArrowRightIcon data-icon="inline-end" />
       </Button>
     </form>

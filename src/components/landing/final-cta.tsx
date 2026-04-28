@@ -1,4 +1,5 @@
 import { EmailCapture } from "@/components/landing/email-capture"
+import { finalCtaCopy } from "@/content/landing"
 
 export function FinalCta() {
   return (
@@ -29,14 +30,13 @@ export function FinalCta() {
 
       <div className="paper-card relative mx-auto w-full max-w-5xl overflow-hidden rounded-[20px] border border-black/5 px-6 py-14 text-center shadow-[0_10px_60px_-30px_rgb(15_23_42/0.2)] sm:px-12 sm:py-20 lg:px-16 lg:py-24">
         <p className="text-xs font-medium tracking-[0.18em] text-[color:var(--paper-muted)] uppercase sm:text-sm">
-          Free for individual teachers
+          {finalCtaCopy.kicker}
         </p>
         <h2 className="mt-4 font-heading text-[clamp(1.75rem,4.4vw,4rem)] leading-[1.05] font-medium tracking-tight text-balance text-[color:var(--paper-ink)]">
-          Know every student before tomorrow's bell.
+          {finalCtaCopy.headline}
         </h2>
         <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-[color:var(--paper-muted)] sm:text-lg sm:leading-8">
-          Join the early list for Teacher Workspace. Schools are welcome, and
-          individual teachers can start free.
+          {finalCtaCopy.body}
         </p>
         <div className="mx-auto mt-10 max-w-xl">
           <EmailCapture />

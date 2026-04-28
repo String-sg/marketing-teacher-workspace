@@ -8,12 +8,21 @@ import {
 import { useEffect, useRef, useState } from "react"
 
 import { Button } from "@/components/ui/button"
-import { SiteHeader } from "@/components/landing/site-header"
-import { heroCopy } from "@/content/landing"
+import {
+  finalCtaCopy,
+  stages,
+  TEACHER_WORKSPACE_APP_URL,
+} from "@/content/landing"
 
 const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v)
 
 export function PaperHero() {
+  const heroEntry = stages.find((s) => s.id === "hero")
+  if (!heroEntry || heroEntry.id !== "hero") {
+    throw new Error("PaperHero: hero stage missing from content/landing stages")
+  }
+  const hero = heroEntry.copy
+
   const sectionRef = useRef<HTMLElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const videoDurationRef = useRef(0)
@@ -23,6 +32,14 @@ export function PaperHero() {
     offset: ["start start", "end end"],
   })
 
+  // PHASE-2-DEBT: this useState→opacity pattern (lines below: setStageOpacity,
+  // setScreenOpacity, setCopyOpacity driven by useMotionValueEvent) and the
+  // magic-number useTransform keyframes (lines below: [0, 0.6, 1], [1, 2.4, 5.2],
+  // [0, 0.55, 0.85, 1], etc.) are explicit Phase 2 work. Do NOT refactor here.
+  // See:
+  //   - .planning/REQUIREMENTS.md MIGRATE-02 (useState fix), MIGRATE-03 (named STAGES)
+  //   - .planning/REQUIREMENTS.md PERF-04, CHOREO-06
+  //   - .planning/phases/01-foundation-types-static-fallback-ssr-contract/01-CONTEXT.md D-14
   const stageScale = useTransform(scrollYProgress, [0, 0.6, 1], [1, 2.4, 5.2])
   const screenScale = useTransform(
     scrollYProgress,
@@ -119,8 +136,6 @@ export function PaperHero() {
           </motion.div>
 
           <div className="relative z-10 mx-auto flex w-fit flex-col pt-8 sm:pt-10">
-            <SiteHeader />
-
             <motion.div
               className="mt-14 flex flex-col items-center text-center sm:mt-20"
               style={reduced ? undefined : { opacity: copyOpacity, y: copyY }}
@@ -129,19 +144,17 @@ export function PaperHero() {
                 className="font-heading text-[clamp(1.75rem,4.4vw,4rem)] leading-[1.05] font-medium tracking-tight text-[color:var(--paper-ink)]"
                 id="hero-title"
               >
-                <span className="block whitespace-nowrap">
-                  {heroCopy.headline}
-                </span>
-                <span className="block whitespace-nowrap">
-                  {heroCopy.headlineSecond}
-                </span>
+                {hero.headline}
               </h1>
+              <p className="mt-3 max-w-xl text-balance text-base leading-7 text-[color:var(--paper-muted)] sm:text-lg sm:leading-8">
+                {hero.subline}
+              </p>
               <Button
                 asChild
                 className="mt-6 h-11 rounded-full bg-primary px-7 text-base text-primary-foreground hover:bg-primary/90 sm:mt-7"
               >
-                <a href={heroCopy.ctaHref} rel="noreferrer">
-                  {heroCopy.cta}
+                <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
+                  {finalCtaCopy.cta}
                 </a>
               </Button>
             </motion.div>
@@ -186,7 +199,7 @@ export function PaperHero() {
                 <span className="size-3 rounded-full bg-[#febc2e]" />
                 <span className="size-3 rounded-full bg-[#28c840]" />
                 <span className="ml-4 truncate text-xs text-black/55">
-                  teacherworkspace-alpha.vercel.app/students
+                  {TEACHER_WORKSPACE_APP_URL.replace("https://", "")}
                 </span>
               </div>
               <img
@@ -207,7 +220,7 @@ export function PaperHero() {
               <span className="size-3 rounded-full bg-[#febc2e]" />
               <span className="size-3 rounded-full bg-[#28c840]" />
               <span className="ml-4 truncate text-xs text-black/55">
-                teacherworkspace-alpha.vercel.app/students
+                {TEACHER_WORKSPACE_APP_URL.replace("https://", "")}
               </span>
             </div>
             <img

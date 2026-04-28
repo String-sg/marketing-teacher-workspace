@@ -1,4 +1,4 @@
-import { proofPoints } from "@/content/landing"
+import { proofCopy } from "@/content/landing"
 
 export function ProofStrip() {
   return (
@@ -21,16 +21,15 @@ export function ProofStrip() {
         <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:gap-16">
           <div>
             <p className="text-xs font-medium tracking-[0.18em] text-[color:var(--paper-muted)] uppercase sm:text-sm">
-              Built around the student
+              {proofCopy.heading}
             </p>
             <h2 className="mt-4 max-w-2xl font-heading text-[clamp(1.5rem,3.6vw,3.25rem)] leading-[1.08] font-medium tracking-tight text-balance text-[color:var(--paper-ink)]">
-              The grade, the absence, the parent message — finally on the
-              same page.
+              {proofCopy.subheading}
             </h2>
           </div>
 
           <div className="grid gap-6 sm:grid-cols-3 sm:gap-4">
-            {proofPoints.map((point, index) => (
+            {proofCopy.points.map((point, index) => (
               <article
                 className="border-l border-[color:var(--paper-rule)] pl-5"
                 key={point}
