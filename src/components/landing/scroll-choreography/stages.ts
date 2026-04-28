@@ -1,9 +1,4 @@
-import type {
-  ScreenTarget,
-  ScreenTargetRect,
-  StageDef,
-  StageId,
-} from "./types"
+import type { ScreenTarget, ScreenTargetRect, StageDef, StageId } from "./types"
 
 /**
  * The four choreography stages.
@@ -35,8 +30,13 @@ export function byId(id: StageId): StageDef {
 /**
  * Phase 3 fills the rect values — Phase 1 ships only the type contract.
  *
- * IMPORTANT (per RESEARCH.md line 246): `declare const` produces NO runtime
- * export. Phase 1 code MUST NOT import the value `SCREEN_TARGETS` — only the
- * type. Phase 3 will replace `declare const` with a real `export const`.
+ * Exporting just the TYPE (not a `declare const` value) means any Phase 1
+ * value-import (`import { SCREEN_TARGETS } from "./stages"`) is a hard
+ * TypeScript error rather than a silent `undefined` at runtime. This makes
+ * the phase-gating contract enforceable by tsc instead of by hand-review.
+ *
+ * Phase 3 replaces this type alias with `export const SCREEN_TARGETS` of
+ * the same shape. Consumers should import the type today and update the
+ * import to a value once Phase 3 lands.
  */
-export declare const SCREEN_TARGETS: Record<ScreenTarget, ScreenTargetRect>
+export type ScreenTargetsMap = Record<ScreenTarget, ScreenTargetRect>
