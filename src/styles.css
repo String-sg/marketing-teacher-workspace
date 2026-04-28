@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
+@import "@fontsource-variable/plus-jakarta-sans";
 @import "@radix-ui/colors/mauve.css";
 @import "@radix-ui/colors/mauve-dark.css";
 @import "@radix-ui/colors/blue.css";
@@ -16,8 +17,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-    --font-heading: var(--font-sans);
-    --font-sans: 'Geist Variable', sans-serif;
+    --font-heading: 'Plus Jakarta Sans Variable', sans-serif;
+    --font-sans: 'Plus Jakarta Sans Variable', sans-serif;
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -105,9 +106,10 @@
     --interface-accent: var(--cyan-9);
     --interface-accent-soft: color-mix(in oklab, var(--cyan-9) 18%, transparent);
     --paper: var(--amber-2);
-    --paper-ink: color-mix(in oklab, var(--mauve-12) 88%, var(--grass-11));
+    --paper-ink: #1a1a1a;
     --paper-muted: color-mix(in oklab, var(--mauve-11) 72%, var(--grass-10));
     --paper-rule: color-mix(in oklab, var(--mauve-7) 68%, var(--amber-6));
+    --paper-card: #ffffff;
     --cta-ground: color-mix(in oklab, var(--mauve-12) 88%, var(--blue-12));
 }
 
@@ -161,175 +163,52 @@
 }
 
 @layer components {
+  .paper-page {
+    background-color: #cfe6ff;
+    background-image: url("/hero/blue-paper.png");
+    background-size: 100vw auto;
+    background-position: top center;
+    background-repeat: repeat-y;
+    background-attachment: scroll;
+  }
+
+  .paper-card {
+    background-color: #ffffff;
+  }
+
   .hero-media {
-    background: var(--interface-ink);
-  }
-
-  .hero-placeholder {
-    overflow: hidden;
-    isolation: isolate;
-  }
-
-  .hero-placeholder-base {
-    background:
-      radial-gradient(circle at 50% 18%, rgb(255 255 255 / 48%), transparent 19%),
-      radial-gradient(circle at 16% 28%, color-mix(in oklab, var(--cyan-5) 44%, transparent), transparent 26%),
-      radial-gradient(circle at 78% 32%, color-mix(in oklab, var(--amber-5) 32%, transparent), transparent 26%),
-      linear-gradient(180deg, color-mix(in oklab, var(--mauve-9) 54%, var(--cyan-7)) 0%, color-mix(in oklab, var(--mauve-8) 68%, var(--grass-8)) 42%, color-mix(in oklab, var(--grass-10) 62%, var(--mauve-12)) 100%);
-  }
-
-  .hero-placeholder-base::before,
-  .hero-placeholder-base::after {
-    position: absolute;
-    right: -14%;
-    left: -14%;
-    content: "";
-    filter: blur(1px);
-    opacity: 0.74;
-    clip-path: polygon(0 76%, 14% 58%, 25% 67%, 38% 43%, 51% 62%, 64% 36%, 78% 57%, 88% 40%, 100% 62%, 100% 100%, 0 100%);
-  }
-
-  .hero-placeholder-base::before {
-    bottom: 34%;
-    height: 36%;
-    background: color-mix(in oklab, var(--cyan-12) 42%, var(--mauve-7));
-  }
-
-  .hero-placeholder-base::after {
-    bottom: 26%;
-    height: 34%;
-    background: color-mix(in oklab, var(--grass-12) 58%, var(--cyan-10));
-    transform: translateX(8%) scaleX(1.08);
-  }
-
-  .hero-placeholder-scrub {
-    background:
-      radial-gradient(ellipse at 52% 34%, rgb(255 255 255 / 22%), transparent 20%),
-      radial-gradient(ellipse at 22% 50%, rgb(255 255 255 / 18%), transparent 24%),
-      linear-gradient(180deg, transparent 0 42%, rgb(255 255 255 / 8%) 43%, transparent 56%);
-    filter: blur(9px);
-    mix-blend-mode: screen;
-  }
-
-  .hero-placeholder-end {
-    background:
-      radial-gradient(ellipse at 62% 62%, color-mix(in oklab, var(--cyan-8) 34%, transparent), transparent 24%),
-      linear-gradient(180deg, rgb(17 16 25 / 0%) 0 45%, rgb(17 16 25 / 34%) 100%);
-    backdrop-filter: blur(2px);
-  }
-
-  .hero-placeholder-workspace {
-    z-index: 1;
-    background:
-      linear-gradient(180deg, transparent 0 16%, color-mix(in oklab, var(--grass-9) 58%, transparent) 17%, transparent 72%),
-      repeating-linear-gradient(84deg, transparent 0 27px, rgb(17 16 25 / 18%) 28px 30px);
-    mask-image: linear-gradient(180deg, transparent, black 18%, black);
-  }
-
-  .hero-placeholder-desk {
-    position: absolute;
-    right: 5%;
-    bottom: 32%;
-    width: min(72vw, 880px);
-    height: 5.5%;
-    border-radius: 999px;
-    background: color-mix(in oklab, var(--amber-6) 62%, var(--mauve-7));
-    box-shadow: 0 26px 50px rgb(0 0 0 / 32%);
-  }
-
-  .hero-placeholder-desk::before,
-  .hero-placeholder-desk::after {
-    position: absolute;
-    top: 86%;
-    width: 18px;
-    height: 280%;
-    content: "";
-    background: color-mix(in oklab, var(--mauve-12) 78%, var(--amber-8));
-  }
-
-  .hero-placeholder-desk::before {
-    left: 16%;
-  }
-
-  .hero-placeholder-desk::after {
-    right: 10%;
-  }
-
-  .hero-placeholder-seat {
-    position: absolute;
-    bottom: 18%;
-    left: 17%;
-    width: min(22vw, 230px);
-    height: 48%;
-    border: 6px solid rgb(255 255 255 / 22%);
-    border-radius: 34% 34% 18% 18%;
-    background: linear-gradient(145deg, color-mix(in oklab, var(--mauve-12) 86%, var(--cyan-12)), color-mix(in oklab, var(--mauve-12) 82%, var(--amber-10)));
-    box-shadow: 0 26px 54px rgb(0 0 0 / 42%);
-  }
-
-  .hero-placeholder-seat::after {
-    position: absolute;
-    right: -18%;
-    bottom: -13%;
-    left: 14%;
-    height: 22%;
-    content: "";
-    border-radius: 16px;
-    background: inherit;
-  }
-
-  .hero-placeholder-device {
-    position: absolute;
-    right: 28%;
-    bottom: 42%;
-    width: min(22vw, 250px);
-    aspect-ratio: 1.35;
-    border-radius: 12px 12px 5px 5px;
-    background: color-mix(in oklab, var(--interface-ink) 88%, var(--cyan-12));
-    box-shadow: 0 22px 50px rgb(0 0 0 / 34%);
-  }
-
-  .hero-placeholder-device::after {
-    position: absolute;
-    right: -10%;
-    bottom: -13%;
-    left: -10%;
-    height: 10%;
-    content: "";
-    border-radius: 999px;
-    background: rgb(255 255 255 / 38%);
-  }
-
-  .hero-placeholder-device-screen {
-    position: absolute;
-    inset: 18% 14%;
-    border-radius: 10px;
-    background:
-      linear-gradient(180deg, rgb(255 255 255 / 9%), transparent),
-      linear-gradient(90deg, color-mix(in oklab, var(--cyan-8) 78%, transparent) 0 56%, rgb(255 255 255 / 12%) 57% 100%);
-    opacity: 0.86;
-  }
-
-  .hero-media::before,
-  .hero-media::after {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    pointer-events: none;
-    content: "";
-  }
-
-  .hero-media::before {
-    background:
-      linear-gradient(180deg, rgb(17 16 25 / 48%) 0%, rgb(17 16 25 / 10%) 24%, rgb(17 16 25 / 0%) 50%, rgb(17 16 25 / 70%) 100%),
-      radial-gradient(circle at 50% 16%, rgb(255 255 255 / 20%), transparent 34%);
+    filter: brightness(1.05) contrast(1.03);
     mix-blend-mode: multiply;
   }
 
-  .hero-media::after {
-    background:
-      radial-gradient(circle at 50% 48%, transparent 0 36%, rgb(8 8 13 / 34%) 72%, rgb(8 8 13 / 64%) 100%),
-      linear-gradient(90deg, rgb(17 16 25 / 34%) 0%, transparent 28%, transparent 72%, rgb(17 16 25 / 42%) 100%);
+  .cloud-drift-left,
+  .cloud-drift-right {
+    filter: brightness(1.06) contrast(1.02);
+  }
+
+  .cloud-drift-left {
+    animation: cloud-drift-left 18s ease-in-out infinite;
+  }
+
+  .cloud-drift-right {
+    animation: cloud-drift-right 22s ease-in-out infinite;
+  }
+
+  @keyframes cloud-drift-left {
+    0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
+    50%  { transform: translate3d(56px, -22px, 0) rotate(1.2deg); }
+    100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  }
+
+  @keyframes cloud-drift-right {
+    0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
+    50%  { transform: translate3d(-64px, 18px, 0) rotate(-1.4deg); }
+    100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cloud-drift-left,
+    .cloud-drift-right { animation: none; }
   }
 
   .chart-path {
@@ -351,31 +230,6 @@
     border-right: 0;
     clip-path: polygon(0 72%, 10% 58%, 21% 62%, 34% 34%, 47% 44%, 58% 22%, 70% 29%, 82% 12%, 100% 18%, 100% 100%, 0 100%);
     filter: drop-shadow(0 0 18px color-mix(in oklab, var(--interface-accent) 70%, transparent));
-  }
-}
-
-@media (max-width: 760px) {
-  .hero-placeholder-workspace {
-    right: -50%;
-    left: -58%;
-    width: auto;
-    transform: scale(0.92);
-    transform-origin: center bottom;
-  }
-
-  .hero-placeholder-desk {
-    right: 0;
-    width: 620px;
-  }
-
-  .hero-placeholder-seat {
-    left: 25%;
-    width: 180px;
-  }
-
-  .hero-placeholder-device {
-    right: 24%;
-    width: 170px;
   }
 }
 

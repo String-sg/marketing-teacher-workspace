@@ -1,50 +1,54 @@
-import { ArrowRightIcon, ChevronDownIcon } from "lucide-react"
+import { ArrowRightIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { navItems } from "@/content/landing"
+import { heroCopy, navItems } from "@/content/landing"
 
 export function SiteHeader() {
   return (
-    <header className="absolute inset-x-0 top-0 z-50 border-white/10 bg-[color:var(--nav-surface)] text-white backdrop-blur-xl">
+    <header className="relative z-30 w-full">
       <nav
         aria-label="Primary navigation"
-        className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8"
+        className="flex w-full items-center gap-12 rounded-full border border-slate-300 bg-white px-4 py-2.5 sm:gap-16 sm:px-6"
       >
-        <a
-          className="flex items-center gap-3 font-heading text-lg font-medium"
-          href="/"
-        >
-          <span className="grid size-10 place-items-center rounded-full border border-white/20 bg-white/10">
-            <span className="size-4 rounded-full bg-[color:var(--brand-orbit)] shadow-[0_0_0_6px_color-mix(in_oklab,var(--brand-orbit)_22%,transparent)]" />
-          </span>
-          <span className="hidden sm:inline">Teacher Workspace</span>
-          <span className="sm:hidden">TW</span>
-        </a>
-
-        <div className="hidden items-center gap-7 text-sm text-white/78 lg:flex">
-          {navItems.map((item, index) => (
-            <a
-              className="inline-flex items-center gap-1 transition-colors hover:text-white focus-visible:ring-3 focus-visible:ring-white/40 focus-visible:outline-none"
-              href={item.href}
-              key={item.label}
-            >
-              {item.label}
-              {index < 3 ? <ChevronDownIcon aria-hidden /> : null}
-            </a>
-          ))}
-        </div>
-
-        <div className="flex items-center gap-2">
           <a
-            className="hidden text-sm text-white/78 transition-colors hover:text-white sm:inline-flex"
-            href="#today"
+            className="flex items-center gap-2.5 font-heading text-[color:var(--paper-ink)]"
+            href="/"
           >
-            Log in
+            <img
+              alt=""
+              aria-hidden
+              className="size-9 select-none"
+              src="/hero/tw-icon.png"
+            />
+            <span className="hidden text-sm leading-[1.05] font-medium sm:flex sm:flex-col">
+              <span>Teacher</span>
+              <span>Workspace</span>
+            </span>
           </a>
-          <Button className="h-11 rounded-full bg-primary px-5 text-primary-foreground hover:bg-primary/90">
-            Start free
-            <ArrowRightIcon data-icon="inline-end" />
-          </Button>
+
+          <div className="ml-auto flex items-center gap-6 sm:gap-8">
+            <div className="hidden items-center gap-7 text-sm font-medium text-[color:var(--paper-ink)] lg:flex">
+              {navItems.map((item) => (
+                <a
+                  className="transition-colors hover:text-primary focus-visible:ring-3 focus-visible:ring-primary/40 focus-visible:outline-none"
+                  href={item.href}
+                  key={item.label}
+                >
+                  {item.label}
+                </a>
+              ))}
+            </div>
+
+            <Button
+              asChild
+              className="h-10 rounded-full border-primary/40 px-5 text-primary hover:bg-primary/5"
+              variant="outline"
+            >
+              <a href={heroCopy.ctaHref} rel="noreferrer">
+                {heroCopy.cta}
+                <ArrowRightIcon data-icon="inline-end" />
+              </a>
+            </Button>
         </div>
       </nav>
     </header>

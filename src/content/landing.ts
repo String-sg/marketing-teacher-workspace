@@ -1,16 +1,15 @@
 export const navItems = [
-  { label: "Today", href: "#today" },
-  { label: "Classes", href: "#today" },
-  { label: "Reviews", href: "#reviews" },
-  { label: "Pricing", href: "#pricing" },
+  { label: "Features", href: "#features" },
+  { label: "Testimonials", href: "#testimonials" },
 ]
 
 export const heroCopy = {
-  eyebrow: "Teacher Workspace",
-  headline: "Monday mornings, sorted.",
+  headline: "See every student's full picture.",
+  headlineSecond: "One screen.",
   body: "Your plan, classes, grading queue, and the parent email you have been meaning to send, all in one calm place.",
   emailPlaceholder: "Enter your school email",
-  cta: "Get early access",
+  cta: "Start",
+  ctaHref: "https://teacherworkspace-alpha.vercel.app/students",
 }
 
 export const productCopy = {

@@ -1,0 +1,204 @@
+import {
+  motion,
+  useMotionValueEvent,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "motion/react"
+import { useRef, useState } from "react"
+
+import { Button } from "@/components/ui/button"
+import { SiteHeader } from "@/components/landing/site-header"
+import { heroCopy } from "@/content/landing"
+
+const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v)
+
+export function PaperHero() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const prefersReducedMotion = useReducedMotion()
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"],
+  })
+
+  const stageScale = useTransform(scrollYProgress, [0, 0.6, 1], [1, 2.4, 5.2])
+  const screenScale = useTransform(
+    scrollYProgress,
+    [0, 0.55, 0.85, 1],
+    [0.55, 0.55, 1, 1.04]
+  )
+  const copyY = useTransform(
+    scrollYProgress,
+    [0, 0.14, 1],
+    ["0px", "-72px", "-72px"]
+  )
+  const cloudYLeft = useTransform(scrollYProgress, [0, 1], ["0px", "-160px"])
+  const cloudYRight = useTransform(scrollYProgress, [0, 1], ["0px", "-110px"])
+
+  const [stageOpacity, setStageOpacity] = useState(1)
+  const [screenOpacity, setScreenOpacity] = useState(0)
+  const [copyOpacity, setCopyOpacity] = useState(1)
+
+  useMotionValueEvent(scrollYProgress, "change", (p) => {
+    setStageOpacity(p < 0.6 ? 1 : clamp01(1 - (p - 0.6) / 0.18))
+    setScreenOpacity(p < 0.55 ? 0 : clamp01((p - 0.55) / 0.23))
+    setCopyOpacity(p < 0.06 ? 1 : clamp01(1 - (p - 0.06) / 0.08))
+  })
+
+  const reduced = prefersReducedMotion === true
+
+  return (
+    <section
+      aria-labelledby="hero-title"
+      className={
+        reduced
+          ? "paper-page relative min-h-svh overflow-hidden"
+          : "paper-page relative h-[280vh]"
+      }
+      ref={sectionRef}
+    >
+      <div
+        className={
+          reduced
+            ? "relative p-3"
+            : "sticky top-0 flex h-svh items-stretch overflow-hidden p-3"
+        }
+      >
+        <motion.div
+          className="paper-card relative mx-auto flex w-full max-w-[110rem] flex-1 flex-col items-center overflow-hidden rounded-[20px] bg-[color:var(--paper-card)] shadow-[0_10px_60px_-30px_rgb(15_23_42/0.18)]"
+          style={
+            reduced
+              ? undefined
+              : {
+                  scale: stageScale,
+                  opacity: stageOpacity,
+                  transformOrigin: "50% 92%",
+                }
+          }
+        >
+          <motion.div
+            aria-hidden
+            className="pointer-events-none absolute -bottom-8 -left-10 w-[min(28vw,300px)] sm:-left-12"
+            style={reduced ? undefined : { y: cloudYLeft }}
+          >
+            <img
+              alt=""
+              className="cloud-drift-left block w-full opacity-80 mix-blend-multiply select-none"
+              src="/hero/cloud-halftone.png"
+            />
+          </motion.div>
+          <motion.div
+            aria-hidden
+            className="pointer-events-none absolute -top-4 -right-10 w-[min(26vw,280px)] sm:-right-12"
+            style={reduced ? undefined : { y: cloudYRight }}
+          >
+            <img
+              alt=""
+              className="cloud-drift-right block w-full opacity-80 mix-blend-multiply select-none"
+              src="/hero/cloud-halftone.png"
+            />
+          </motion.div>
+
+          <div className="relative z-10 mx-auto flex w-fit flex-col pt-8 sm:pt-10">
+            <SiteHeader />
+
+            <motion.div
+              className="mt-14 flex flex-col items-center text-center sm:mt-20"
+              style={reduced ? undefined : { opacity: copyOpacity, y: copyY }}
+            >
+              <h1
+                className="font-heading text-[clamp(1.75rem,4.4vw,4rem)] leading-[1.05] font-medium tracking-tight text-[color:var(--paper-ink)]"
+                id="hero-title"
+              >
+                <span className="block whitespace-nowrap">
+                  {heroCopy.headline}
+                </span>
+                <span className="block whitespace-nowrap">
+                  {heroCopy.headlineSecond}
+                </span>
+              </h1>
+              <Button
+                asChild
+                className="mt-6 h-11 rounded-full bg-primary px-7 text-base text-primary-foreground hover:bg-primary/90 sm:mt-7"
+              >
+                <a href={heroCopy.ctaHref} rel="noreferrer">
+                  {heroCopy.cta}
+                </a>
+              </Button>
+            </motion.div>
+          </div>
+
+          <div className="relative z-0 mt-auto flex w-full justify-center pb-0">
+            <div className="relative w-full max-w-[360px] px-4 sm:max-w-[400px]">
+              {reduced ? (
+                <img
+                  alt="Teacher working at her desk with a laptop and lamp"
+                  className="hero-media block h-auto w-full select-none"
+                  src="/hero/teacher-illustration.png"
+                />
+              ) : (
+                <video
+                  aria-label="A teacher slowly working at her desk"
+                  autoPlay
+                  className="hero-media block h-auto w-full select-none"
+                  loop
+                  muted
+                  playsInline
+                  poster="/hero/teacher-illustration.png"
+                  src="/hero/teacher-working.mp4"
+                />
+              )}
+            </div>
+          </div>
+        </motion.div>
+
+        {!reduced && (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center px-4 sm:px-10 lg:px-16"
+            style={{ opacity: screenOpacity }}
+          >
+            <motion.div
+              className="relative w-full max-w-[1280px] overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_30px_120px_-40px_rgb(15_23_42/0.45)]"
+              style={{ scale: screenScale }}
+            >
+              <div className="flex items-center gap-2 border-b border-black/5 bg-[#f7f7f5] px-4 py-2.5">
+                <span className="size-3 rounded-full bg-[#ff5f57]" />
+                <span className="size-3 rounded-full bg-[#febc2e]" />
+                <span className="size-3 rounded-full bg-[#28c840]" />
+                <span className="ml-4 truncate text-xs text-black/55">
+                  teacherworkspace-alpha.vercel.app/students
+                </span>
+              </div>
+              <img
+                alt="Teacher Workspace student insights dashboard"
+                className="block h-auto w-full select-none"
+                src="/hero/profiles-screen.png"
+              />
+            </motion.div>
+          </div>
+        )}
+      </div>
+
+      {reduced ? (
+        <div className="relative mx-auto mt-12 max-w-5xl px-4 pb-12 sm:px-6 lg:px-10">
+          <div className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_10px_40px_-20px_rgb(15_23_42/0.2)]">
+            <div className="flex items-center gap-2 border-b border-black/5 bg-[#f7f7f5] px-4 py-2.5">
+              <span className="size-3 rounded-full bg-[#ff5f57]" />
+              <span className="size-3 rounded-full bg-[#febc2e]" />
+              <span className="size-3 rounded-full bg-[#28c840]" />
+              <span className="ml-4 truncate text-xs text-black/55">
+                teacherworkspace-alpha.vercel.app/students
+              </span>
+            </div>
+            <img
+              alt="Teacher Workspace student insights dashboard"
+              className="block h-auto w-full select-none"
+              src="/hero/profiles-screen.png"
+            />
+          </div>
+        </div>
+      ) : null}
+    </section>
+  )
+}

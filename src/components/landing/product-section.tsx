@@ -1,7 +1,7 @@
 import { ArrowUpRightIcon, CheckIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { ProductInterfaceFrame } from "@/components/landing/cinematic-hero"
+import { ProductInterfaceFrame } from "@/components/landing/product-interface-frame"
 import { modules, productCopy } from "@/content/landing"
 
 export function ProductSection() {
