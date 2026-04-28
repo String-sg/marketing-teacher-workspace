@@ -195,8 +195,8 @@ Explicitly excluded. Documented to prevent scope creep.
 - Mapped to phases: 53
 - Unmapped: 0 ✓
 
-> Note: Traceability above is the orchestrator's pre-roadmap mapping based on the SUMMARY.md build order. The roadmapper agent will rewrite this section authoritatively from `.planning/ROADMAP.md`.
+> Authoritative mapping derived from `.planning/ROADMAP.md`. All 53 v1 requirements map to exactly one phase. Phase 1 establishes the foundation (types + static fallback + SSR contract); Phase 2 owns the orchestrator + `paper-hero.tsx` migration; Phase 3 lands the shared product-screen and visual asset; Phase 4 lands copy, trust, and meta; Phase 5 cuts over to production; Phase 6 audits and signs off.
 
 ---
 *Requirements defined: 2026-04-28*
-*Last updated: 2026-04-28 after initial definition*
+*Last updated: 2026-04-28 — traceability rewritten authoritatively by roadmapper from ROADMAP.md*
