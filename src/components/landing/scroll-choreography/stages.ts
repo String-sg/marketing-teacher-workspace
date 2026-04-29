@@ -14,7 +14,7 @@ import type { ScreenTarget, ScreenTargetRect, StageDef, StageId } from "./types"
  */
 export const STAGES = [
   { id: "hero", window: [0.0, 0.25] as const, screen: "tiny" },
-  { id: "wow", window: [0.2, 0.55] as const, screen: "centered" },
+  { id: "wow", window: [0.2, 0.78] as const, screen: "centered" },
   { id: "feature-a", window: [0.5, 0.78] as const, screen: "docked-left" },
   { id: "feature-b", window: [0.75, 1.0] as const, screen: "docked-right" },
 ] as const satisfies readonly StageDef[]
