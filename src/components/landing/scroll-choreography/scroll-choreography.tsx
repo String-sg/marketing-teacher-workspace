@@ -36,6 +36,8 @@ import { STAGES } from "./stages"
 import { StaticChoreographyFallback } from "./static-choreography-fallback"
 import { useIsDesktop } from "./use-is-desktop"
 
+import { FinalCta } from "@/components/landing/final-cta"
+import { ProofStrip } from "@/components/landing/proof-strip"
 import { Button } from "@/components/ui/button"
 import {
   finalCtaCopy,
@@ -155,6 +157,14 @@ function ChoreographyTree({
           <ProductScreen />
         </div>
       </section>
+      {/* Page-tail sections are siblings of the choreography per
+          research/ARCHITECTURE.md System Overview. The choreography section
+          owns hero+wow only; ProofStrip and FinalCta render after it
+          regardless of mode. (Static branch reaches them via
+          <StaticChoreographyFallback />, which composes them itself —
+          this branch reaches them here.) */}
+      <ProofStrip />
+      <FinalCta />
     </ScrollChoreographyContext.Provider>
   )
 }
