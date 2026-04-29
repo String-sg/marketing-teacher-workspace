@@ -50,9 +50,9 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Outer container uses `lvh` and inner sticky container uses `svh`; on a desktop viewport-resize there is no mid-scroll lurch, and no scroll-driven element animates `width`/`height`/`top`/`left`/`box-shadow` (transform/opacity/clip-path only).
   5. All `useTransform` keyframes for stage thresholds resolve through named `STAGES` constants tied to `StageDef.window` — zero inline magic-number tuples remain in component code.
 **Plans**: 5 plans
-  - [ ] 02-01-PLAN.md — Wave 0: vitest scaffold (Phase 1 reuse) + 7 fail-loudly test stubs + stages.test.ts retune assertion + @typescript-eslint/parser devDep
-  - [ ] 02-02-PLAN.md — Wave 1: PaperBackdrop extraction (paper-card frame + clouds + video + CHOREO-08 video gate; useState→useTransform for stageOpacity/cloudY*; STAGES-bound keyframes)
-  - [ ] 02-03-PLAN.md — Wave 1: ProductScreen Phase-2 stub (browser frame + screenshot; useTransform screenScale + screenOpacity; hero→wow only; never unmounts; no layoutId)
+  - [x] 02-01-PLAN.md — Wave 0: vitest scaffold (Phase 1 reuse) + 7 fail-loudly test stubs + stages.test.ts retune assertion + @typescript-eslint/parser devDep
+  - [x] 02-02-PLAN.md — Wave 1: PaperBackdrop extraction (paper-card frame + clouds + video + CHOREO-08 video gate; useState→useTransform for stageOpacity/cloudY*; STAGES-bound keyframes)
+  - [x] 02-03-PLAN.md — Wave 1: ProductScreen Phase-2 stub (browser frame + screenshot; useTransform screenScale + screenOpacity; hero→wow only; never unmounts; no layoutId)
   - [ ] 02-04-PLAN.md — Wave 2: ScrollChoreography orchestrator fill (two-component split per hooks-rules; useScroll w/ layoutEffect:false; provider mount; sticky shell; hero copy children) + STAGES.wow.window retune to [0.20, 0.78]
   - [ ] 02-05-PLAN.md — Wave 3: routes/index.tsx swap to <ScrollChoreography> + checkpoint:human-verify for FOUND-04/OQ-1 production smoke + checkpoint:human-verify for STAGES retune visual review
 **UI hint**: yes
@@ -126,7 +126,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation — Types, Static Fallback, SSR Contract | 0/5 | Not started | - |
-| 2. Orchestrator Shell + Backdrop Migration | 0/5 | Not started | - |
+| 2. Orchestrator Shell + Backdrop Migration | 3/5 | In Progress|  |
 | 3. Product Screen — The Single Shared Element | 0/TBD | Not started | - |
 | 4. Stage Copy, Bullet Reveals, Trust Signals, Meta | 0/TBD | Not started | - |
 | 5. Wire-In, Delete `paper-hero.tsx`, Ship to Production | 0/TBD | Not started | - |
