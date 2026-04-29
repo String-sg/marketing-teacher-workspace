@@ -23,21 +23,21 @@
 
 ### Choreography
 
-- [ ] **CHOREO-01**: A single product-screen `motion.div` is shared across all four stages; it never unmounts and is not assigned a `layoutId`
-- [ ] **CHOREO-02**: Stage 1 (Hero) — product screen sits tiny inside the existing illustration; current scroll-linked hero video continues to play underneath
+- [x] **CHOREO-01**: A single product-screen `motion.div` is shared across all four stages; it never unmounts and is not assigned a `layoutId`
+- [x] **CHOREO-02**: Stage 1 (Hero) — product screen sits tiny inside the existing illustration; current scroll-linked hero video continues to play underneath
 - [ ] **CHOREO-03**: Stage 2 (Wow) — product screen scales to a centered, near-full-viewport reveal as the user enters the second scroll zone
 - [ ] **CHOREO-04**: Stage 3 (Feature A) — product screen docks to one side; "every signal" feature copy and bullets fade in alongside
 - [ ] **CHOREO-05**: Stage 4 (Feature B) — product screen docks to the other side (or shifts position); "trends / notes" feature copy and bullets fade in
-- [ ] **CHOREO-06**: All scroll-driven visual values use `useTransform` directly into `style` — no `useState` is driven from `useMotionValueEvent` for visual properties
-- [ ] **CHOREO-07**: Tall outer container uses `lvh` units, inner sticky container uses `svh` units (iOS Safari address-bar safety)
-- [ ] **CHOREO-08**: Existing scroll-linked hero video continues to scrub during Stage 1 only; `currentTime` updates are gated/paused once Stage 2 fully covers it (GPU pressure fix)
+- [x] **CHOREO-06**: All scroll-driven visual values use `useTransform` directly into `style` — no `useState` is driven from `useMotionValueEvent` for visual properties
+- [x] **CHOREO-07**: Tall outer container uses `lvh` units, inner sticky container uses `svh` units (iOS Safari address-bar safety)
+- [x] **CHOREO-08**: Existing scroll-linked hero video continues to scrub during Stage 1 only; `currentTime` updates are gated/paused once Stage 2 fully covers it (GPU pressure fix)
 
 ### Backdrop Migration
 
-- [ ] **MIGRATE-01**: `paper-hero.tsx`'s illustration, video, and cloud parallax are extracted into a `<PaperBackdrop>` component
-- [ ] **MIGRATE-02**: `paper-hero.tsx`'s `useState`-driven opacity values are replaced with `useTransform` motion values (re-render-storm fix)
-- [ ] **MIGRATE-03**: Hardcoded magic-number `useTransform` keyframes are replaced with named `STAGES` constants tied to the `StageDef` data model
-- [ ] **MIGRATE-04**: Site header remains visible above the morphing product-screen layer at every scroll position (stacking-context regression check)
+- [x] **MIGRATE-01**: `paper-hero.tsx`'s illustration, video, and cloud parallax are extracted into a `<PaperBackdrop>` component
+- [x] **MIGRATE-02**: `paper-hero.tsx`'s `useState`-driven opacity values are replaced with `useTransform` motion values (re-render-storm fix)
+- [x] **MIGRATE-03**: Hardcoded magic-number `useTransform` keyframes are replaced with named `STAGES` constants tied to the `StageDef` data model
+- [x] **MIGRATE-04**: Site header remains visible above the morphing product-screen layer at every scroll position (stacking-context regression check)
 - [ ] **MIGRATE-05**: After cutover, `paper-hero.tsx` is deleted; `routes/index.tsx` imports `<ScrollChoreography>` directly
 
 ### Content
@@ -69,7 +69,7 @@
 - [ ] **PERF-01**: Lighthouse performance score does not regress versus the current production landing
 - [ ] **PERF-02**: LCP ≤ 2.5s on a Vercel preview build
 - [ ] **PERF-03**: CLS does not regress versus the current production landing
-- [ ] **PERF-04**: No animated `width`/`height`/`top`/`left`/`box-shadow` on scroll-driven elements — `transform`/`opacity`/`clip-path` only
+- [x] **PERF-04**: No animated `width`/`height`/`top`/`left`/`box-shadow` on scroll-driven elements — `transform`/`opacity`/`clip-path` only
 - [ ] **PERF-05**: React DevTools Profiler shows ≤ 2 component re-renders per second of continuous scroll
 
 ### Accessibility
@@ -145,18 +145,18 @@ Explicitly excluded. Documented to prevent scope creep.
 | STATIC-02 | Phase 1 | Pending |
 | STATIC-03 | Phase 1 | Pending |
 | STATIC-04 | Phase 1 | Pending |
-| CHOREO-01 | Phase 2 | Pending |
-| CHOREO-02 | Phase 2 | Pending |
+| CHOREO-01 | Phase 2 | Complete |
+| CHOREO-02 | Phase 2 | Complete |
 | CHOREO-03 | Phase 3 | Pending |
 | CHOREO-04 | Phase 3 | Pending |
 | CHOREO-05 | Phase 3 | Pending |
-| CHOREO-06 | Phase 2 | Pending |
-| CHOREO-07 | Phase 2 | Pending |
-| CHOREO-08 | Phase 2 | Pending |
-| MIGRATE-01 | Phase 2 | Pending |
-| MIGRATE-02 | Phase 2 | Pending |
-| MIGRATE-03 | Phase 2 | Pending |
-| MIGRATE-04 | Phase 2 | Pending |
+| CHOREO-06 | Phase 2 | Complete |
+| CHOREO-07 | Phase 2 | Complete |
+| CHOREO-08 | Phase 2 | Complete |
+| MIGRATE-01 | Phase 2 | Complete |
+| MIGRATE-02 | Phase 2 | Complete |
+| MIGRATE-03 | Phase 2 | Complete |
+| MIGRATE-04 | Phase 2 | Complete |
 | MIGRATE-05 | Phase 5 | Pending |
 | CONTENT-01 | Phase 4 | Pending |
 | CONTENT-02 | Phase 4 | Pending |
@@ -176,7 +176,7 @@ Explicitly excluded. Documented to prevent scope creep.
 | PERF-01 | Phase 6 | Pending |
 | PERF-02 | Phase 6 | Pending |
 | PERF-03 | Phase 6 | Pending |
-| PERF-04 | Phase 2 | Pending |
+| PERF-04 | Phase 2 | Complete |
 | PERF-05 | Phase 6 | Pending |
 | A11Y-01 | Phase 1 | Pending |
 | A11Y-02 | Phase 6 | Pending |

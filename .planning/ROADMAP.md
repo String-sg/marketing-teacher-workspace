@@ -126,7 +126,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation — Types, Static Fallback, SSR Contract | 0/5 | Not started | - |
-| 2. Orchestrator Shell + Backdrop Migration | 5/5 | Complete   | 2026-04-29 |
+| 2. Orchestrator Shell + Backdrop Migration | 5/5 | Complete    | 2026-04-29 |
 | 3. Product Screen — The Single Shared Element | 0/TBD | Not started | - |
 | 4. Stage Copy, Bullet Reveals, Trust Signals, Meta | 0/TBD | Not started | - |
 | 5. Wire-In, Delete `paper-hero.tsx`, Ship to Production | 0/TBD | Not started | - |
