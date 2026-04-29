@@ -39,4 +39,12 @@ describe("STAGES data", () => {
     // @ts-expect-error — intentional invalid id at runtime
     expect(() => byId("nope")).toThrow(/Unknown stage id/)
   })
+
+  it("byId('wow').window[1] is retuned to the Phase 2 first-pass value (D-14)", () => {
+    // Phase 2 D-14 retunes wow.window[1] to align with the moment the screen
+    // visually covers the video. First-pass: [0.20, 0.78]. Plan 04 may adjust
+    // during the visual-review checkpoint; if so, update this assertion AND
+    // the CONTEXT.md D-14 entry together.
+    expect(byId("wow").window[1]).toBeCloseTo(0.78, 2)
+  })
 })
