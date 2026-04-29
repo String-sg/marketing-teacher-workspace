@@ -13,7 +13,7 @@ Six-phase delivery of a 4-stage shared-element scroll choreography (Hero → Wow
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Foundation — Types, Static Fallback, SSR Contract** - Typed `StageDef[]` data model, `<StaticChoreographyFallback>`, SSR-safe `useIsDesktop`, content reshaped, footer + skip-link landmarks
-- [ ] **Phase 2: Orchestrator Shell + Backdrop Migration** - `<ScrollChoreography>` owns `useScroll`, `<PaperBackdrop>` extracted from `paper-hero.tsx`, `useState` re-render storm eliminated
+- [x] **Phase 2: Orchestrator Shell + Backdrop Migration** - `<ScrollChoreography>` owns `useScroll`, `<PaperBackdrop>` extracted from `paper-hero.tsx`, `useState` re-render storm eliminated (completed 2026-04-29)
 - [ ] **Phase 3: Product Screen — The Single Shared Element** - One persistent `motion.div` morphs across four stage targets (tiny → centered → docked → docked); responsive `srcset` + LCP preload
 - [ ] **Phase 4: Stage Copy, Bullet Reveals, Trust Signals, Meta** - Stage copy rewritten, 200–300ms bullet stagger, OG/canonical meta, primary-CTA URL centralized, education trust line
 - [ ] **Phase 5: Wire-In, Delete `paper-hero.tsx`, Ship to Production** - `routes/index.tsx` swap, old hero deleted, deploy verified on Vercel — SSR view-source matches first-paint DOM
@@ -54,7 +54,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   - [x] 02-02-PLAN.md — Wave 1: PaperBackdrop extraction (paper-card frame + clouds + video + CHOREO-08 video gate; useState→useTransform for stageOpacity/cloudY*; STAGES-bound keyframes)
   - [x] 02-03-PLAN.md — Wave 1: ProductScreen Phase-2 stub (browser frame + screenshot; useTransform screenScale + screenOpacity; hero→wow only; never unmounts; no layoutId)
   - [x] 02-04-PLAN.md — Wave 2: ScrollChoreography orchestrator fill (two-component split per hooks-rules; useScroll w/ layoutEffect:false; provider mount; sticky shell; hero copy children) + STAGES.wow.window retune to [0.20, 0.78]
-  - [ ] 02-05-PLAN.md — Wave 3: routes/index.tsx swap to <ScrollChoreography> + checkpoint:human-verify for FOUND-04/OQ-1 production smoke + checkpoint:human-verify for STAGES retune visual review
+  - [x] 02-05-PLAN.md — Wave 3: routes/index.tsx swap to <ScrollChoreography> + checkpoint:human-verify for FOUND-04/OQ-1 production smoke + checkpoint:human-verify for STAGES retune visual review
 **UI hint**: yes
 
 ### Phase 3: Product Screen — The Single Shared Element
@@ -126,7 +126,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation — Types, Static Fallback, SSR Contract | 0/5 | Not started | - |
-| 2. Orchestrator Shell + Backdrop Migration | 4/5 | In Progress|  |
+| 2. Orchestrator Shell + Backdrop Migration | 5/5 | Complete   | 2026-04-29 |
 | 3. Product Screen — The Single Shared Element | 0/TBD | Not started | - |
 | 4. Stage Copy, Bullet Reveals, Trust Signals, Meta | 0/TBD | Not started | - |
 | 5. Wire-In, Delete `paper-hero.tsx`, Ship to Production | 0/TBD | Not started | - |
