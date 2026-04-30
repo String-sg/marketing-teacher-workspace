@@ -30,3 +30,32 @@ Object.defineProperty(window, "matchMedia", {
     dispatchEvent: vi.fn(() => false),
   })),
 })
+
+// jsdom does not implement IntersectionObserver. Provide a minimal stub so
+// hooks that rely on it (e.g. motion/react's useInView, used by
+// RevealOnScroll) do not throw in tests. The stub never fires callbacks,
+// so any rendered RevealOnScroll-wrapped tree stays in its un-revealed
+// initial state — matching motion's SSR fallback (useInView returns false
+// until the observer fires). Tests that need to assert "in view" behavior
+// should mock motion/react directly (see reveal-on-scroll.test.tsx).
+class StubIntersectionObserver {
+  readonly root: Element | null = null
+  readonly rootMargin: string = ""
+  readonly thresholds: ReadonlyArray<number> = []
+  observe(): void {}
+  unobserve(): void {}
+  disconnect(): void {}
+  takeRecords(): Array<IntersectionObserverEntry> {
+    return []
+  }
+}
+Object.defineProperty(window, "IntersectionObserver", {
+  writable: true,
+  configurable: true,
+  value: StubIntersectionObserver,
+})
+Object.defineProperty(globalThis, "IntersectionObserver", {
+  writable: true,
+  configurable: true,
+  value: StubIntersectionObserver,
+})

@@ -1,5 +1,7 @@
 import { audienceCopy } from "@/content/landing"
 
+import { RevealOnScroll } from "./reveal-on-scroll"
+
 /**
  * Section 4 — Built for the way schools work.
  *
@@ -27,18 +29,17 @@ export function AudienceColumns() {
         </div>
 
         <div className="mt-12 grid grid-cols-1 gap-10 lg:mt-16 lg:grid-cols-3">
-          {audienceCopy.columns.map((column) => (
-            <article
-              className="border-t border-[color:var(--paper-rule)]/55 pt-6"
-              key={column.label}
-            >
-              <p className="font-heading text-lg font-medium leading-[1.2] tracking-tight text-[color:var(--paper-ink)] sm:text-xl">
-                {column.label}
-              </p>
-              <p className="mt-3 text-base leading-7 text-[color:var(--paper-muted)]">
-                {column.body}
-              </p>
-            </article>
+          {audienceCopy.columns.map((column, i) => (
+            <RevealOnScroll delay={i * 100} key={column.label}>
+              <article className="border-t border-[color:var(--paper-rule)]/55 pt-6">
+                <p className="font-heading text-lg font-medium leading-[1.2] tracking-tight text-[color:var(--paper-ink)] sm:text-xl">
+                  {column.label}
+                </p>
+                <p className="mt-3 text-base leading-7 text-[color:var(--paper-muted)]">
+                  {column.body}
+                </p>
+              </article>
+            </RevealOnScroll>
           ))}
         </div>
       </div>
