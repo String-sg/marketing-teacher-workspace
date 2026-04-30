@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-28)
 Phase: 3 (Product Screen — The Single Shared Element) — EXECUTING
 Plan: 5 of 5
 Status: Ready to execute
-Last activity: 2026-04-30
+Last activity: 2026-05-01 - Completed quick task 260501-a3u: Mercury-style reveal-on-scroll for post-hero sections (SchoolsToday, AudienceColumns, FinalCta)
 
 Progress: [█████████░] 93%
 
@@ -94,6 +94,12 @@ None yet.
 - Real iOS Safari address-bar behavior is described in research but not verified on-device — closes via Phase 6 dedicated smoke test.
 - Post-cutover LCP candidate is unknown until the larger product screenshot lands — closes via Phase 3 (responsive `srcset` + preload) confirmed at Phase 6 (Lighthouse vs baseline).
 - Real teacher testimonials don't yet exist — soft "Built with teachers" trust line ships v1; testimonials are a v1.x follow-up.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260501-a3u | Mercury-style reveal-on-scroll for post-hero sections (SchoolsToday, AudienceColumns, FinalCta) | 2026-05-01 | 3f21945 | [260501-a3u-mercury-style-reveal-on-scroll-for-post-](./quick/260501-a3u-mercury-style-reveal-on-scroll-for-post-/) |
 
 ## Deferred Items
 
