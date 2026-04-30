@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 3 context gathered
-last_updated: "2026-04-30T05:56:01.306Z"
+last_updated: "2026-04-30T06:02:51.831Z"
 last_activity: 2026-04-30
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 15
-  completed_plans: 13
-  percent: 87
+  completed_plans: 14
+  percent: 93
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-28)
 ## Current Position
 
 Phase: 3 (Product Screen — The Single Shared Element) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-04-30
 
-Progress: [█████████░] 87%
+Progress: [█████████░] 93%
 
 ## Performance Metrics
 
@@ -56,6 +56,7 @@ Progress: [█████████░] 87%
 | Phase 03-product-screen-the-single-shared-element P01 | 4min | 3 tasks | 16 files |
 | Phase 03-product-screen-the-single-shared-element P03 | 5min | 2 tasks | 2 files |
 | Phase 03 P02 | 10min | 2 tasks | 2 files |
+| Phase 03 P04 | 5min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,10 @@ Recent decisions affecting current work:
 - [Phase ?]: D-14: Per-segment eases applied via { ease: EasingFunction[] } — imported function refs (easeOut, easeInOut, cubicBezier) used in place of plan's string-literal forms
 - [Phase ?]: D-16 Option A: FA-FB scale dip implemented as 9th mid-stop at progress=0.815, value=0.45 (named consts FA_TO_FB_SCALE_DIP_PROGRESS / FA_TO_FB_SCALE_DIP_VALUE)
 - [Phase ?]: MIGRATE-03 walker compatibility: keyframe arrays inlined as ArrayExpressions of MemberExpressions at useTransform call sites; data-driven STAGES.flatMap form preserved verbatim in docstring
+- [Phase ?]: D-12 LCP preload landed via index-route head() with React 19 camelCase keys (imageSrcSet, imageSizes, fetchPriority); OQ-04 falsification gate flipped RED→GREEN
+- [Phase ?]: D-09 choreography section height committed at h-[400lvh] (4× viewport for 4 stages); inner sticky h-svh preserved
+- [Phase ?]: D-20 PaperBackdrop intra-stage retune used first-pass values: STAGE_OPACITY_FADE_END=0.55 (matches new wow.window[1]); MID_PROGRESS=0.40; tunable at Plan 05 D-17 visual checkpoint
+- [Phase ?]: D-21 zero-edit cascade verified empirically: paper-backdrop.test.tsx required zero edits because every threshold reference goes through byId('wow').window[1]
 
 ### Pending Todos
 
@@ -100,6 +105,6 @@ Items acknowledged and carried forward:
 
 ## Session Continuity
 
-Last session: 2026-04-30T05:55:55.744Z
+Last session: 2026-04-30T06:02:42.984Z
 Stopped at: Phase 3 context gathered
 Resume file: None

@@ -21,3 +21,9 @@ Reference: `src/routes/index.head.test.tsx:1-25` (file header explicitly documen
 - **Verification:** `pnpm lint src/components/landing/scroll-choreography/product-screen.tsx src/components/landing/scroll-choreography/product-screen.test.tsx` exits 0 — Plan 03-02's two modified files are clean.
 - **Out of scope for Plan 03-02:** SCOPE BOUNDARY rule — Plan 03-02 only modifies `product-screen.tsx` + `product-screen.test.tsx`. Pre-existing lint debt in other files is owned by whichever earlier plan introduced it.
 - **Action:** None — these errors do not block Plan 03-02 verification. A future polish plan (or Phase 6) may auto-fix them with `pnpm lint --fix`.
+
+### Re-verified during Plan 03-04 (2026-04-29)
+
+- Total lint count was **41 errors before and after Plan 03-04's three commits** (a1ac81f, 0c8e15d, 2810c28) — confirming Plan 03-04 introduced zero new lint errors.
+- Plan 03-04's modified source files lint-clean at the touched lines: `src/routes/index.tsx` (zero errors at all), `paper-backdrop.tsx` (errors at lines 42 + 113, untouched by 03-04), `scroll-choreography.tsx` (errors at lines 32 + 47 + 93, untouched by 03-04).
+- Action: still deferred to a future polish plan / Phase 6.
