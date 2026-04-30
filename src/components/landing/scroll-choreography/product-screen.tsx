@@ -179,6 +179,13 @@ export function ProductScreen() {
     { ease: X_EASES }
   )
 
+  // clamp:false disables motion 12's accelerate/WAAPI path on opacity. Without
+  // it the derived MotionValue carries `accelerate` metadata that the
+  // motion.div binder routes to a native WAAPI animation (acceleratedValues
+  // includes "opacity"), and that animation plays on its own timeline instead
+  // of tracking scrollYProgress — leaving opacity stuck at the first keyframe.
+  // See motion-dom use-transform.mjs:31-43. Input range covers [0, 1], so
+  // disabling clamp is safe — scrollYProgress is bounded by useScroll.
   const opacity = useTransform(
     scrollYProgress,
     [
@@ -201,7 +208,7 @@ export function ProductScreen() {
       SCREEN_TARGETS[STAGES[3].screen].opacity,
       SCREEN_TARGETS[STAGES[3].screen].opacity,
     ],
-    { ease: OPACITY_EASES }
+    { ease: OPACITY_EASES, clamp: false }
   )
 
   return (

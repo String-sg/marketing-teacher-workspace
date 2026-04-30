@@ -78,10 +78,16 @@ export function PaperBackdrop({ children }: { children?: ReactNode }) {
     [0, STAGE_SCALE_MID_PROGRESS, 1],
     [1, STAGE_SCALE_MID_VALUE, STAGE_SCALE_END_VALUE]
   )
+  // clamp:false disables motion 12's accelerate/WAAPI path on opacity, which
+  // hijacks scroll-linked opacity into an independent native animation that
+  // ignores scrollYProgress (motion-dom use-transform.mjs:31-43). The keyframe
+  // range covers [0, 1] so disabling clamp is safe — scrollYProgress is
+  // bounded by useScroll and never extrapolates.
   const stageOpacity = useTransform(
     scrollYProgress,
-    [STAGE_OPACITY_FADE_START, STAGE_OPACITY_FADE_END],
-    [1, 0]
+    [0, STAGE_OPACITY_FADE_START, STAGE_OPACITY_FADE_END, 1],
+    [1, 1, 0, 0],
+    { clamp: false }
   )
   const cloudYLeft = useTransform(
     scrollYProgress,

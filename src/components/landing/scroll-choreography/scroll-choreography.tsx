@@ -101,10 +101,15 @@ function ChoreographyTree({
   // + D-13 (intra-stage timing as named local consts). Replaces the
   // paper-hero.tsx:56-60 inline [0, 0.14, 1] magic-number tuples + the
   // paper-hero.tsx:66 useState/useMotionValueEvent driven copyOpacity.
+  // clamp:false disables motion 12's accelerate/WAAPI path on opacity (see
+  // motion-dom use-transform.mjs:31-43). Without it the WAAPI animation
+  // hijacks the scroll-linked opacity and plays on its own timeline. Input
+  // range covers [0, 1] so clamp:false is safe — scrollYProgress is bounded.
   const copyOpacity = useTransform(
     scrollYProgress,
     [0, HERO_COPY_FADE_OUT_START, HERO_COPY_FADE_OUT_END, 1],
-    [1, 1, 0, 0]
+    [1, 1, 0, 0],
+    { clamp: false }
   )
   const copyY = useTransform(
     scrollYProgress,
