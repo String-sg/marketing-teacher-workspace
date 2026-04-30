@@ -34,6 +34,7 @@ import type { RefObject } from "react"
 import { ScrollChoreographyContext } from "./context"
 import { PaperBackdrop } from "./paper-backdrop"
 import { ProductScreen } from "./product-screen"
+import { StageCopy } from "./stage-copy"
 import { STAGES } from "./stages"
 import { StaticChoreographyFallback } from "./static-choreography-fallback"
 import { useIsDesktop } from "./use-is-desktop"
@@ -162,6 +163,8 @@ function ChoreographyTree({
             </motion.div>
           </PaperBackdrop>
           <ProductScreen />
+          <StageCopy stage="feature-a" />
+          <StageCopy stage="feature-b" />
         </div>
       </section>
       {/* Page-tail sections are siblings of the choreography per
