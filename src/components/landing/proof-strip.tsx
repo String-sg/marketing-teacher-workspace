@@ -17,7 +17,7 @@ export function ProofStrip() {
         />
       </div>
 
-      <div className="paper-card relative mx-auto w-full max-w-[110rem] overflow-hidden rounded-[20px] border border-black/5 px-6 py-10 shadow-[0_10px_60px_-30px_rgb(15_23_42/0.18)] sm:px-10 sm:py-14 lg:px-16 lg:py-20">
+      <div className="paper-card relative mx-auto w-[1024px] max-w-full overflow-hidden rounded-[20px] border border-black/5 px-6 py-10 shadow-[0_10px_60px_-30px_rgb(15_23_42/0.18)] sm:px-10 sm:py-14 lg:px-16 lg:py-20">
         <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:gap-16">
           <div>
             <p className="text-xs font-medium tracking-[0.18em] text-[color:var(--paper-muted)] uppercase sm:text-sm">
