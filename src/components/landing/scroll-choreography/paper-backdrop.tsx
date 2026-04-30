@@ -18,12 +18,12 @@
  *     resume the loop.
  *   - PERF-04: transform/opacity only — no width/height/top/left
  *
- * Phase 3 cascade (D-20):
- *   The intra-stage timing consts (STAGE_OPACITY_FADE_*, STAGE_SCALE_MID_PROGRESS)
- *   retune to track the new wow.window[1] = 0.55 — the paper card now
- *   finishes fading exactly when the wow plateau ends. VIDEO_GATE_THRESHOLD
- *   = byId("wow").window[1] auto-tracks the retune (D-21) — no source edit
- *   needed for the gate itself.
+ * Paper-card zoom envelope (scaleMidProgress / scaleMidValue /
+ * scaleEndValue / opacityFadeStart / opacityFadeEnd) is owned by
+ * usePaperCardConfig() so the dev tuner can live-edit it. Defaults
+ * resolve to PAPER_CARD_DEFAULTS outside dev. VIDEO_GATE_THRESHOLD =
+ * byId("wow").window[1] auto-tracks the wow window — no source edit
+ * needed for the gate itself.
  *
  * 2026-04-29 scope shift (user direction): the original CHOREO-02 / CHOREO-08
  * specified scroll-linked currentTime scrubbing. After production-preview
@@ -42,51 +42,39 @@ import { useRef } from "react"
 import type { ReactNode } from "react"
 
 import { useScrollChoreography } from "./context"
-import { useFlowStages } from "./dev-flow-context"
+import { useFlowStages, usePaperCardConfig } from "./dev-flow-context"
 
-// Intra-stage timing constants — D-13: named local constants in component file
-// (cannot live in stages.ts because they are not stage windows).
-//
-// Phase 3 D-20 retune: track new wow.window[1] = 0.55. The paper card now
-// finishes fading exactly when the wow plateau ends (was 0.78 in Phase 2).
-// First-pass values; tunable at the visual-review checkpoint (D-17).
-const STAGE_SCALE_MID_PROGRESS = 0.4
-const STAGE_SCALE_MID_VALUE = 2.4
-const STAGE_SCALE_END_VALUE = 5.2
-// stageOpacity fade range — D-20 retunes the start to 0.45 and the end to
-// 0.55. The endpoint 0.55 happens to equal byId("wow").window[1] but is
-// kept as a separate intra-stage const because it expresses a different
-// concern (paper-card opacity) from the video gate threshold (D-21).
-const STAGE_OPACITY_FADE_START = 0.45
-const STAGE_OPACITY_FADE_END = 0.55
+// The paper-card zoom envelope (scale mid/end + opacity fade window) is
+// owned by usePaperCardConfig() so the dev tuner can live-edit it. The
+// curve shape is documented on PaperCardConfig in dev-flow-context.tsx.
+// Outside dev the hook returns PAPER_CARD_DEFAULTS, so the production
+// render is identical to the previous compile-time consts.
 const CLOUD_LEFT_TRAVEL_PX = "-160px"
 const CLOUD_RIGHT_TRAVEL_PX = "-110px"
 
 export function PaperBackdrop({ children }: { children?: ReactNode }) {
   const { scrollYProgress } = useScrollChoreography()
   const stages = useFlowStages()
+  const paper = usePaperCardConfig()
   // Video gate fires when scrollYProgress crosses out of the wow exit edge.
   // Resolved per-render so dev tuning of the wow window is honored live.
   const videoGateThreshold =
     stages.find((s) => s.id === "wow")?.window[1] ?? 0.55
   // Hold the paper-card at scale 1 throughout the hero hold so the cartoon
   // laptop stays visually locked under the tiny ProductScreen overlay
-  // (which sits at the fixed viewport coords +2.2vw, +26vh during hero).
-  // Without this hold the paper-card scales from 1 toward 2.4 immediately,
-  // and the cartoon laptop drifts up/out of the tiny UI's overlay
-  // position — reads as "two things zooming in different directions."
-  // The zoom kicks in only at the hero→wow morph zone, when ProductScreen
-  // is also growing toward centered.
+  // during hero. The zoom kicks in only at the hero→wow morph zone, when
+  // ProductScreen is also growing toward centered, so both transforms
+  // travel together rather than zooming independently.
   const heroHoldEnd = stages.find((s) => s.id === "hero")?.window[1] ?? 0.15
   const videoRef = useRef<HTMLVideoElement>(null)
 
-  // useTransform replaces paper-hero.tsx:50 useTransform AND paper-hero.tsx:64
-  // useState/useMotionValueEvent (D-10 + CHOREO-06). useTransform's clamp:true
-  // default removes the clamp01 helper that paper-hero.tsx:18 declared.
+  // useTransform — visual props flow direct from MotionValue into style
+  // (CHOREO-06). useTransform's clamp:true default keeps values bounded
+  // outside the keyframe range without an explicit clamp01 helper.
   const stageScale = useTransform(
     scrollYProgress,
-    [0, heroHoldEnd, STAGE_SCALE_MID_PROGRESS, 1],
-    [1, 1, STAGE_SCALE_MID_VALUE, STAGE_SCALE_END_VALUE]
+    [0, heroHoldEnd, paper.scaleMidProgress, 1],
+    [1, 1, paper.scaleMidValue, paper.scaleEndValue]
   )
   // clamp:false disables motion 12's accelerate/WAAPI path on opacity, which
   // hijacks scroll-linked opacity into an independent native animation that
@@ -95,7 +83,7 @@ export function PaperBackdrop({ children }: { children?: ReactNode }) {
   // bounded by useScroll and never extrapolates.
   const stageOpacity = useTransform(
     scrollYProgress,
-    [0, STAGE_OPACITY_FADE_START, STAGE_OPACITY_FADE_END, 1],
+    [0, paper.opacityFadeStart, paper.opacityFadeEnd, 1],
     [1, 1, 0, 0],
     { clamp: false }
   )

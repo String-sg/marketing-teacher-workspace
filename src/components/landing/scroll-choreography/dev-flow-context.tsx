@@ -1,11 +1,12 @@
 /**
- * Dev-only override store for STAGES so the floating <DevFlowPanel> can
- * tune the choreography flow live without a source edit + reload cycle.
+ * Dev-only override store for STAGES + paper-card envelope so the
+ * floating <DevFlowPanel> can tune the choreography flow live without
+ * a source edit + reload cycle.
  *
  * Production / test render paths render the choreography components
- * without a <DevFlowProvider>; useFlowStages() falls back to the
- * compile-time STAGES const in that case, so this module is purely
- * additive.
+ * without a <DevFlowProvider>; useFlowStages() and usePaperCardConfig()
+ * fall back to the compile-time defaults in that case, so this module
+ * is purely additive.
  */
 import {
   createContext,
@@ -31,11 +32,44 @@ export type StageRectPatch = Partial<{
   opacity: number
 }>
 
+/**
+ * Paper-card (cartoon video) zoom envelope. Drives the scale + opacity
+ * curves on PaperBackdrop's outer motion.div. The curves are:
+ *
+ *   scale: [0, heroHoldEnd, scaleMidProgress, 1]
+ *       -> [1, 1,           scaleMidValue,    scaleEndValue]
+ *   opacity: [0, opacityFadeStart, opacityFadeEnd, 1]
+ *         -> [1, 1,                0,              0]
+ *
+ * heroHoldEnd auto-tracks STAGES[hero].window[1] so the card stays at
+ * scale 1 throughout the hero hold and only starts zooming once the
+ * UI begins its hero→wow morph.
+ */
+export type PaperCardConfig = {
+  readonly scaleMidProgress: number
+  readonly scaleMidValue: number
+  readonly scaleEndValue: number
+  readonly opacityFadeStart: number
+  readonly opacityFadeEnd: number
+}
+
+export const PAPER_CARD_DEFAULTS: PaperCardConfig = {
+  scaleMidProgress: 0.4,
+  scaleMidValue: 2.4,
+  scaleEndValue: 5.2,
+  opacityFadeStart: 0.45,
+  opacityFadeEnd: 0.55,
+}
+
+export type PaperCardPatch = Partial<PaperCardConfig>
+
 type FlowStagesState = Record<StageId, StageDef>
 
 type FlowControlsContextValue = {
   readonly stages: readonly StageDef[]
+  readonly paperCard: PaperCardConfig
   readonly setStage: (id: StageId, patch: StageRectPatch) => void
+  readonly setPaperCard: (patch: PaperCardPatch) => void
   readonly resetAll: () => void
 }
 
@@ -55,8 +89,13 @@ const cloneStages = (): FlowStagesState => {
 const orderedFromState = (state: FlowStagesState): readonly StageDef[] =>
   STAGES.map((s) => state[s.id])
 
+const clamp01 = (v: number) => Math.min(Math.max(v, 0), 1)
+
 export function DevFlowProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<FlowStagesState>(cloneStages)
+  const [paperCard, setPaperCardState] = useState<PaperCardConfig>(
+    PAPER_CARD_DEFAULTS
+  )
 
   const setStage = useCallback((id: StageId, patch: StageRectPatch) => {
     setState((prev) => {
@@ -77,15 +116,31 @@ export function DevFlowProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
+  const setPaperCard = useCallback((patch: PaperCardPatch) => {
+    setPaperCardState((prev) => {
+      const next = { ...prev, ...patch }
+      // Clamp progress-based fields to [0, 1]; keep scale/opacity values
+      // free-form (negative/large values are nonsense but easy to spot in
+      // tuning so we don't second-guess the dev).
+      return {
+        ...next,
+        scaleMidProgress: clamp01(next.scaleMidProgress),
+        opacityFadeStart: clamp01(next.opacityFadeStart),
+        opacityFadeEnd: clamp01(next.opacityFadeEnd),
+      }
+    })
+  }, [])
+
   const resetAll = useCallback(() => {
     setState(cloneStages())
+    setPaperCardState(PAPER_CARD_DEFAULTS)
   }, [])
 
   const stages = useMemo(() => orderedFromState(state), [state])
 
   const value = useMemo(
-    () => ({ stages, setStage, resetAll }),
-    [stages, setStage, resetAll]
+    () => ({ stages, paperCard, setStage, setPaperCard, resetAll }),
+    [stages, paperCard, setStage, setPaperCard, resetAll]
   )
 
   return (
@@ -102,6 +157,13 @@ export function DevFlowProvider({ children }: { children: ReactNode }) {
 export function useFlowStages(): readonly StageDef[] {
   const ctx = useContext(FlowControlsContext)
   return ctx?.stages ?? STAGES
+}
+
+/** Read the paper-card zoom envelope. Falls back to PAPER_CARD_DEFAULTS
+ *  outside dev so production renders the same curve without a provider. */
+export function usePaperCardConfig(): PaperCardConfig {
+  const ctx = useContext(FlowControlsContext)
+  return ctx?.paperCard ?? PAPER_CARD_DEFAULTS
 }
 
 /** Returns null when no provider is mounted (so the panel can no-op). */

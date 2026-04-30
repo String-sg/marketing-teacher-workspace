@@ -24,7 +24,12 @@ import type {
 
 import { useScrollChoreography } from "./context"
 import { useFlowControls } from "./dev-flow-context"
-import type { FlowWindow, StageRectPatch } from "./dev-flow-context"
+import type {
+  FlowWindow,
+  PaperCardConfig,
+  PaperCardPatch,
+  StageRectPatch,
+} from "./dev-flow-context"
 import { STAGES } from "./stages"
 import type { StageDef, StageId } from "./types"
 
@@ -86,11 +91,14 @@ const TICKS: ReadonlyArray<Tick> = [
 
 type DragHint = { id: StageId; lo: number; hi: number }
 
-function serializeFlow(stages: readonly StageDef[]): string {
-  const lines = [
+function serializeFlow(
+  stages: readonly StageDef[],
+  paper: PaperCardConfig
+): string {
+  const stageBlock = [
     "export const STAGES = [",
-    ...stages.map((s) => {
-      return [
+    ...stages.map((s) =>
+      [
         "  {",
         `    id: "${s.id}",`,
         `    window: [${fmtNumber(s.window[0])}, ${fmtNumber(s.window[1])}] as const,`,
@@ -100,10 +108,19 @@ function serializeFlow(stages: readonly StageDef[]): string {
         `    opacity: ${fmtNumber(s.opacity)},`,
         "  },",
       ].join("\n")
-    }),
+    ),
     "] as const satisfies readonly StageDef[]",
   ]
-  return lines.join("\n")
+  const paperBlock = [
+    "export const PAPER_CARD_DEFAULTS: PaperCardConfig = {",
+    `  scaleMidProgress: ${fmtNumber(paper.scaleMidProgress)},`,
+    `  scaleMidValue: ${fmtNumber(paper.scaleMidValue)},`,
+    `  scaleEndValue: ${fmtNumber(paper.scaleEndValue)},`,
+    `  opacityFadeStart: ${fmtNumber(paper.opacityFadeStart)},`,
+    `  opacityFadeEnd: ${fmtNumber(paper.opacityFadeEnd)},`,
+    "}",
+  ]
+  return [...stageBlock, "", ...paperBlock].join("\n")
 }
 
 async function copyText(text: string): Promise<boolean> {
@@ -137,7 +154,7 @@ export function DevFlowPanel() {
 
   if (!controls) return null
 
-  const configText = serializeFlow(controls.stages)
+  const configText = serializeFlow(controls.stages, controls.paperCard)
 
   const handleCopy = async () => {
     const ok = await copyText(configText)
@@ -179,6 +196,11 @@ export function DevFlowPanel() {
                 stage={stage}
               />
             ))}
+            <PaperCardEditor
+              config={controls.paperCard}
+              onChange={controls.setPaperCard}
+              progress={progress}
+            />
           </div>
 
           <div className="flex gap-2">
@@ -516,6 +538,99 @@ function StageEditor({
           placeholder="0 / +Nvh"
           value={stage.y}
         />
+      </div>
+    </details>
+  )
+}
+
+/** Live-tunable controls for the paper-card (cartoon video) zoom envelope.
+ *  The card holds at scale 1 through hero, then ramps to scaleMidValue at
+ *  scaleMidProgress, then to scaleEndValue at p=1. Opacity stays at 1
+ *  through opacityFadeStart, then fades to 0 by opacityFadeEnd. The
+ *  current scrollYProgress is shown so the user can scrub to the fade
+ *  threshold and tune visually. */
+function PaperCardEditor({
+  config,
+  onChange,
+  progress,
+}: {
+  config: PaperCardConfig
+  onChange: (patch: PaperCardPatch) => void
+  progress: number
+}) {
+  // Compute the live paper-card scale for the current scroll progress so
+  // the user can see what the value actually is at any point in the
+  // timeline (helpful for matching the mid value to a target visual).
+  const liveScale = (() => {
+    if (progress <= config.scaleMidProgress) {
+      const span = config.scaleMidProgress
+      const t = span > 0 ? progress / span : 0
+      return 1 + t * (config.scaleMidValue - 1)
+    }
+    const span = 1 - config.scaleMidProgress
+    const t = span > 0 ? (progress - config.scaleMidProgress) / span : 0
+    return (
+      config.scaleMidValue + t * (config.scaleEndValue - config.scaleMidValue)
+    )
+  })()
+  const liveOpacity = (() => {
+    if (progress <= config.opacityFadeStart) return 1
+    if (progress >= config.opacityFadeEnd) return 0
+    const t =
+      (progress - config.opacityFadeStart) /
+      (config.opacityFadeEnd - config.opacityFadeStart)
+    return 1 - t
+  })()
+  return (
+    <details className="rounded border border-black/10">
+      <summary className="cursor-pointer px-2 py-1 font-medium tracking-wide select-none">
+        video zoom
+        <span className="ml-2 font-mono text-[10px] text-black/45">
+          live: scale {fmtNumber(Number(liveScale.toFixed(3)))} · opacity{" "}
+          {fmtNumber(Number(liveOpacity.toFixed(2)))}
+        </span>
+      </summary>
+      <div className="space-y-2 px-2 pt-1 pb-2">
+        <div className="grid grid-cols-2 gap-1.5">
+          <NumberField
+            label="mid p"
+            max={1}
+            min={0}
+            onChange={(v) => onChange({ scaleMidProgress: v })}
+            step={0.01}
+            value={config.scaleMidProgress}
+          />
+          <NumberField
+            label="mid s"
+            onChange={(v) => onChange({ scaleMidValue: v })}
+            step={0.1}
+            value={config.scaleMidValue}
+          />
+          <NumberField
+            label="end s"
+            onChange={(v) => onChange({ scaleEndValue: v })}
+            step={0.1}
+            value={config.scaleEndValue}
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-1.5">
+          <NumberField
+            label="fade in"
+            max={1}
+            min={0}
+            onChange={(v) => onChange({ opacityFadeStart: v })}
+            step={0.01}
+            value={config.opacityFadeStart}
+          />
+          <NumberField
+            label="fade out"
+            max={1}
+            min={0}
+            onChange={(v) => onChange({ opacityFadeEnd: v })}
+            step={0.01}
+            value={config.opacityFadeEnd}
+          />
+        </div>
       </div>
     </details>
   )
