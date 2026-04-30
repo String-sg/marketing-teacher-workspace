@@ -16,7 +16,11 @@
  */
 import { useMotionValueEvent } from "motion/react"
 import { useRef, useState } from "react"
-import type { ChangeEvent, PointerEvent as ReactPointerEvent } from "react"
+import type {
+  ChangeEvent,
+  KeyboardEvent as ReactKeyboardEvent,
+  PointerEvent as ReactPointerEvent,
+} from "react"
 
 import { useScrollChoreography } from "./context"
 import { useFlowControls } from "./dev-flow-context"
@@ -25,28 +29,24 @@ import type {
   FlowTargets,
   FlowWindow,
 } from "./dev-flow-context"
+import { SCREEN_TARGETS, STAGES } from "./stages"
 import type { ScreenTarget, ScreenTargetRect, StageId } from "./types"
 
 const STAGE_COLORS: Record<StageId, string> = {
   hero: "#a3d4ff",
   wow: "#ffd28f",
   "feature-a": "#9be0a8",
-  "feature-b": "#e0c1ff",
 }
 
-const STAGE_ORDER: readonly StageId[] = [
-  "hero",
-  "wow",
-  "feature-a",
-  "feature-b",
-] as const
+const STAGE_ORDER: readonly StageId[] = STAGES.map((s) => s.id)
 
-const TARGET_ORDER: readonly ScreenTarget[] = [
-  "tiny",
-  "centered",
-  "docked-left",
-  "docked-right",
-] as const
+const TARGET_ORDER: readonly ScreenTarget[] = Object.keys(
+  SCREEN_TARGETS
+) as ScreenTarget[]
+
+const STAGE_SCREEN_MAP: Record<StageId, ScreenTarget> = Object.fromEntries(
+  STAGES.map((s) => [s.id, s.screen])
+) as Record<StageId, ScreenTarget>
 
 function scrubToProgress(progress: number) {
   const section = document.querySelector(
@@ -65,21 +65,48 @@ function fmtNumber(n: number): string {
   return Number(n.toFixed(6)).toString()
 }
 
+const clamp01 = (v: number) => Math.max(0, Math.min(1, v))
+
+/** Snap a [0,1] progress value to a grid. Default 0.01; shift = 0.001 (10× finer);
+ *  alt = no snap (raw). Used both for pointer drag and keyboard nudge. */
+function quantize(p: number, shift: boolean, alt: boolean): number {
+  if (alt) return p
+  const step = shift ? 0.001 : 0.01
+  return Math.round(p / step) * step
+}
+
+/** Minimum band width — keeps a stage from collapsing to zero on edge drag. */
+const MIN_WIDTH = 0.005
+
+type Tick = { readonly p: number; readonly label?: string }
+
+const TICKS: ReadonlyArray<Tick> = [
+  { p: 0, label: "0" },
+  { p: 0.1 },
+  { p: 0.2 },
+  { p: 0.25, label: "0.25" },
+  { p: 0.3 },
+  { p: 0.4 },
+  { p: 0.5, label: "0.5" },
+  { p: 0.6 },
+  { p: 0.7 },
+  { p: 0.75, label: "0.75" },
+  { p: 0.8 },
+  { p: 0.9 },
+  { p: 1, label: "1" },
+]
+
+type DragHint = { id: StageId; lo: number; hi: number }
+
 function serializeFlow(
   targets: FlowTargets,
   windows: FlowStageWindows
 ): string {
-  const stageScreenMap: Record<StageId, ScreenTarget> = {
-    hero: "tiny",
-    wow: "centered",
-    "feature-a": "docked-left",
-    "feature-b": "docked-right",
-  }
   const stagesBlock = [
     "export const STAGES = [",
     ...STAGE_ORDER.map((id) => {
       const w = windows[id]
-      const screen = stageScreenMap[id]
+      const screen = STAGE_SCREEN_MAP[id]
       return `  { id: "${id}", window: [${fmtNumber(w[0])}, ${fmtNumber(w[1])}] as const, screen: "${screen}" },`
     }),
     "] as const satisfies readonly StageDef[]",
@@ -222,6 +249,16 @@ function Timeline({
   setStageWindow: (id: StageId, window: FlowWindow) => void
 }) {
   const trackRef = useRef<HTMLDivElement>(null)
+  const [dragHint, setDragHint] = useState<DragHint | null>(null)
+
+  const applyEdgeMin = (next: FlowWindow): FlowWindow => {
+    const lo = clamp01(next[0])
+    const hi = clamp01(next[1])
+    if (hi - lo >= MIN_WIDTH) return [lo, hi]
+    // Preserve the side the user is moving by widening the opposite side.
+    if (lo + MIN_WIDTH <= 1) return [lo, lo + MIN_WIDTH]
+    return [hi - MIN_WIDTH, hi]
+  }
 
   const beginDrag = (
     e: ReactPointerEvent<HTMLElement>,
@@ -234,44 +271,114 @@ function Timeline({
     if (!track) return
     const rect = track.getBoundingClientRect()
     const startWindow = stageWindows[id]
-    const startProgress = (e.clientX - rect.left) / rect.width
+    const rawStart = clamp01((e.clientX - rect.left) / rect.width)
 
     const onMove = (ev: PointerEvent) => {
-      const p = Math.min(
-        Math.max((ev.clientX - rect.left) / rect.width, 0),
-        1
-      )
-      const delta = p - startProgress
+      const raw = clamp01((ev.clientX - rect.left) / rect.width)
+      const p = quantize(raw, ev.shiftKey, ev.altKey)
+      let next: FlowWindow
       if (mode === "left") {
-        setStageWindow(id, [p, startWindow[1]])
+        next = applyEdgeMin([p, startWindow[1]])
       } else if (mode === "right") {
-        setStageWindow(id, [startWindow[0], p])
+        next = applyEdgeMin([startWindow[0], p])
       } else {
-        // Keep the window inside [0, 1] without changing its width.
+        // Move whole band: snap the delta, keep width fixed.
+        const delta =
+          quantize(raw, ev.shiftKey, ev.altKey) -
+          quantize(rawStart, ev.shiftKey, ev.altKey)
         const width = startWindow[1] - startWindow[0]
-        const lo = startWindow[0] + delta
-        const loClamped = Math.max(0, Math.min(lo, 1 - width))
-        setStageWindow(id, [loClamped, loClamped + width])
+        const lo = clamp01(startWindow[0] + delta)
+        const loClamped = Math.min(lo, 1 - width)
+        next = [Math.max(0, loClamped), Math.max(0, loClamped) + width]
       }
+      setStageWindow(id, next)
+      setDragHint({ id, lo: next[0], hi: next[1] })
     }
     const onUp = () => {
+      setDragHint(null)
       window.removeEventListener("pointermove", onMove)
       window.removeEventListener("pointerup", onUp)
       window.removeEventListener("pointercancel", onUp)
     }
+    setDragHint({ id, lo: startWindow[0], hi: startWindow[1] })
     window.addEventListener("pointermove", onMove)
     window.addEventListener("pointerup", onUp)
     window.addEventListener("pointercancel", onUp)
+  }
+
+  // Click/drop on the bare track area scrubs the page to that progress.
+  // Bands and edge handles call stopPropagation so they won't trigger this.
+  const onTrackPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (e.target !== e.currentTarget) return
+    const track = trackRef.current
+    if (!track) return
+    const rect = track.getBoundingClientRect()
+    const p = clamp01((e.clientX - rect.left) / rect.width)
+    scrubToProgress(p)
+  }
+
+  // Arrow keys nudge the focused band. Default 0.01; Shift = 0.001 (fine).
+  // Alt restricts the move to the left edge only (right edge stays put).
+  const onBandKeyDown = (
+    e: ReactKeyboardEvent<HTMLDivElement>,
+    id: StageId
+  ) => {
+    if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return
+    e.preventDefault()
+    const sign = e.key === "ArrowRight" ? 1 : -1
+    const step = (e.shiftKey ? 0.001 : 0.01) * sign
+    const w = stageWindows[id]
+    let next: FlowWindow
+    if (e.altKey) {
+      next = applyEdgeMin([w[0] + step, w[1]])
+    } else {
+      const width = w[1] - w[0]
+      const lo = clamp01(w[0] + step)
+      const loClamped = Math.min(lo, 1 - width)
+      next = [Math.max(0, loClamped), Math.max(0, loClamped) + width]
+    }
+    setStageWindow(id, next)
   }
 
   return (
     <div>
       <div className="mb-1 flex items-center justify-between text-[10px] tracking-wider text-black/50 uppercase">
         <span>Timeline</span>
-        <span className="font-mono normal-case">drag bands · drag edges</span>
+        <span className="font-mono normal-case">
+          drag · ⇧ fine · ⌥ raw · ⇥ then ←/→
+        </span>
       </div>
+
+      {/* Tick + label rule above the track */}
+      <div className="relative mb-0.5 h-3 font-mono text-[9px] text-black/40">
+        {TICKS.map((t) =>
+          t.label ? (
+            <span
+              className="absolute top-0 -translate-x-1/2"
+              key={`l-${t.p}`}
+              style={{ left: `${t.p * 100}%` }}
+            >
+              {t.label}
+            </span>
+          ) : null
+        )}
+      </div>
+      <div className="relative mb-1 h-1.5">
+        {TICKS.map((t) => (
+          <span
+            aria-hidden
+            className={`absolute top-0 w-px ${
+              t.label ? "h-1.5 bg-black/30" : "h-1 bg-black/15"
+            }`}
+            key={`t-${t.p}`}
+            style={{ left: `${t.p * 100}%` }}
+          />
+        ))}
+      </div>
+
       <div
         className="relative h-8 w-full overflow-visible rounded bg-black/5"
+        onPointerDown={onTrackPointerDown}
         ref={trackRef}
       >
         {STAGE_ORDER.map((id) => {
@@ -280,32 +387,59 @@ function Timeline({
           const width = `${(w[1] - w[0]) * 100}%`
           return (
             <div
-              className="group absolute top-0 flex h-full cursor-grab items-center justify-center rounded text-[9px] font-medium text-black/70 active:cursor-grabbing"
+              className="group absolute top-0 flex h-full cursor-grab items-center justify-center rounded text-[9px] font-medium text-black/70 outline-none ring-offset-1 focus-visible:ring-2 focus-visible:ring-black/60 active:cursor-grabbing"
               key={id}
+              onKeyDown={(e) => onBandKeyDown(e, id)}
               onPointerDown={(e) => beginDrag(e, id, "move")}
+              role="slider"
+              aria-label={`${id} stage window`}
+              aria-valuemin={0}
+              aria-valuemax={1}
+              aria-valuenow={w[0]}
+              tabIndex={0}
               style={{ left, width, backgroundColor: STAGE_COLORS[id] }}
               title={`${id}: ${w[0].toFixed(3)}–${w[1].toFixed(3)} (${(w[1] - w[0]).toFixed(3)})`}
             >
               <span className="pointer-events-none truncate px-1">{id}</span>
               <span
                 aria-hidden
-                className="absolute top-0 -left-1 h-full w-2 cursor-ew-resize rounded-l bg-black/0 group-hover:bg-black/20"
+                className="absolute top-0 -left-1 z-10 flex h-full w-2 cursor-ew-resize items-center justify-center"
                 onPointerDown={(e) => beginDrag(e, id, "left")}
-              />
+              >
+                <span className="block h-full w-0.5 rounded-sm bg-black/40 group-hover:bg-black/70" />
+              </span>
               <span
                 aria-hidden
-                className="absolute top-0 -right-1 h-full w-2 cursor-ew-resize rounded-r bg-black/0 group-hover:bg-black/20"
+                className="absolute top-0 -right-1 z-10 flex h-full w-2 cursor-ew-resize items-center justify-center"
                 onPointerDown={(e) => beginDrag(e, id, "right")}
-              />
+              >
+                <span className="block h-full w-0.5 rounded-sm bg-black/40 group-hover:bg-black/70" />
+              </span>
             </div>
           )
         })}
+
+        {/* Live drag readout chip */}
+        {dragHint ? (
+          <div
+            className="pointer-events-none absolute -top-7 z-20 rounded bg-black/85 px-1.5 py-0.5 font-mono text-[10px] whitespace-nowrap text-white"
+            style={{
+              left: `${((dragHint.lo + dragHint.hi) / 2) * 100}%`,
+              transform: "translateX(-50%)",
+            }}
+          >
+            {fmtNumber(dragHint.lo)} → {fmtNumber(dragHint.hi)} (
+            {fmtNumber(dragHint.hi - dragHint.lo)})
+          </div>
+        ) : null}
+
         <div
           aria-hidden
           className="pointer-events-none absolute top-0 h-full w-[2px] bg-black"
           style={{ left: `${progress * 100}%` }}
         />
       </div>
+
       <input
         aria-label="Scroll progress"
         className="mt-2 w-full"
@@ -316,9 +450,11 @@ function Timeline({
         type="range"
         value={progress}
       />
-      <div className="mt-2 grid grid-cols-2 gap-x-2 gap-y-1 text-[10px]">
+
+      <div className="mt-2 space-y-1 text-[10px]">
         {STAGE_ORDER.map((id) => {
           const w = stageWindows[id]
+          const width = w[1] - w[0]
           return (
             <div
               className="flex items-center gap-1.5"
@@ -330,30 +466,33 @@ function Timeline({
                 className="inline-block size-2 rounded-sm"
                 style={{ backgroundColor: STAGE_COLORS[id] }}
               />
-              <span className="w-14 truncate">{id}</span>
+              <span className="w-16 truncate">{id}</span>
               <input
-                className="w-12 rounded border border-black/15 bg-white px-1 py-0.5 font-mono text-[10px]"
+                className="w-16 rounded border border-black/15 bg-white px-1 py-0.5 font-mono text-[10px] tabular-nums"
                 max={1}
                 min={0}
                 onChange={(e) =>
                   setStageWindow(id, [Number(e.target.value), w[1]])
                 }
-                step={0.005}
+                step={0.001}
                 type="number"
                 value={fmtNumber(w[0])}
               />
               <span className="text-black/40">→</span>
               <input
-                className="w-12 rounded border border-black/15 bg-white px-1 py-0.5 font-mono text-[10px]"
+                className="w-16 rounded border border-black/15 bg-white px-1 py-0.5 font-mono text-[10px] tabular-nums"
                 max={1}
                 min={0}
                 onChange={(e) =>
                   setStageWindow(id, [w[0], Number(e.target.value)])
                 }
-                step={0.005}
+                step={0.001}
                 type="number"
                 value={fmtNumber(w[1])}
               />
+              <span className="ml-auto font-mono text-[10px] tabular-nums text-black/40">
+                {fmtNumber(width)}
+              </span>
             </div>
           )
         })}
@@ -380,7 +519,7 @@ function TargetEditor({
         <NumberField
           label="scale"
           onChange={(v) => onChange({ scale: v })}
-          step={0.005}
+          step={0.001}
           value={target.scale}
         />
         <NumberField
