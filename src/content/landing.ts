@@ -16,7 +16,7 @@ export const navItems: readonly NavItem[] = [
 
 /**
  * Per-stage copy keyed by StageId. Discriminated union enforces correct
- * shape per stage at compile time (e.g., feature-a MUST have exactly 3
+ * shape per stage at compile time (e.g., docked MUST have exactly 3
  * bullets — adding a fourth is a TypeScript error).
  *
  * Phase 4 (CONTENT-01..05) owns the final copy rewrite — Phase 1 ships
@@ -39,7 +39,7 @@ export const stages: readonly StageCopyContent[] = [
     },
   },
   {
-    id: "feature-a",
+    id: "docked",
     copy: {
       kicker: "A profile for every student",
       heading: "Every student, in context.",

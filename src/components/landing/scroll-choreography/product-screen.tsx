@@ -3,12 +3,13 @@
  *
  * Carries the browser-frame chrome + a responsive <picture> of the
  * product screenshot. Three useTransform calls (scale, x, opacity) drive
- * the morph across the three SCREEN_TARGETS (tiny → centered →
- * docked-left) using a 6-stop keyframe array built from
+ * the morph across the three stages (hero → wow → docked) using a 6-stop
+ * keyframe array built from
  * STAGES.flatMap(s => [s.window[0], s.window[1]]) — the holds — and
  * per-segment cubic-bezier eases for the 2 morph zones.
  *
- *   - D-04 / D-08: keyframe values resolve from SCREEN_TARGETS map
+ *   - Keyframe values resolve from each stage's inlined rect fields
+ *     (scale / x / y / opacity), no preset-target indirection.
  *   - D-14: per-segment cubic-bezier eases via useTransform's { ease } option
  *   - D-15: light overshoot (~1.04) at each stage's arrival peak rides on the
  *     cubic-bezier curve's natural response (no per-stage stop value)
@@ -30,84 +31,61 @@
  * NOT accepted by the type and would be pipe()'d directly at runtime, so we
  * import the function ref (easeOut) from "motion" rather than using the
  * string-literal form.
- *
- * Note on MIGRATE-03 walker (D-12): the AST walker requires args[1] of
- * each useTransform call to be a literal ArrayExpression where every
- * element is a Literal (0/1), Identifier (named const), or MemberExpression
- * (STAGES[i].window[j] / SCREEN_TARGETS[...]...). Spread elements and
- * CallExpressions are not accepted, so the keyframe arrays at the call
- * sites are written as fully-inlined literal arrays of MemberExpressions
- * referencing STAGES + SCREEN_TARGETS by index/key. The data-driven
- * STAGES.flatMap form is documented (and unit-tested) as equivalent —
- * adding a 4th stage requires extending these arrays in lock-step with
- * STAGES, but the values continue to resolve from the single source of
- * truth (STAGES + SCREEN_TARGETS). The flatMap shape:
- *     STAGES.flatMap(s => [s.window[0], s.window[1]])  // 6-stop input
- *     STAGES.flatMap(s => { const v = SCREEN_TARGETS[s.screen][axis]; return [v, v] })
- * is preserved verbatim in the per-axis tests so a regression is loud.
  */
 import { cubicBezier, easeOut } from "motion"
 import { motion, useTransform } from "motion/react"
 
 import { useScrollChoreography } from "./context"
-import { useFlowStages, useFlowTargets } from "./dev-flow-context"
+import { useFlowStages } from "./dev-flow-context"
 
 import { TEACHER_WORKSPACE_APP_URL } from "@/content/landing"
 
 // D-14: per-segment easing curves — first-pass; tunable at human-verify (D-17)
 const EASE_HERO_TO_WOW = cubicBezier(0.32, 0, 0.67, 1)
-const EASE_WOW_TO_FA = cubicBezier(0.4, 0, 0.2, 1)
+const EASE_WOW_TO_DOCKED = cubicBezier(0.4, 0, 0.2, 1)
 const LINEAR = (t: number) => t // hold-segment no-op
 
 // Per-axis ease arrays. 6 stops → 5 segments. Hold segments use LINEAR
 // (no-op since values are identical at hold edges). Morph segments use
 // the cubic-bezier curves.
 const SCALE_EASES = [
-  LINEAR, // 0→0.10  hero hold
-  EASE_HERO_TO_WOW, // 0.10→0.20 hero→wow morph
-  LINEAR, // 0.20→0.55 wow hold
-  EASE_WOW_TO_FA, // 0.55→0.65 wow→fA morph
-  LINEAR, // 0.65→1.00 fA hold
+  LINEAR, // hero hold
+  EASE_HERO_TO_WOW, // hero→wow morph
+  LINEAR, // wow hold
+  EASE_WOW_TO_DOCKED, // wow→docked morph
+  LINEAR, // docked hold
 ]
 
-// Hero→wow: easeOut (settle); wow→fA: matches scale curve so axes feel
+// Hero→wow: easeOut (settle); wow→docked: matches scale curve so axes feel
 // coupled.
 const X_EASES = [
   LINEAR, // hero hold
   easeOut, // hero→wow
   LINEAR, // wow hold
-  EASE_WOW_TO_FA, // wow→fA
-  LINEAR, // fA hold
+  EASE_WOW_TO_DOCKED, // wow→docked
+  LINEAR, // docked hold
 ]
 
-// Only the hero→wow segment matters for opacity (it goes 0→1 there); all
-// other segments are 1→1 holds where ease is irrelevant.
+// Only the hero→wow segment matters for opacity (it goes 0→1 there if any
+// stage opts out of opacity 1; today all stages = 1, so all segments are holds).
 const OPACITY_EASES = [
-  LINEAR, // hero hold (0→0)
-  easeOut, // hero→wow (0→1)
-  LINEAR, // wow hold (1→1)
-  LINEAR, // wow→fA (1→1)
-  LINEAR, // fA hold (1→1)
+  LINEAR, // hero hold
+  easeOut, // hero→wow
+  LINEAR, // wow hold
+  LINEAR, // wow→docked
+  LINEAR, // docked hold
 ]
 
 export function ProductScreen() {
   const { scrollYProgress } = useScrollChoreography()
-  // Reads live overrides from <DevFlowPanel> when mounted; both fall back
-  // to compile-time defaults outside dev. STAGES window edges + SCREEN_TARGETS
-  // values flow through hooks so useTransform re-derives keyframes on each
-  // render — visual changes are visible the same frame in dev tuning.
-  const targets = useFlowTargets()
+  // Reads live overrides from <DevFlowPanel> when mounted; falls back to
+  // compile-time STAGES outside dev. Keyframes re-derive on each render so
+  // visual changes are visible the same frame in dev tuning.
   const STAGES = useFlowStages()
 
-  // The keyframe arrays are inlined as literal ArrayExpressions of
-  // MemberExpressions binding to STAGES + SCREEN_TARGETS — the MIGRATE-03
-  // AST walker (D-12) accepts these as data-driven references. Every
-  // numeric literal here is 0, 1, or a named const; every other entry
-  // resolves to STAGES[i].window[j] or SCREEN_TARGETS[k].axis.
-  //
-  // Equivalent flatMap form (verified in tests):
-  //   STAGES.flatMap(s => [s.window[0], s.window[1]])
-  //   STAGES.flatMap(s => { const v = SCREEN_TARGETS[s.screen].scale; return [v, v] })
+  // 6-stop keyframe array: STAGES.flatMap(s => [s.window[0], s.window[1]]).
+  // Inlined as a literal MemberExpression array so the structure is grep-able
+  // and adding a 4th stage requires extending each array in lock-step.
 
   const scale = useTransform(
     scrollYProgress,
@@ -120,12 +98,12 @@ export function ProductScreen() {
       STAGES[2].window[1],
     ],
     [
-      targets[STAGES[0].screen].scale,
-      targets[STAGES[0].screen].scale,
-      targets[STAGES[1].screen].scale,
-      targets[STAGES[1].screen].scale,
-      targets[STAGES[2].screen].scale,
-      targets[STAGES[2].screen].scale,
+      STAGES[0].scale,
+      STAGES[0].scale,
+      STAGES[1].scale,
+      STAGES[1].scale,
+      STAGES[2].scale,
+      STAGES[2].scale,
     ],
     { ease: SCALE_EASES }
   )
@@ -141,17 +119,17 @@ export function ProductScreen() {
       STAGES[2].window[1],
     ],
     [
-      targets[STAGES[0].screen].x,
-      targets[STAGES[0].screen].x,
-      targets[STAGES[1].screen].x,
-      targets[STAGES[1].screen].x,
-      targets[STAGES[2].screen].x,
-      targets[STAGES[2].screen].x,
+      STAGES[0].x,
+      STAGES[0].x,
+      STAGES[1].x,
+      STAGES[1].x,
+      STAGES[2].x,
+      STAGES[2].x,
     ],
     { ease: X_EASES }
   )
 
-  // y mirrors the x channel — non-zero only on tiny so the screen overlays
+  // y mirrors the x channel — non-zero only on hero so the screen overlays
   // the laptop in the cartoon illustration during hero stage.
   const y = useTransform(
     scrollYProgress,
@@ -164,12 +142,12 @@ export function ProductScreen() {
       STAGES[2].window[1],
     ],
     [
-      targets[STAGES[0].screen].y,
-      targets[STAGES[0].screen].y,
-      targets[STAGES[1].screen].y,
-      targets[STAGES[1].screen].y,
-      targets[STAGES[2].screen].y,
-      targets[STAGES[2].screen].y,
+      STAGES[0].y,
+      STAGES[0].y,
+      STAGES[1].y,
+      STAGES[1].y,
+      STAGES[2].y,
+      STAGES[2].y,
     ],
     { ease: X_EASES }
   )
@@ -192,12 +170,12 @@ export function ProductScreen() {
       STAGES[2].window[1],
     ],
     [
-      targets[STAGES[0].screen].opacity,
-      targets[STAGES[0].screen].opacity,
-      targets[STAGES[1].screen].opacity,
-      targets[STAGES[1].screen].opacity,
-      targets[STAGES[2].screen].opacity,
-      targets[STAGES[2].screen].opacity,
+      STAGES[0].opacity,
+      STAGES[0].opacity,
+      STAGES[1].opacity,
+      STAGES[1].opacity,
+      STAGES[2].opacity,
+      STAGES[2].opacity,
     ],
     { ease: OPACITY_EASES, clamp: false }
   )

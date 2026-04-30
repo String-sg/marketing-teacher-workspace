@@ -5,10 +5,10 @@
  * by import.meta.env.DEV). Provides:
  *   - A timeline strip with per-stage colored windows + the live
  *     scrollYProgress indicator + a click/drag scrubber.
- *   - A per-target editor (tiny / centered / docked-left / docked-right)
- *     with scale, x, y, opacity inputs that update SCREEN_TARGETS via
- *     <DevFlowProvider>'s React state — useTransform re-derives on each
- *     render so visual changes are immediate.
+ *   - A per-stage editor (hero / wow / docked) combining window inputs
+ *     with the rect fields (scale / x / y / opacity) that update the
+ *     STAGES override via <DevFlowProvider>'s React state — useTransform
+ *     re-derives on each render so visual changes are immediate.
  *
  * Not exported in production: <ChoreographyTree> only mounts this when
  * import.meta.env.DEV is true. The panel itself is a single fixed-position
@@ -24,29 +24,17 @@ import type {
 
 import { useScrollChoreography } from "./context"
 import { useFlowControls } from "./dev-flow-context"
-import type {
-  FlowStageWindows,
-  FlowTargets,
-  FlowWindow,
-} from "./dev-flow-context"
-import { SCREEN_TARGETS, STAGES } from "./stages"
-import type { ScreenTarget, ScreenTargetRect, StageId } from "./types"
+import type { FlowWindow, StageRectPatch } from "./dev-flow-context"
+import { STAGES } from "./stages"
+import type { StageDef, StageId } from "./types"
 
 const STAGE_COLORS: Record<StageId, string> = {
   hero: "#a3d4ff",
   wow: "#ffd28f",
-  "feature-a": "#9be0a8",
+  docked: "#9be0a8",
 }
 
 const STAGE_ORDER: readonly StageId[] = STAGES.map((s) => s.id)
-
-const TARGET_ORDER: readonly ScreenTarget[] = Object.keys(
-  SCREEN_TARGETS
-) as ScreenTarget[]
-
-const STAGE_SCREEN_MAP: Record<StageId, ScreenTarget> = Object.fromEntries(
-  STAGES.map((s) => [s.id, s.screen])
-) as Record<StageId, ScreenTarget>
 
 function scrubToProgress(progress: number) {
   const section = document.querySelector(
@@ -98,29 +86,24 @@ const TICKS: ReadonlyArray<Tick> = [
 
 type DragHint = { id: StageId; lo: number; hi: number }
 
-function serializeFlow(
-  targets: FlowTargets,
-  windows: FlowStageWindows
-): string {
-  const stagesBlock = [
+function serializeFlow(stages: readonly StageDef[]): string {
+  const lines = [
     "export const STAGES = [",
-    ...STAGE_ORDER.map((id) => {
-      const w = windows[id]
-      const screen = STAGE_SCREEN_MAP[id]
-      return `  { id: "${id}", window: [${fmtNumber(w[0])}, ${fmtNumber(w[1])}] as const, screen: "${screen}" },`
+    ...stages.map((s) => {
+      return [
+        "  {",
+        `    id: "${s.id}",`,
+        `    window: [${fmtNumber(s.window[0])}, ${fmtNumber(s.window[1])}] as const,`,
+        `    scale: ${fmtNumber(s.scale)},`,
+        `    x: "${s.x}",`,
+        `    y: "${s.y}",`,
+        `    opacity: ${fmtNumber(s.opacity)},`,
+        "  },",
+      ].join("\n")
     }),
     "] as const satisfies readonly StageDef[]",
   ]
-  const targetsBlock = [
-    "export const SCREEN_TARGETS: Record<ScreenTarget, ScreenTargetRect> = {",
-    ...TARGET_ORDER.map((key) => {
-      const t = targets[key]
-      const k = key.includes("-") ? `"${key}"` : key
-      return `  ${k}: { scale: ${fmtNumber(t.scale)}, x: "${t.x}", y: "${t.y}", opacity: ${fmtNumber(t.opacity)} },`
-    }),
-    "} as const",
-  ]
-  return [...stagesBlock, "", ...targetsBlock].join("\n")
+  return lines.join("\n")
 }
 
 async function copyText(text: string): Promise<boolean> {
@@ -154,7 +137,7 @@ export function DevFlowPanel() {
 
   if (!controls) return null
 
-  const configText = serializeFlow(controls.targets, controls.stageWindows)
+  const configText = serializeFlow(controls.stages)
 
   const handleCopy = async () => {
     const ok = await copyText(configText)
@@ -184,17 +167,16 @@ export function DevFlowPanel() {
         <div className="space-y-3 p-3">
           <Timeline
             progress={progress}
-            stageWindows={controls.stageWindows}
-            setStageWindow={controls.setStageWindow}
+            stages={controls.stages}
+            setStage={controls.setStage}
           />
 
           <div className="space-y-2">
-            {TARGET_ORDER.map((key) => (
-              <TargetEditor
-                key={key}
-                onChange={(patch) => controls.setTarget(key, patch)}
-                stageKey={key}
-                target={controls.targets[key]}
+            {controls.stages.map((stage) => (
+              <StageEditor
+                key={stage.id}
+                onChange={(patch) => controls.setStage(stage.id, patch)}
+                stage={stage}
               />
             ))}
           </div>
@@ -241,21 +223,22 @@ type DragMode = "move" | "left" | "right"
 
 function Timeline({
   progress,
-  stageWindows,
-  setStageWindow,
+  stages,
+  setStage,
 }: {
   progress: number
-  stageWindows: FlowStageWindows
-  setStageWindow: (id: StageId, window: FlowWindow) => void
+  stages: readonly StageDef[]
+  setStage: (id: StageId, patch: StageRectPatch) => void
 }) {
   const trackRef = useRef<HTMLDivElement>(null)
   const [dragHint, setDragHint] = useState<DragHint | null>(null)
+
+  const stageById = (id: StageId) => stages.find((s) => s.id === id)!
 
   const applyEdgeMin = (next: FlowWindow): FlowWindow => {
     const lo = clamp01(next[0])
     const hi = clamp01(next[1])
     if (hi - lo >= MIN_WIDTH) return [lo, hi]
-    // Preserve the side the user is moving by widening the opposite side.
     if (lo + MIN_WIDTH <= 1) return [lo, lo + MIN_WIDTH]
     return [hi - MIN_WIDTH, hi]
   }
@@ -270,7 +253,7 @@ function Timeline({
     const track = trackRef.current
     if (!track) return
     const rect = track.getBoundingClientRect()
-    const startWindow = stageWindows[id]
+    const startWindow = stageById(id).window
     const rawStart = clamp01((e.clientX - rect.left) / rect.width)
 
     const onMove = (ev: PointerEvent) => {
@@ -282,7 +265,6 @@ function Timeline({
       } else if (mode === "right") {
         next = applyEdgeMin([startWindow[0], p])
       } else {
-        // Move whole band: snap the delta, keep width fixed.
         const delta =
           quantize(raw, ev.shiftKey, ev.altKey) -
           quantize(rawStart, ev.shiftKey, ev.altKey)
@@ -291,7 +273,7 @@ function Timeline({
         const loClamped = Math.min(lo, 1 - width)
         next = [Math.max(0, loClamped), Math.max(0, loClamped) + width]
       }
-      setStageWindow(id, next)
+      setStage(id, { window: next })
       setDragHint({ id, lo: next[0], hi: next[1] })
     }
     const onUp = () => {
@@ -306,8 +288,6 @@ function Timeline({
     window.addEventListener("pointercancel", onUp)
   }
 
-  // Click/drop on the bare track area scrubs the page to that progress.
-  // Bands and edge handles call stopPropagation so they won't trigger this.
   const onTrackPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (e.target !== e.currentTarget) return
     const track = trackRef.current
@@ -317,8 +297,6 @@ function Timeline({
     scrubToProgress(p)
   }
 
-  // Arrow keys nudge the focused band. Default 0.01; Shift = 0.001 (fine).
-  // Alt restricts the move to the left edge only (right edge stays put).
   const onBandKeyDown = (
     e: ReactKeyboardEvent<HTMLDivElement>,
     id: StageId
@@ -327,7 +305,7 @@ function Timeline({
     e.preventDefault()
     const sign = e.key === "ArrowRight" ? 1 : -1
     const step = (e.shiftKey ? 0.001 : 0.01) * sign
-    const w = stageWindows[id]
+    const w = stageById(id).window
     let next: FlowWindow
     if (e.altKey) {
       next = applyEdgeMin([w[0] + step, w[1]])
@@ -337,7 +315,7 @@ function Timeline({
       const loClamped = Math.min(lo, 1 - width)
       next = [Math.max(0, loClamped), Math.max(0, loClamped) + width]
     }
-    setStageWindow(id, next)
+    setStage(id, { window: next })
   }
 
   return (
@@ -349,7 +327,6 @@ function Timeline({
         </span>
       </div>
 
-      {/* Tick + label rule above the track */}
       <div className="relative mb-0.5 h-3 font-mono text-[9px] text-black/40">
         {TICKS.map((t) =>
           t.label ? (
@@ -382,7 +359,7 @@ function Timeline({
         ref={trackRef}
       >
         {STAGE_ORDER.map((id) => {
-          const w = stageWindows[id]
+          const w = stageById(id).window
           const left = `${w[0] * 100}%`
           const width = `${(w[1] - w[0]) * 100}%`
           return (
@@ -419,7 +396,6 @@ function Timeline({
           )
         })}
 
-        {/* Live drag readout chip */}
         {dragHint ? (
           <div
             className="pointer-events-none absolute -top-7 z-20 rounded bg-black/85 px-1.5 py-0.5 font-mono text-[10px] whitespace-nowrap text-white"
@@ -453,7 +429,7 @@ function Timeline({
 
       <div className="mt-2 space-y-1 text-[10px]">
         {STAGE_ORDER.map((id) => {
-          const w = stageWindows[id]
+          const w = stageById(id).window
           const width = w[1] - w[0]
           return (
             <div
@@ -472,7 +448,7 @@ function Timeline({
                 max={1}
                 min={0}
                 onChange={(e) =>
-                  setStageWindow(id, [Number(e.target.value), w[1]])
+                  setStage(id, { window: [Number(e.target.value), w[1]] })
                 }
                 step={0.001}
                 type="number"
@@ -484,7 +460,7 @@ function Timeline({
                 max={1}
                 min={0}
                 onChange={(e) =>
-                  setStageWindow(id, [w[0], Number(e.target.value)])
+                  setStage(id, { window: [w[0], Number(e.target.value)] })
                 }
                 step={0.001}
                 type="number"
@@ -501,26 +477,24 @@ function Timeline({
   )
 }
 
-function TargetEditor({
-  stageKey,
-  target,
+function StageEditor({
+  stage,
   onChange,
 }: {
-  stageKey: ScreenTarget
-  target: ScreenTargetRect
-  onChange: (patch: Partial<ScreenTargetRect>) => void
+  stage: StageDef
+  onChange: (patch: StageRectPatch) => void
 }) {
   return (
-    <details className="rounded border border-black/10" open={stageKey === "tiny"}>
+    <details className="rounded border border-black/10" open={stage.id === "hero"}>
       <summary className="cursor-pointer px-2 py-1 font-medium tracking-wide select-none">
-        {stageKey}
+        {stage.id}
       </summary>
       <div className="grid grid-cols-2 gap-1.5 px-2 pt-1 pb-2">
         <NumberField
           label="scale"
           onChange={(v) => onChange({ scale: v })}
           step={0.001}
-          value={target.scale}
+          value={stage.scale}
         />
         <NumberField
           label="opacity"
@@ -528,19 +502,19 @@ function TargetEditor({
           min={0}
           onChange={(v) => onChange({ opacity: v })}
           step={0.05}
-          value={target.opacity}
+          value={stage.opacity}
         />
         <StringField
           label="x"
           onChange={(v) => onChange({ x: v })}
           placeholder="0 / +Nvw"
-          value={target.x}
+          value={stage.x}
         />
         <StringField
           label="y"
           onChange={(v) => onChange({ y: v })}
           placeholder="0 / +Nvh"
-          value={target.y}
+          value={stage.y}
         />
       </div>
     </details>

@@ -41,6 +41,7 @@ import { useIsDesktop } from "./use-is-desktop"
 
 import { FinalCta } from "@/components/landing/final-cta"
 import { ProofStrip } from "@/components/landing/proof-strip"
+import { SiteHeader } from "@/components/landing/site-header"
 import { Button } from "@/components/ui/button"
 import {
   finalCtaCopy,
@@ -140,8 +141,11 @@ function ChoreographyTree({
       >
         <div className="sticky top-0 flex h-svh items-stretch overflow-hidden p-3">
           <PaperBackdrop>
+            <div className="px-4 pt-4 sm:px-6 sm:pt-6">
+              <SiteHeader />
+            </div>
             <motion.div
-              className="mt-14 flex flex-col items-center text-center sm:mt-20"
+              className="mx-auto mt-10 flex w-fit flex-col items-center text-center sm:mt-14"
               style={{ opacity: copyOpacity, y: copyY }}
             >
               <h1
@@ -164,7 +168,7 @@ function ChoreographyTree({
             </motion.div>
           </PaperBackdrop>
           <ProductScreen />
-          <StageCopy stage="feature-a" />
+          <StageCopy stage="docked" />
         </div>
       </section>
       {/* Page-tail sections are siblings of the choreography per

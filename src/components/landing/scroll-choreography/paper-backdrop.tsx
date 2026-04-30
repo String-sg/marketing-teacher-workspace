@@ -155,11 +155,10 @@ export function PaperBackdrop({ children }: { children?: ReactNode }) {
         />
       </motion.div>
 
-      {/* D-06: children nest between cloud layers and the video container,
-          matching paper-hero.tsx:147-170's slot exactly. */}
-      <div className="relative z-10 mx-auto flex w-fit flex-col pt-8 sm:pt-10">
-        {children}
-      </div>
+      {/* D-06: children nest between cloud layers and the video container.
+          Full-width slot so the orchestrator can pass a top SiteHeader
+          (full-bleed) above the centered hero copy block. */}
+      <div className="relative z-10 flex w-full flex-col">{children}</div>
 
       <div className="relative z-0 mt-auto flex w-full justify-center pb-0">
         <div className="relative w-full max-w-[360px] px-4 sm:max-w-[400px]">

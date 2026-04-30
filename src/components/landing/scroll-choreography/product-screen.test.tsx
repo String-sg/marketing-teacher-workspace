@@ -4,7 +4,7 @@
  * Covers:
  *   - CHOREO-01 mount stability: single motion.div, never unmounts, no
  *     shared-element layout-id attribute
- *   - 3-stage stitched morph (hero/wow/feature-a all emit visible state)
+ *   - 3-stage stitched morph (hero/wow/docked all emit visible state)
  *   - CHOREO-06 / D-10: visual props flow direct from useTransform into style
  *   - VISUAL-03 / D-10 / D-11: <picture> renders 3 image-format sources
  *   - A11Y-05 / D-13: alt text is the spec-verbatim string
@@ -80,9 +80,9 @@ describe("ProductScreen mount stability (CHOREO-01)", () => {
 
 describe("ProductScreen motion-value shape (CHOREO-06 / D-10)", () => {
   it("renders inline styles carrying motion-value-driven opacity, x (outer) and scale (inner)", () => {
-    // Probe at progress=0.6 — inside the wow→feature-a morph zone
-    // ([wow.window[1]=0.55, feature-a.window[0]=0.65]) where scale
-    // interpolates 1.0→0.5 and x interpolates 0→-28vw, so both axes
+    // Probe at progress=0.6 — inside the wow→docked morph zone
+    // ([wow.window[1]=0.55, docked.window[0]=0.65]) where scale
+    // interpolates 1.0→0.5 and x interpolates 0→+28vw, so both axes
     // are guaranteed to emit non-identity transform values into the
     // inline style attribute.
     const { container } = renderWithMockProgress(0.6)

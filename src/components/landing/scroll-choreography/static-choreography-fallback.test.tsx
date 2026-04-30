@@ -10,10 +10,10 @@ describe("StaticChoreographyFallback", () => {
     expect(h1s).toHaveLength(1)
   })
 
-  it("renders the feature-a h2 alongside proof and final-cta h2s", () => {
+  it("renders the docked-stage h2 alongside proof and final-cta h2s", () => {
     render(<StaticChoreographyFallback />)
     const h2s = screen.getAllByRole("heading", { level: 2 })
-    // h2 candidates: feature-a, proof-strip, final-cta = at least 3
+    // h2 candidates: docked, proof-strip, final-cta = at least 3
     expect(h2s.length).toBeGreaterThanOrEqual(3)
   })
 

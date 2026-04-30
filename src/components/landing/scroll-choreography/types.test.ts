@@ -1,8 +1,6 @@
 import { describe, it, expectTypeOf } from "vitest"
 
 import type {
-  ScreenTarget,
-  ScreenTargetRect,
   ScrollChoreographyContextValue,
   ScrollChoreographyMode,
   StageCopyContent,
@@ -13,7 +11,7 @@ import type {
 
 describe("scroll-choreography type module", () => {
   it("StageId is a string-literal union of exactly 3 ids", () => {
-    expectTypeOf<StageId>().toEqualTypeOf<"hero" | "wow" | "feature-a">()
+    expectTypeOf<StageId>().toEqualTypeOf<"hero" | "wow" | "docked">()
   })
 
   it("StageWindow is a readonly [number, number] tuple", () => {
@@ -22,21 +20,18 @@ describe("scroll-choreography type module", () => {
     >()
   })
 
-  it("ScreenTarget is a string-literal union of 3 presets", () => {
-    expectTypeOf<ScreenTarget>().toEqualTypeOf<
-      "tiny" | "centered" | "docked-left"
-    >()
-  })
-
-  it("StageDef has readonly id/window/screen fields", () => {
+  it("StageDef has readonly id/window plus inlined rect fields (scale/x/y/opacity)", () => {
     expectTypeOf<StageDef["id"]>().toEqualTypeOf<StageId>()
     expectTypeOf<StageDef["window"]>().toEqualTypeOf<StageWindow>()
-    expectTypeOf<StageDef["screen"]>().toEqualTypeOf<ScreenTarget>()
+    expectTypeOf<StageDef["scale"]>().toEqualTypeOf<number>()
+    expectTypeOf<StageDef["x"]>().toEqualTypeOf<string>()
+    expectTypeOf<StageDef["y"]>().toEqualTypeOf<string>()
+    expectTypeOf<StageDef["opacity"]>().toEqualTypeOf<number>()
   })
 
-  it("StageCopyContent for feature-a has exactly-3-bullets tuple", () => {
-    type FeatureA = Extract<StageCopyContent, { id: "feature-a" }>
-    expectTypeOf<FeatureA["copy"]["bullets"]>().toEqualTypeOf<
+  it("StageCopyContent for docked has exactly-3-bullets tuple", () => {
+    type Docked = Extract<StageCopyContent, { id: "docked" }>
+    expectTypeOf<Docked["copy"]["bullets"]>().toEqualTypeOf<
       readonly [string, string, string]
     >()
   })
@@ -44,14 +39,6 @@ describe("scroll-choreography type module", () => {
   it("ScrollChoreographyMode is 'choreography' | 'static'", () => {
     expectTypeOf<ScrollChoreographyMode>().toEqualTypeOf<
       "choreography" | "static"
-    >()
-  })
-
-  it("ScreenTargetRect has scale/x/y/opacity required and clipPath optional", () => {
-    expectTypeOf<ScreenTargetRect["scale"]>().toEqualTypeOf<number>()
-    expectTypeOf<ScreenTargetRect["x"]>().toEqualTypeOf<string>()
-    expectTypeOf<ScreenTargetRect["clipPath"]>().toEqualTypeOf<
-      string | undefined
     >()
   })
 

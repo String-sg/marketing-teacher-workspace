@@ -8,6 +8,7 @@ import {
 import { useEffect, useRef, useState } from "react"
 
 import { useIsDesktop } from "@/components/landing/scroll-choreography/use-is-desktop"
+import { SiteHeader } from "@/components/landing/site-header"
 import { Button } from "@/components/ui/button"
 import {
   finalCtaCopy,
@@ -144,9 +145,12 @@ export function PaperHero() {
             />
           </motion.div>
 
-          <div className="relative z-10 mx-auto flex w-fit flex-col pt-8 sm:pt-10">
+          <div className="relative z-10 flex w-full flex-col">
+            <div className="px-4 pt-4 sm:px-6 sm:pt-6">
+              <SiteHeader />
+            </div>
             <motion.div
-              className="mt-14 flex flex-col items-center text-center sm:mt-20"
+              className="mx-auto mt-10 flex w-fit flex-col items-center text-center sm:mt-14"
               style={reduced ? undefined : { opacity: copyOpacity, y: copyY }}
             >
               <h1

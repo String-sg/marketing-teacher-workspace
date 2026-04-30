@@ -1,40 +1,42 @@
 import type { MotionValue } from "motion/react"
 
 /** The three scroll-driven stages, ordered by narrative beat. */
-export type StageId = "hero" | "wow" | "feature-a"
+export type StageId = "hero" | "wow" | "docked"
 
 /** Scroll-progress window: [enter, exit] in master scrollYProgress (0..1). */
 export type StageWindow = readonly [start: number, end: number]
 
-/** Named layout target for the shared product screen at this stage's peak. */
-export type ScreenTarget =
-  | "tiny" // hero — small inside the illustration
-  | "centered" // wow — near-full-viewport reveal
-  | "docked-left" // feature-a — docked one side
-
 /**
- * Shape filled in Phase 3 — declared in Phase 1 as a type-only contract.
- * Phase 3's <ProductScreen> resolves preset → rect at runtime.
+ * A single choreography stage. Window defines where in master scroll
+ * progress (0..1) this stage's hold lives; the morph between adjacent
+ * stages happens in the gap between prev.window[1] and next.window[0].
+ *
+ * The rect fields (scale / x / y / opacity) describe the product-screen's
+ * peak-of-stage transform target. ProductScreen's useTransform reads
+ * these directly — no intermediate ScreenTarget preset layer.
+ *
+ * Conventions:
+ *   - x sign: negative = leftward (toward viewport left), positive =
+ *     rightward (toward viewport right). Values include CSS units (vw / vh)
+ *     so motion's mix() interpolates them as units, not numbers.
+ *   - Hero rect positions the screen over the laptop in the cartoon
+ *     illustration (small scale + offset right + offset down).
+ *   - Wow rect is the centered full-viewport reveal (scale 1, x/y "0").
+ *   - Docked rect parks the screen on one side (positive x = right side).
  */
-export type ScreenTargetRect = {
+export type StageDef = {
+  readonly id: StageId
+  readonly window: StageWindow
   readonly scale: number
   readonly x: string
   readonly y: string
   readonly opacity: number
-  readonly clipPath?: string
-}
-
-/** A single choreography stage's structural definition. */
-export type StageDef = {
-  readonly id: StageId
-  readonly window: StageWindow
-  readonly screen: ScreenTarget
 }
 
 /**
  * Per-stage copy — discriminated union by `id` (per CONTEXT.md D-07).
  * The exact-3-bullets tuple enforces CONTENT-03/04 at compile time:
- * adding a fourth bullet to feature-a or feature-b is a TypeScript error.
+ * adding a fourth bullet to docked is a TypeScript error.
  */
 export type StageCopyContent =
   | {
@@ -49,7 +51,7 @@ export type StageCopyContent =
       readonly copy: { readonly caption?: string }
     }
   | {
-      readonly id: "feature-a"
+      readonly id: "docked"
       readonly copy: {
         readonly kicker: string
         readonly heading: string

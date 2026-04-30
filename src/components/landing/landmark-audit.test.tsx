@@ -2,21 +2,20 @@ import { describe, expect, it } from "vitest"
 import { render, screen, within } from "@testing-library/react"
 
 import { SiteFooter } from "./footer"
-import { SiteHeader } from "./site-header"
 import { SkipLink } from "./skip-link"
 import { StaticChoreographyFallback } from "./scroll-choreography/static-choreography-fallback"
 
 /**
  * Mirrors the routes/index.tsx HomePage composition for landmark auditing.
- * Reflects D-16 final structure: SiteHeader and SiteFooter are siblings of
- * <main>, not children. If routes/index.tsx changes its structure, update
- * this fixture.
+ * The header lives INSIDE the hero scene (rendered by PaperHero inside
+ * StaticChoreographyFallback), so the fixture intentionally does NOT
+ * render a separate <SiteHeader /> outside <main>. Footer remains a
+ * sibling of <main> per D-17.
  */
 function HomePageFixture() {
   return (
     <>
       <SkipLink />
-      <SiteHeader />
       <main id="main">
         <StaticChoreographyFallback />
       </main>
@@ -33,7 +32,7 @@ describe("Landmark audit", () => {
 
   it("renders exactly one <header> (SiteHeader as banner)", () => {
     render(<HomePageFixture />)
-    expect(screen.queryByRole("banner")).not.toBeNull()
+    expect(screen.getAllByRole("banner")).toHaveLength(1)
   })
 
   it("renders exactly one <main> with id='main'", () => {
@@ -46,10 +45,10 @@ describe("Landmark audit", () => {
     expect(screen.queryByRole("contentinfo")).not.toBeNull()
   })
 
-  it("header is NOT inside main (D-16 landmark sibling structure)", () => {
+  it("header lives inside main (header is part of the hero scene)", () => {
     render(<HomePageFixture />)
     const main = screen.getByRole("main")
-    expect(within(main).queryByRole("banner")).toBeNull()
+    expect(within(main).queryByRole("banner")).not.toBeNull()
   })
 
   it("footer is NOT inside main (D-17 landmark sibling structure)", () => {

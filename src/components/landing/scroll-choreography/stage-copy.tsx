@@ -1,16 +1,16 @@
 /**
- * Stage copy track for the docked feature-a stage.
+ * Stage copy track for the docked stage.
  *
  * Renders the kicker / heading / paragraph / bullets / CTA on the side of
  * the viewport opposite where <ProductScreen> docks:
- *   - feature-a: screen docked-left → copy ml-auto (right side)
+ *   - docked: screen on the right → copy on the left side
  *
  * Opacity is scroll-linked via useTransform: the copy fades in during the
- * wow→feature-a morph zone (so it arrives just as the screen finishes
+ * wow→docked morph zone (so it arrives just as the screen finishes
  * docking) and holds through the rest of the timeline.
  *
- *   feature-a: fade in [wow.window[1] → fa.window[0]] = [0.55, 0.65]
- *              hold   [0.65, 1.00]
+ *   docked: fade in [wow.window[1] → docked.window[0]] = [0.55, 0.65]
+ *           hold   [0.65, 1.00]
  *
  * clamp:false on opacity disables motion 12's WAAPI accelerate path that
  * otherwise hijacks scroll-linked opacity (see paper-backdrop.tsx).
@@ -24,22 +24,22 @@ import { useFlowStages } from "./dev-flow-context"
 import { Button } from "@/components/ui/button"
 import { stages, TEACHER_WORKSPACE_APP_URL } from "@/content/landing"
 
-type StageCopyProps = { stage: "feature-a" }
+type StageCopyProps = { stage: "docked" }
 
 export function StageCopy({ stage }: StageCopyProps) {
   const { scrollYProgress } = useScrollChoreography()
   const flowStages = useFlowStages()
-  const byFlowId = (id: "wow" | "feature-a") =>
+  const byFlowId = (id: "wow" | "docked") =>
     flowStages.find((s) => s.id === id)
 
   const entry = stages.find((s) => s.id === stage)
-  if (!entry || entry.id !== "feature-a") {
+  if (!entry || entry.id !== "docked") {
     throw new Error(`StageCopy: unknown stage "${stage}"`)
   }
   const { kicker, heading, paragraph, bullets } = entry.copy
 
   const fadeInStart = byFlowId("wow")!.window[1]
-  const holdStart = byFlowId("feature-a")!.window[0]
+  const holdStart = byFlowId("docked")!.window[0]
 
   const opacity = useTransform(
     scrollYProgress,
@@ -50,7 +50,7 @@ export function StageCopy({ stage }: StageCopyProps) {
 
   return (
     <motion.div
-      className="pointer-events-none absolute inset-0 z-30 flex items-center justify-end px-4 sm:px-10 lg:px-16"
+      className="pointer-events-none absolute inset-0 z-30 flex items-center justify-start px-4 sm:px-10 lg:px-16"
       style={{ opacity }}
     >
       <div className="pointer-events-auto w-full max-w-xl px-4 sm:px-6 lg:w-[44%] lg:max-w-2xl lg:px-8">

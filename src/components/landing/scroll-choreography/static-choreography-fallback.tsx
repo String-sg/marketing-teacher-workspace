@@ -18,7 +18,7 @@ export function StaticChoreographyFallback() {
   return (
     <>
       <PaperHero />
-      <FeatureSection stage="feature-a" />
+      <FeatureSection stage="docked" />
       <ProofStrip />
       <FinalCta />
     </>

@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest"
 
-import { SCREEN_TARGETS, STAGES, byId } from "./stages"
+import { STAGES, byId } from "./stages"
 
 describe("STAGES data", () => {
   it("contains exactly 3 stages in narrative order", () => {
     expect(STAGES).toHaveLength(3)
-    expect(STAGES.map((s) => s.id)).toEqual(["hero", "wow", "feature-a"])
+    expect(STAGES.map((s) => s.id)).toEqual(["hero", "wow", "docked"])
   })
 
   it("each stage has a [start, end] window with start < end and both in [0, 1]", () => {
@@ -17,16 +17,23 @@ describe("STAGES data", () => {
     }
   })
 
-  it("screen target presets cover the 3 named values", () => {
-    const screens = STAGES.map((s) => s.screen)
-    expect(screens).toContain("tiny")
-    expect(screens).toContain("centered")
-    expect(screens).toContain("docked-left")
+  it("each stage carries inlined rect fields (scale/x/y/opacity)", () => {
+    for (const stage of STAGES) {
+      expect(typeof stage.scale).toBe("number")
+      expect(typeof stage.x).toBe("string")
+      expect(typeof stage.y).toBe("string")
+      expect(typeof stage.opacity).toBe("number")
+    }
   })
 
-  it("byId('hero') returns the hero stage", () => {
-    expect(byId("hero").id).toBe("hero")
-    expect(byId("hero").screen).toBe("tiny")
+  it("byId('hero') returns the hero stage with tiny-laptop rect", () => {
+    const hero = byId("hero")
+    expect(hero.id).toBe("hero")
+    expect(hero.scale).toBeGreaterThan(0)
+    expect(hero.scale).toBeLessThan(0.2)
+    expect(hero.x).toMatch(/^[+-]?[\d.]+vw$/)
+    expect(hero.y).toMatch(/^[+-]?[\d.]+vh$/)
+    expect(hero.opacity).toBe(1)
   })
 
   it("byId throws on an unknown id (defensive contract)", () => {
@@ -35,15 +42,10 @@ describe("STAGES data", () => {
   })
 
   it("byId('wow').window[1] is the wow plateau end (0.55)", () => {
-    // wow.window[1] is the single value PaperBackdrop's
-    // VIDEO_GATE_THRESHOLD auto-tracks (D-21).
     expect(byId("wow").window[1]).toBeCloseTo(0.55, 2)
   })
 
   it("STAGES windows are monotonic non-overlapping (D-02)", () => {
-    // For each adjacent pair, prev.window[1] must be < next.window[0].
-    // This invariant is what enables window-edge keyframe stitching
-    // (D-01) — adjacent stages have a clean morph zone between holds.
     for (let i = 0; i < STAGES.length - 1; i++) {
       const prev = STAGES[i]
       const next = STAGES[i + 1]
@@ -54,43 +56,21 @@ describe("STAGES data", () => {
   it("STAGES window endpoints exactly match the D-02 schedule", () => {
     expect(byId("hero").window).toEqual([0, 0.15])
     expect(byId("wow").window).toEqual([0.25, 0.55])
-    expect(byId("feature-a").window).toEqual([0.65, 1])
-  })
-})
-
-describe("SCREEN_TARGETS map (D-04 / D-08)", () => {
-  it("has exactly the 3 named ScreenTarget keys", () => {
-    expect(Object.keys(SCREEN_TARGETS).sort()).toEqual([
-      "centered",
-      "docked-left",
-      "tiny",
-    ])
+    expect(byId("docked").window).toEqual([0.65, 1])
   })
 
-  it("tiny target — laptop-overlay contract: visible, small, offset over the cartoon laptop", () => {
-    const t = SCREEN_TARGETS["tiny"]
-    // tiny is the laptop overlay at hero stage. Opacity=1 (visible),
-    // small scale to fit the cartoon laptop's screen, x/y offsets in
-    // vw/vh that translate the centered ProductScreen to sit over the
-    // laptop in the paper-card illustration.
-    expect(t.opacity).toBe(1)
-    expect(t.scale).toBeGreaterThan(0)
-    expect(t.scale).toBeLessThan(0.2)
-    expect(t.x).toMatch(/^[+-]?[\d.]+vw$/)
-    expect(t.y).toMatch(/^[+-]?[\d.]+vh$/)
+  it("wow rect — centered full-viewport reveal", () => {
+    const w = byId("wow")
+    expect(w.scale).toBe(1.0)
+    expect(w.opacity).toBe(1)
+    expect(w.x).toBe("0")
+    expect(w.y).toBe("0")
   })
 
-  it("centered target — wow plateau: scale = 1.00, opacity = 1, x = '0'", () => {
-    const c = SCREEN_TARGETS["centered"]
-    expect(c.scale).toBe(1.0)
-    expect(c.opacity).toBe(1)
-    expect(c.x).toBe("0")
-  })
-
-  it("docked-left target — D-07 negative-leftward sign, scale 0.5", () => {
-    const dl = SCREEN_TARGETS["docked-left"]
-    expect(dl.scale).toBe(0.5)
-    expect(dl.opacity).toBe(1)
-    expect(dl.x).toBe("-28vw")
+  it("docked rect — positive-rightward sign, scale 0.5", () => {
+    const d = byId("docked")
+    expect(d.scale).toBe(0.5)
+    expect(d.opacity).toBe(1)
+    expect(d.x).toBe("+28vw")
   })
 })
