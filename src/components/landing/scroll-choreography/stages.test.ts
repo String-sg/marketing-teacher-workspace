@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { STAGES, byId } from "./stages"
+import { SCREEN_TARGETS, STAGES, byId } from "./stages"
 
 describe("STAGES data", () => {
   it("contains exactly 4 stages in narrative order", () => {
@@ -40,11 +40,78 @@ describe("STAGES data", () => {
     expect(() => byId("nope")).toThrow(/Unknown stage id/)
   })
 
-  it("byId('wow').window[1] is retuned to the Phase 2 first-pass value (D-14)", () => {
-    // Phase 2 D-14 retunes wow.window[1] to align with the moment the screen
-    // visually covers the video. First-pass: [0.20, 0.78]. Plan 04 may adjust
-    // during the visual-review checkpoint; if so, update this assertion AND
-    // the CONTEXT.md D-14 entry together.
-    expect(byId("wow").window[1]).toBeCloseTo(0.78, 2)
+  it("byId('wow').window[1] is retuned to the Phase 3 D-02 value (0.55)", () => {
+    // Phase 3 D-02 retunes wow.window[1] to align with the moment the
+    // wow plateau ends (was Phase 2's 0.78). This is the single value
+    // PaperBackdrop's VIDEO_GATE_THRESHOLD auto-tracks (D-21).
+    expect(byId("wow").window[1]).toBeCloseTo(0.55, 2)
+  })
+
+  it("STAGES windows are monotonic non-overlapping (D-02)", () => {
+    // For each adjacent pair, prev.window[1] must be < next.window[0].
+    // This invariant is what enables window-edge keyframe stitching
+    // (D-01) — adjacent stages have a clean morph zone between holds.
+    for (let i = 0; i < STAGES.length - 1; i++) {
+      const prev = STAGES[i]
+      const next = STAGES[i + 1]
+      expect(prev.window[1]).toBeLessThan(next.window[0])
+    }
+  })
+
+  it("STAGES window endpoints exactly match the D-02 schedule", () => {
+    expect(byId("hero").window).toEqual([0, 0.1])
+    expect(byId("wow").window).toEqual([0.2, 0.55])
+    expect(byId("feature-a").window).toEqual([0.65, 0.78])
+    expect(byId("feature-b").window).toEqual([0.85, 1])
+  })
+})
+
+describe("SCREEN_TARGETS map (D-04 / D-08)", () => {
+  it("has exactly the 4 named ScreenTarget keys", () => {
+    expect(Object.keys(SCREEN_TARGETS).sort()).toEqual([
+      "centered",
+      "docked-left",
+      "docked-right",
+      "tiny",
+    ])
+  })
+
+  it("tiny target — D-05 hidden contract: opacity = 0, scale = 0.55", () => {
+    const t = SCREEN_TARGETS["tiny"]
+    expect(t.opacity).toBe(0)
+    expect(t.scale).toBe(0.55)
+    expect(t.x).toBe("0")
+    expect(t.y).toBe("0")
+  })
+
+  it("centered target — wow plateau: scale = 1.00, opacity = 1, x = '0'", () => {
+    const c = SCREEN_TARGETS["centered"]
+    expect(c.scale).toBe(1.0)
+    expect(c.opacity).toBe(1)
+    expect(c.x).toBe("0")
+  })
+
+  it("docked-left target — D-07 negative-leftward sign, scale 0.5", () => {
+    const dl = SCREEN_TARGETS["docked-left"]
+    expect(dl.scale).toBe(0.5)
+    expect(dl.opacity).toBe(1)
+    expect(dl.x).toBe("-28vw")
+  })
+
+  it("docked-right target — D-07 positive-rightward sign, scale 0.5", () => {
+    const dr = SCREEN_TARGETS["docked-right"]
+    expect(dr.scale).toBe(0.5)
+    expect(dr.opacity).toBe(1)
+    expect(dr.x).toBe("+28vw")
+  })
+
+  it("docked-left and docked-right are mirror-symmetric on the x axis", () => {
+    const dl = SCREEN_TARGETS["docked-left"]
+    const dr = SCREEN_TARGETS["docked-right"]
+    expect(dl.x).toBe("-28vw")
+    expect(dr.x).toBe("+28vw")
+    // Same scale + opacity (only x differs): D-08 balanced-dock decision
+    expect(dl.scale).toBe(dr.scale)
+    expect(dl.opacity).toBe(dr.opacity)
   })
 })

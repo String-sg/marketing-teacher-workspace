@@ -3,20 +3,31 @@ import type { ScreenTarget, ScreenTargetRect, StageDef, StageId } from "./types"
 /**
  * The four choreography stages.
  *
- * Window numbers are FIRST-PASS — Phase 2/3 will tune them once the
- * orchestrator and product screen are running. Overlapping windows are
- * intentional (per CONTEXT.md D-12): neighboring stages cross-fade.
+ * Phase 3 retune (D-02): monotonic non-overlapping windows. Each stage
+ * holds at its peak target between window[0] and window[1]; the morph
+ * happens in the gap between adjacent windows (prev.window[1] →
+ * next.window[0]). The 35% wow plateau (0.20→0.55) is the centerpiece
+ * reveal; hero is a 10% setup; docked stages get ~13–15% each — enough
+ * for Phase 4's 200–300ms-staggered 3-bullet reveals.
  *
- * Ordering is significant — `STAGES.map(...)` iterates in narrative beat.
- * Per RESEARCH.md OQ-1 we use `readonly StageDef[]` + `byId()` helper
- * (Option B) instead of `Record<StageId, StageDef>` so iteration is the
- * default and there is one source of truth for ordering.
+ * Window-edge holds → useTransform's keyframe stops array is built by
+ * STAGES.flatMap(s => [s.window[0], s.window[1]]) (8 stops, value at
+ * window[0] === value at window[1] = the hold).
+ *
+ * Phase 2 windows (overlapping) are explicitly revised:
+ *   wow:       [0.20, 0.78] → [0.20, 0.55]
+ *   feature-a: [0.50, 0.78] → [0.65, 0.78]
+ *   feature-b: [0.75, 1.00] → [0.85, 1.00]
+ *
+ * Cascade: PaperBackdrop's VIDEO_GATE_THRESHOLD = byId("wow").window[1]
+ * auto-tracks 0.78 → 0.55. PaperBackdrop intra-stage timing consts
+ * (STAGE_OPACITY_FADE_*, STAGE_SCALE_*) retune in Plan 04 alongside this.
  */
 export const STAGES = [
-  { id: "hero", window: [0.0, 0.25] as const, screen: "tiny" },
-  { id: "wow", window: [0.2, 0.78] as const, screen: "centered" },
-  { id: "feature-a", window: [0.5, 0.78] as const, screen: "docked-left" },
-  { id: "feature-b", window: [0.75, 1.0] as const, screen: "docked-right" },
+  { id: "hero", window: [0.0, 0.1] as const, screen: "tiny" },
+  { id: "wow", window: [0.2, 0.55] as const, screen: "centered" },
+  { id: "feature-a", window: [0.65, 0.78] as const, screen: "docked-left" },
+  { id: "feature-b", window: [0.85, 1.0] as const, screen: "docked-right" },
 ] as const satisfies readonly StageDef[]
 
 /** Throws on unknown id — see CONTEXT.md note that strict-types philosophy
@@ -28,15 +39,24 @@ export function byId(id: StageId): StageDef {
 }
 
 /**
- * Phase 3 fills the rect values — Phase 1 ships only the type contract.
+ * Runtime per-target rect map (D-04 / D-08). Replaces the Phase 1
+ * `ScreenTargetsMap` type alias with the actual values <ProductScreen>
+ * consumes.
  *
- * Exporting just the TYPE (not a `declare const` value) means any Phase 1
- * value-import (`import { SCREEN_TARGETS } from "./stages"`) is a hard
- * TypeScript error rather than a silent `undefined` at runtime. This makes
- * the phase-gating contract enforceable by tsc instead of by hand-review.
- *
- * Phase 3 replaces this type alias with `export const SCREEN_TARGETS` of
- * the same shape. Consumers should import the type today and update the
- * import to a value once Phase 3 lands.
+ * Conventions:
+ *   - x sign convention (D-07): negative = leftward (docked-left toward
+ *     viewport left), positive = rightward (docked-right toward viewport
+ *     right). String values include CSS units (vw) so motion's mix()
+ *     interpolates them as units, not numbers.
+ *   - tiny.opacity = 0 (D-05): the hero target is a geometric starting
+ *     point; the screen is hidden until the hero→wow morph fades it in.
+ *   - y is "0" for all targets (D-03 — no vertical morph in Phase 3);
+ *     the field is declared on ScreenTargetRect but unused.
+ *   - clipPath stays undefined (D-03 — no shape morph in Phase 3).
  */
-export type ScreenTargetsMap = Record<ScreenTarget, ScreenTargetRect>
+export const SCREEN_TARGETS: Record<ScreenTarget, ScreenTargetRect> = {
+  tiny: { scale: 0.55, x: "0", y: "0", opacity: 0 },
+  centered: { scale: 1.0, x: "0", y: "0", opacity: 1 },
+  "docked-left": { scale: 0.5, x: "-28vw", y: "0", opacity: 1 },
+  "docked-right": { scale: 0.5, x: "+28vw", y: "0", opacity: 1 },
+} as const
