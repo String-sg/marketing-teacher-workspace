@@ -69,6 +69,15 @@ export function PaperBackdrop({ children }: { children?: ReactNode }) {
   // Resolved per-render so dev tuning of the wow window is honored live.
   const videoGateThreshold =
     stages.find((s) => s.id === "wow")?.window[1] ?? 0.55
+  // Hold the paper-card at scale 1 throughout the hero hold so the cartoon
+  // laptop stays visually locked under the tiny ProductScreen overlay
+  // (which sits at the fixed viewport coords +2.2vw, +26vh during hero).
+  // Without this hold the paper-card scales from 1 toward 2.4 immediately,
+  // and the cartoon laptop drifts up/out of the tiny UI's overlay
+  // position — reads as "two things zooming in different directions."
+  // The zoom kicks in only at the hero→wow morph zone, when ProductScreen
+  // is also growing toward centered.
+  const heroHoldEnd = stages.find((s) => s.id === "hero")?.window[1] ?? 0.15
   const videoRef = useRef<HTMLVideoElement>(null)
 
   // useTransform replaces paper-hero.tsx:50 useTransform AND paper-hero.tsx:64
@@ -76,8 +85,8 @@ export function PaperBackdrop({ children }: { children?: ReactNode }) {
   // default removes the clamp01 helper that paper-hero.tsx:18 declared.
   const stageScale = useTransform(
     scrollYProgress,
-    [0, STAGE_SCALE_MID_PROGRESS, 1],
-    [1, STAGE_SCALE_MID_VALUE, STAGE_SCALE_END_VALUE]
+    [0, heroHoldEnd, STAGE_SCALE_MID_PROGRESS, 1],
+    [1, 1, STAGE_SCALE_MID_VALUE, STAGE_SCALE_END_VALUE]
   )
   // clamp:false disables motion 12's accelerate/WAAPI path on opacity, which
   // hijacks scroll-linked opacity into an independent native animation that
