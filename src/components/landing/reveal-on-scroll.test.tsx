@@ -4,9 +4,16 @@ import { render, screen } from "@testing-library/react"
 // Per-test mocks of motion/react are configured via vi.hoisted() so each
 // test can flip useInView / useReducedMotion independently while keeping
 // the rest of the module (motion.div, cubicBezier) intact.
+type InViewOptions = {
+  once?: boolean
+  margin?: string
+  amount?: number | string
+}
 const mocks = vi.hoisted(() => ({
-  useInView: vi.fn(() => false),
-  useReducedMotion: vi.fn(() => false),
+  useInView: vi.fn(
+    (_ref: unknown, _options?: InViewOptions): boolean => false
+  ),
+  useReducedMotion: vi.fn((): boolean => false),
 }))
 
 vi.mock("motion/react", async (importOriginal) => {
@@ -59,13 +66,7 @@ describe("RevealOnScroll", () => {
     expect(mocks.useInView).toHaveBeenCalled()
     const call = mocks.useInView.mock.calls.at(-1)
     expect(call).not.toBeUndefined()
-    const options = call?.[1] as
-      | {
-          once?: boolean
-          margin?: string
-          amount?: number | string
-        }
-      | undefined
+    const options = call?.[1] as InViewOptions | undefined
     expect(options).not.toBeUndefined()
     expect(options?.once).toBe(true)
     expect(options?.margin).toBe("0px 0px -15% 0px")
