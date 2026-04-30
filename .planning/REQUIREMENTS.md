@@ -55,7 +55,7 @@
 
 - [ ] **VISUAL-01**: Tonal contrast between paper-sketch world and photorealistic UI is preserved — UI screen is not flattened to match paper aesthetic
 - [ ] **VISUAL-02**: Browser-frame screenshot of the Student Insights view (or a refreshed variant) is the canonical product-UI asset
-- [ ] **VISUAL-03**: Product-UI image is delivered with responsive `srcset` + WebP/AVIF; LCP candidate is preloaded with `<link rel="preload" fetchpriority="high">`
+- [x] **VISUAL-03**: Product-UI image is delivered with responsive `srcset` + WebP/AVIF; LCP candidate is preloaded with `<link rel="preload" fetchpriority="high">`
 - [ ] **VISUAL-04**: 25%, 50%, 75% midstates of every stage transition are intentionally designed (no broken-looking scrub points)
 
 ### SEO / Meta
@@ -168,7 +168,7 @@ Explicitly excluded. Documented to prevent scope creep.
 | CONTENT-08 | Phase 4 | Pending |
 | VISUAL-01 | Phase 3 | Pending |
 | VISUAL-02 | Phase 3 | Pending |
-| VISUAL-03 | Phase 3 | Pending |
+| VISUAL-03 | Phase 3 | Complete |
 | VISUAL-04 | Phase 3 | Pending |
 | SEO-01 | Phase 4 | Pending |
 | SEO-02 | Phase 4 | Pending |

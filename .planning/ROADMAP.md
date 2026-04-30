@@ -68,7 +68,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. The product-UI image ships with responsive `srcset` plus WebP/AVIF variants and is preloaded as the LCP candidate via `<link rel="preload" as="image" fetchpriority="high">`; the network panel shows the right variant for the viewport.
   5. The product-screen `<img>` carries descriptive alt text ("Teacher Workspace student view showing attendance, behavior notes, and family messages") that is reachable to screen readers in both choreography and static-fallback render paths.
 **Plans**: 5 plans
-  - [ ] 03-01-PLAN.md — Wave 0: sharp devDep + gen-hero-images.mjs + 12 variants + OQ-04 falsification (NEW index.head.test.tsx)
+  - [x] 03-01-PLAN.md — Wave 0: sharp devDep + gen-hero-images.mjs + 12 variants + OQ-04 falsification (NEW index.head.test.tsx)
   - [ ] 03-02-PLAN.md — Wave 1a: ProductScreen 4-stage data-driven morph + per-segment ease + scale dip + <picture> + D-13 alt text
   - [ ] 03-03-PLAN.md — Wave 1b: stages.ts retune (D-02 STAGES) + runtime SCREEN_TARGETS const + tests
   - [ ] 03-04-PLAN.md — Wave 1c: routes/index.tsx head() preload + h-[400lvh] retune + PaperBackdrop intra-stage const cascade
