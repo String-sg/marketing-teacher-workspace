@@ -18,6 +18,13 @@
  *     resume the loop.
  *   - PERF-04: transform/opacity only — no width/height/top/left
  *
+ * Phase 3 cascade (D-20):
+ *   The intra-stage timing consts (STAGE_OPACITY_FADE_*, STAGE_SCALE_MID_PROGRESS)
+ *   retune to track the new wow.window[1] = 0.55 — the paper card now
+ *   finishes fading exactly when the wow plateau ends. VIDEO_GATE_THRESHOLD
+ *   = byId("wow").window[1] auto-tracks the retune (D-21) — no source edit
+ *   needed for the gate itself.
+ *
  * 2026-04-29 scope shift (user direction): the original CHOREO-02 / CHOREO-08
  * specified scroll-linked currentTime scrubbing. After production-preview
  * smoke the user requested a continuously-playing loop instead — same intent
@@ -42,19 +49,20 @@ import { byId } from "./stages"
 const VIDEO_GATE_THRESHOLD = byId("wow").window[1]
 
 // Intra-stage timing constants — D-13: named local constants in component file
-// (cannot live in stages.ts because they are not stage windows). Values are
-// preserved verbatim from paper-hero.tsx:50, 61, 62 — the stage-scale
-// progression ships unchanged through the extraction.
-const STAGE_SCALE_MID_PROGRESS = 0.6
+// (cannot live in stages.ts because they are not stage windows).
+//
+// Phase 3 D-20 retune: track new wow.window[1] = 0.55. The paper card now
+// finishes fading exactly when the wow plateau ends (was 0.78 in Phase 2).
+// First-pass values; tunable at the visual-review checkpoint (D-17).
+const STAGE_SCALE_MID_PROGRESS = 0.4
 const STAGE_SCALE_MID_VALUE = 2.4
 const STAGE_SCALE_END_VALUE = 5.2
-// stageOpacity fade range matches paper-hero.tsx:69's `1 - (p - 0.6) / 0.18`
-// (= fade from 0.6 to 0.78). Endpoint `0.78` is intra-stage timing, NOT
-// `byId("wow").window[1]` — the video gate threshold is independent of
-// the stageOpacity fade, even though both happen near the wow→feature-a
-// boundary.
-const STAGE_OPACITY_FADE_START = 0.6
-const STAGE_OPACITY_FADE_END = 0.78
+// stageOpacity fade range — D-20 retunes the start to 0.45 and the end to
+// 0.55. The endpoint 0.55 happens to equal byId("wow").window[1] but is
+// kept as a separate intra-stage const because it expresses a different
+// concern (paper-card opacity) from the video gate threshold (D-21).
+const STAGE_OPACITY_FADE_START = 0.45
+const STAGE_OPACITY_FADE_END = 0.55
 const CLOUD_LEFT_TRAVEL_PX = "-160px"
 const CLOUD_RIGHT_TRAVEL_PX = "-110px"
 
