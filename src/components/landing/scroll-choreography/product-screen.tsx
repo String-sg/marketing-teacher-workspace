@@ -55,8 +55,7 @@ import { cubicBezier, easeInOut, easeOut } from "motion"
 import { motion, useTransform } from "motion/react"
 
 import { useScrollChoreography } from "./context"
-import { useFlowTargets } from "./dev-flow-context"
-import { STAGES } from "./stages"
+import { useFlowStages, useFlowTargets } from "./dev-flow-context"
 
 import { TEACHER_WORKSPACE_APP_URL } from "@/content/landing"
 
@@ -117,11 +116,12 @@ const OPACITY_EASES = [
 
 export function ProductScreen() {
   const { scrollYProgress } = useScrollChoreography()
-  // Reads the live override from <DevFlowPanel> when mounted, else falls back
-  // to compile-time SCREEN_TARGETS. The output values in every useTransform
-  // below resolve through `targets` so dev tuning re-derives motion mappings
-  // on each render. Input keyframes stay STAGES-bound (D-12 walker).
+  // Reads live overrides from <DevFlowPanel> when mounted; both fall back
+  // to compile-time defaults outside dev. STAGES window edges + SCREEN_TARGETS
+  // values flow through hooks so useTransform re-derives keyframes on each
+  // render — visual changes are visible the same frame in dev tuning.
   const targets = useFlowTargets()
+  const STAGES = useFlowStages()
 
   // The keyframe arrays are inlined as literal ArrayExpressions of
   // MemberExpressions binding to STAGES + SCREEN_TARGETS — the MIGRATE-03

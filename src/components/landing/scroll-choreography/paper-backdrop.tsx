@@ -42,11 +42,7 @@ import { useRef } from "react"
 import type { ReactNode } from "react"
 
 import { useScrollChoreography } from "./context"
-import { byId } from "./stages"
-
-// Stage-aligned endpoints — D-12: bind to STAGES via byId(). The video gate
-// fires when scrollYProgress crosses out of the wow window's exit edge.
-const VIDEO_GATE_THRESHOLD = byId("wow").window[1]
+import { useFlowStages } from "./dev-flow-context"
 
 // Intra-stage timing constants — D-13: named local constants in component file
 // (cannot live in stages.ts because they are not stage windows).
@@ -68,6 +64,11 @@ const CLOUD_RIGHT_TRAVEL_PX = "-110px"
 
 export function PaperBackdrop({ children }: { children?: ReactNode }) {
   const { scrollYProgress } = useScrollChoreography()
+  const stages = useFlowStages()
+  // Video gate fires when scrollYProgress crosses out of the wow exit edge.
+  // Resolved per-render so dev tuning of the wow window is honored live.
+  const videoGateThreshold =
+    stages.find((s) => s.id === "wow")?.window[1] ?? 0.55
   const videoRef = useRef<HTMLVideoElement>(null)
 
   // useTransform replaces paper-hero.tsx:50 useTransform AND paper-hero.tsx:64
@@ -110,7 +111,7 @@ export function PaperBackdrop({ children }: { children?: ReactNode }) {
   useMotionValueEvent(scrollYProgress, "change", (p) => {
     const video = videoRef.current
     if (!video) return
-    if (p >= VIDEO_GATE_THRESHOLD) {
+    if (p >= videoGateThreshold) {
       if (!video.paused) video.pause()
     } else if (video.paused) {
       // Real browsers return a Promise from play(); jsdom returns undefined.

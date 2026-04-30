@@ -24,7 +24,7 @@ import { ArrowUpRightIcon, CheckIcon } from "lucide-react"
 import { motion, useTransform } from "motion/react"
 
 import { useScrollChoreography } from "./context"
-import { byId } from "./stages"
+import { useFlowStages } from "./dev-flow-context"
 
 import { Button } from "@/components/ui/button"
 import { stages, TEACHER_WORKSPACE_APP_URL } from "@/content/landing"
@@ -33,6 +33,9 @@ type StageCopyProps = { stage: "feature-a" | "feature-b" }
 
 export function StageCopy({ stage }: StageCopyProps) {
   const { scrollYProgress } = useScrollChoreography()
+  const flowStages = useFlowStages()
+  const byFlowId = (id: typeof stage | "wow" | "feature-a" | "feature-b") =>
+    flowStages.find((s) => s.id === id)
 
   const entry = stages.find((s) => s.id === stage)
   if (!entry || (entry.id !== "feature-a" && entry.id !== "feature-b")) {
@@ -42,11 +45,11 @@ export function StageCopy({ stage }: StageCopyProps) {
 
   const isA = stage === "feature-a"
   const fadeInStart = isA
-    ? byId("wow").window[1]
-    : byId("feature-a").window[1]
-  const holdStart = byId(stage).window[0]
-  const holdEnd = byId(stage).window[1]
-  const fadeOutEnd = isA ? byId("feature-b").window[0] : 1
+    ? byFlowId("wow")!.window[1]
+    : byFlowId("feature-a")!.window[1]
+  const holdStart = byFlowId(stage)!.window[0]
+  const holdEnd = byFlowId(stage)!.window[1]
+  const fadeOutEnd = isA ? byFlowId("feature-b")!.window[0] : 1
 
   const opacity = useTransform(
     scrollYProgress,
