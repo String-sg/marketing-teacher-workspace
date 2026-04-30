@@ -122,7 +122,7 @@ describe("ScrollChoreography container shape (CHOREO-07 / D-18)", () => {
       )
       expect(section).not.toBeNull()
       const sectionClass = section?.className ?? ""
-      expect(sectionClass).toMatch(/h-\[280lvh\]/)
+      expect(sectionClass).toMatch(/h-\[400lvh\]/)
       // header-stacking guarantee: outer section MUST NOT carry inline transform
       expect((section as HTMLElement | null)?.style.transform || "").toBe("")
       // inner sticky child uses h-svh (per D-18 / Pitfall #5)

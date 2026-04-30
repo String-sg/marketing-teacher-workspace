@@ -21,9 +21,11 @@
  * not, motion 12.x fixed it internally and this comment + option may be
  * removed in a follow-up phase.
  *
- * D-18 / CHOREO-07: outer = h-[280lvh], inner sticky = h-svh. The outer
- * also carries `.scroll-choreography-only` so the styles.css:226-230 mobile
- * gate becomes defense-in-depth alongside the JS branch.
+ * D-18 / CHOREO-07 / D-09: outer = h-[400lvh] (Phase 3 retune from
+ * Phase 2's 280lvh — 4× viewport for 4-stage choreography), inner
+ * sticky = h-svh. The outer also carries `.scroll-choreography-only` so
+ * the styles.css:226-230 mobile gate becomes defense-in-depth alongside
+ * the JS branch.
  */
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react"
 import { useRef } from "react"
@@ -126,7 +128,7 @@ function ChoreographyTree({
     >
       <section
         aria-labelledby="hero-title"
-        className="scroll-choreography-only relative h-[280lvh]"
+        className="scroll-choreography-only relative h-[400lvh]"
         ref={sectionRef}
       >
         <div className="sticky top-0 flex h-svh items-stretch overflow-hidden p-3">
