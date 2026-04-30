@@ -57,7 +57,7 @@ export function byId(id: StageId): StageDef {
  *   - clipPath stays undefined (D-03 — no shape morph in Phase 3).
  */
 export const SCREEN_TARGETS: Record<ScreenTarget, ScreenTargetRect> = {
-  tiny: { scale: 0.085, x: "+4.3vw", y: "+35vh", opacity: 1 },
+  tiny: { scale: 0.062, x: "+2.2vw", y: "+26vh", opacity: 1 },
   centered: { scale: 1.0, x: "0", y: "0", opacity: 1 },
   "docked-left": { scale: 0.5, x: "-28vw", y: "0", opacity: 1 },
   "docked-right": { scale: 0.5, x: "+28vw", y: "0", opacity: 1 },
