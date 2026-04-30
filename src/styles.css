@@ -151,6 +151,7 @@
   html {
     @apply font-sans;
     scroll-behavior: smooth;
+    position: relative;
     }
 }
 
