@@ -49,6 +49,7 @@
     "@typescript-eslint/parser": "^8.0.0",
     "@vitejs/plugin-react": "^5.2.0",
     "jsdom": "^27.4.0",
+    "made-refine": "^0.2.20",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "sharp": "^0.34.5",

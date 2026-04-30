@@ -2,6 +2,11 @@ import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router"
 
 import appCss from "../styles.css?url"
 import { SkipLink } from "@/components/landing/skip-link"
+import { lazy, Suspense } from 'react'
+
+const DirectEdit = lazy(() =>
+  import('made-refine').then((m) => ({ default: m.DirectEdit }))
+)
 
 export const Route = createRootRoute({
   head: () => ({
@@ -48,6 +53,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <SkipLink />
         {children}
         <Scripts />
+        {import.meta.env.DEV && typeof window !== 'undefined' && (
+          <Suspense>
+            <DirectEdit />
+          </Suspense>
+        )}
       </body>
     </html>
   )
