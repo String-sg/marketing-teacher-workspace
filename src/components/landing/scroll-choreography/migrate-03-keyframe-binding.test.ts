@@ -122,9 +122,18 @@ describe("MIGRATE-03 keyframe-binding rule (D-12 / D-13)", () => {
         const args = (node as { arguments?: AstNode[] }).arguments ?? []
         if (args.length < 2) return
         const keyframes = args[1]
-        if (!keyframes || keyframes.type !== "ArrayExpression") {
+        if (!keyframes) return
+        // useTransform(source, transformerFn) is the single-source form
+        // — no keyframe array to validate against this rule; skip.
+        if (
+          keyframes.type === "ArrowFunctionExpression" ||
+          keyframes.type === "FunctionExpression"
+        ) {
+          return
+        }
+        if (keyframes.type !== "ArrayExpression") {
           violations.push(
-            `useTransform call's second arg is not an ArrayExpression (got ${keyframes?.type ?? "undefined"})`
+            `useTransform call's second arg is not an ArrayExpression (got ${keyframes.type})`
           )
           return
         }

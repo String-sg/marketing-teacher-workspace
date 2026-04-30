@@ -1,16 +1,29 @@
 /**
- * Paper-card backdrop subscriber. Owns the paper-card stage frame
- * (with stageScale + opacity), the two cloud parallax layers, the
- * autoplay-loop hero video, and the CHOREO-08 video gate.
+ * Paper-card backdrop subscriber. Owns the paper-card stage frame,
+ * the two cloud parallax layers, the autoplay-loop hero video, and
+ * the CHOREO-08 video gate.
  *
  * Rendered ONLY in choreography mode (the orchestrator early-returns
  * <StaticChoreographyFallback /> when reduced/mobile per D-02).
  *
- * Phase 2 fixes:
- *   - MIGRATE-01: extracted from paper-hero.tsx:112-194
- *   - MIGRATE-02 / CHOREO-06: useState→useTransform for stageOpacity
- *   - MIGRATE-03 / D-12 / D-13: every useTransform keyframe is a
- *     STAGES ref or a named local const; zero anonymous numbers
+ * Bundle architecture (2026-04-30):
+ *   - Outer motion.div carries `scale` + `transformOrigin` only — never
+ *     fades. This is the shared transform parent that <ProductScreen>
+ *     piggybacks on (via `paperCardScale` published in
+ *     ScrollChoreographyContext) so the UI overlay stays locked to the
+ *     cartoon laptop throughout the morph zone.
+ *   - Inner backdrop motion.div (absolute inset-0) carries `opacity` +
+ *     the cartoon visuals (paper-card bg color, shadow, clouds, video).
+ *     This is the layer that fades during the wow plateau.
+ *   - Caller-supplied `children` render on top of the backdrop layer
+ *     (z-index 10+) and are NOT affected by the opacity fade — that's
+ *     where the bundled <ProductScreen> + hero copy live.
+ *
+ * `paperCardScale` is computed at the orchestrator level (ChoreographyTree)
+ * so both this component and <ProductScreen> consume the same MotionValue
+ * instance. PaperBackdrop reads it via useScrollChoreography().
+ *
+ * Other invariants:
  *   - CHOREO-08 / D-15 / D-16 (revised 2026-04-29): video autoplay-loops
  *     during stage 1; on crossing byId("wow").window[1] the gate calls
  *     video.pause() so no GPU/decoder work runs while the screen covers
@@ -18,24 +31,8 @@
  *     resume the loop.
  *   - PERF-04: transform/opacity only — no width/height/top/left
  *
- * Paper-card zoom envelope (scaleMidProgress / scaleMidValue /
- * scaleEndValue / opacityFadeStart / opacityFadeEnd) is owned by
- * usePaperCardConfig() so the dev tuner can live-edit it. Defaults
- * resolve to PAPER_CARD_DEFAULTS outside dev. VIDEO_GATE_THRESHOLD =
- * byId("wow").window[1] auto-tracks the wow window — no source edit
- * needed for the gate itself.
- *
- * 2026-04-29 scope shift (user direction): the original CHOREO-02 / CHOREO-08
- * specified scroll-linked currentTime scrubbing. After production-preview
- * smoke the user requested a continuously-playing loop instead — same intent
- * (background motion in the paper world during hero) with a simpler primitive
- * and consistent tempo regardless of scroll speed. The pause-when-covered
- * GPU-relief intent of CHOREO-08 is preserved; only the active behavior
- * (scrub vs loop) changed. The `loadedmetadata` effect and `videoDurationRef`
- * are gone — duration is no longer needed because we don't write currentTime.
- *
- * Accepts children (D-06) — orchestrator passes hero copy block here
- * so it nests inside the paper-card frame and scales together.
+ * The opacityFadeStart / opacityFadeEnd values come from
+ * usePaperCardConfig() so the dev tuner can live-edit the fade window.
  */
 import { motion, useMotionValueEvent, useTransform } from "motion/react"
 import { useRef } from "react"
@@ -44,38 +41,19 @@ import type { ReactNode } from "react"
 import { useScrollChoreography } from "./context"
 import { useFlowStages, usePaperCardConfig } from "./dev-flow-context"
 
-// The paper-card zoom envelope (scale mid/end + opacity fade window) is
-// owned by usePaperCardConfig() so the dev tuner can live-edit it. The
-// curve shape is documented on PaperCardConfig in dev-flow-context.tsx.
-// Outside dev the hook returns PAPER_CARD_DEFAULTS, so the production
-// render is identical to the previous compile-time consts.
 const CLOUD_LEFT_TRAVEL_PX = "-160px"
 const CLOUD_RIGHT_TRAVEL_PX = "-110px"
 
 export function PaperBackdrop({ children }: { children?: ReactNode }) {
-  const { scrollYProgress } = useScrollChoreography()
+  const { scrollYProgress, paperCardScale } = useScrollChoreography()
   const stages = useFlowStages()
   const paper = usePaperCardConfig()
   // Video gate fires when scrollYProgress crosses out of the wow exit edge.
   // Resolved per-render so dev tuning of the wow window is honored live.
   const videoGateThreshold =
     stages.find((s) => s.id === "wow")?.window[1] ?? 0.55
-  // Hold the paper-card at scale 1 throughout the hero hold so the cartoon
-  // laptop stays visually locked under the tiny ProductScreen overlay
-  // during hero. The zoom kicks in only at the hero→wow morph zone, when
-  // ProductScreen is also growing toward centered, so both transforms
-  // travel together rather than zooming independently.
-  const heroHoldEnd = stages.find((s) => s.id === "hero")?.window[1] ?? 0.15
   const videoRef = useRef<HTMLVideoElement>(null)
 
-  // useTransform — visual props flow direct from MotionValue into style
-  // (CHOREO-06). useTransform's clamp:true default keeps values bounded
-  // outside the keyframe range without an explicit clamp01 helper.
-  const stageScale = useTransform(
-    scrollYProgress,
-    [0, heroHoldEnd, paper.scaleMidProgress, 1],
-    [1, 1, paper.scaleMidValue, paper.scaleEndValue]
-  )
   // clamp:false disables motion 12's accelerate/WAAPI path on opacity, which
   // hijacks scroll-linked opacity into an independent native animation that
   // ignores scrollYProgress (motion-dom use-transform.mjs:31-43). The keyframe
@@ -122,57 +100,65 @@ export function PaperBackdrop({ children }: { children?: ReactNode }) {
 
   return (
     <motion.div
-      className="paper-card relative mx-auto flex w-full max-w-[110rem] flex-1 flex-col items-center overflow-hidden rounded-[20px] bg-[color:var(--paper-card)] shadow-[0_10px_60px_-30px_rgb(15_23_42/0.18)]"
+      className="paper-card relative mx-auto flex w-full max-w-[110rem] flex-1 flex-col items-center overflow-hidden rounded-[20px]"
       style={{
-        scale: stageScale,
-        opacity: stageOpacity,
+        scale: paperCardScale,
         transformOrigin: "50% 92%",
       }}
     >
+      {/* Backdrop layer — bg + clouds + video, fades with stageOpacity.
+          Sits behind caller-supplied children (which render at z-10+ and
+          stay fully opaque so the bundled ProductScreen is unaffected
+          by the cartoon fade). */}
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute -bottom-8 -left-10 w-[min(28vw,300px)] sm:-left-12"
-        style={{ y: cloudYLeft }}
+        className="absolute inset-0 rounded-[20px] bg-[color:var(--paper-card)] shadow-[0_10px_60px_-30px_rgb(15_23_42/0.18)]"
+        style={{ opacity: stageOpacity }}
       >
-        <img
-          alt=""
-          className="cloud-drift-left block w-full opacity-80 mix-blend-multiply select-none"
-          src="/hero/cloud-halftone.png"
-        />
-      </motion.div>
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute -top-4 -right-10 w-[min(26vw,280px)] sm:-right-12"
-        style={{ y: cloudYRight }}
-      >
-        <img
-          alt=""
-          className="cloud-drift-right block w-full opacity-80 mix-blend-multiply select-none"
-          src="/hero/cloud-halftone.png"
-        />
-      </motion.div>
-
-      {/* D-06: children nest between cloud layers and the video container.
-          Full-width slot so the orchestrator can pass a top SiteHeader
-          (full-bleed) above the centered hero copy block. */}
-      <div className="relative z-10 flex w-full flex-col">{children}</div>
-
-      <div className="relative z-0 mt-auto flex w-full justify-center pb-0">
-        <div className="relative w-full max-w-[360px] px-4 sm:max-w-[400px]">
-          <video
-            aria-label="A teacher slowly working at her desk"
-            autoPlay
-            className="hero-media block h-auto w-full select-none"
-            loop
-            muted
-            playsInline
-            poster="/hero/teacher-illustration.png"
-            preload="auto"
-            ref={videoRef}
-            src="/hero/teacher-working.mp4"
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute -bottom-8 -left-10 w-[min(28vw,300px)] sm:-left-12"
+          style={{ y: cloudYLeft }}
+        >
+          <img
+            alt=""
+            className="cloud-drift-left block w-full opacity-80 mix-blend-multiply select-none"
+            src="/hero/cloud-halftone.png"
           />
+        </motion.div>
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute -top-4 -right-10 w-[min(26vw,280px)] sm:-right-12"
+          style={{ y: cloudYRight }}
+        >
+          <img
+            alt=""
+            className="cloud-drift-right block w-full opacity-80 mix-blend-multiply select-none"
+            src="/hero/cloud-halftone.png"
+          />
+        </motion.div>
+        <div className="absolute inset-x-0 bottom-0 flex w-full justify-center">
+          <div className="relative w-full max-w-[360px] px-4 sm:max-w-[400px]">
+            <video
+              aria-label="A teacher slowly working at her desk"
+              autoPlay
+              className="hero-media block h-auto w-full select-none"
+              loop
+              muted
+              playsInline
+              poster="/hero/teacher-illustration.png"
+              preload="auto"
+              ref={videoRef}
+              src="/hero/teacher-working.mp4"
+            />
+          </div>
         </div>
-      </div>
+      </motion.div>
+
+      {/* Caller-supplied foreground (hero copy slot + bundled
+          ProductScreen wrapper). Renders above the backdrop layer
+          and outside its opacity fade. */}
+      {children}
     </motion.div>
   )
 }

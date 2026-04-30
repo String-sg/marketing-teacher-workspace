@@ -121,8 +121,12 @@ describe("ScrollChoreography container shape (CHOREO-07 / D-18)", () => {
         "section.scroll-choreography-only"
       )
       expect(section).not.toBeNull()
-      const sectionClass = section?.className ?? ""
-      expect(sectionClass).toMatch(/h-\[400lvh\]/)
+      // Section height now flows through a CSS custom property so the dev
+      // tuner can override it at runtime; the default still maps to 400lvh.
+      const sectionEl = section as HTMLElement | null
+      const scrollH = sectionEl?.style.getPropertyValue("--scroll-h") ?? ""
+      expect(scrollH).toMatch(/^\d+(\.\d+)?lvh$/)
+      expect(sectionEl?.style.height).toBe("var(--scroll-h)")
       // header-stacking guarantee: outer section MUST NOT carry inline transform
       expect((section as HTMLElement | null)?.style.transform || "").toBe("")
       // inner sticky child uses h-svh (per D-18 / Pitfall #5)

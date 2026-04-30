@@ -29,6 +29,7 @@ import type {
   PaperCardConfig,
   PaperCardPatch,
   StageRectPatch,
+  TimelineView,
 } from "./dev-flow-context"
 import { STAGES } from "./stages"
 import type { StageDef, StageId } from "./types"
@@ -186,6 +187,12 @@ export function DevFlowPanel() {
             progress={progress}
             stages={controls.stages}
             setStage={controls.setStage}
+            paper={controls.paperCard}
+            setPaperCard={controls.setPaperCard}
+            view={controls.view}
+            setView={controls.setView}
+            scrollHeightVh={controls.scrollHeightVh}
+            setScrollHeightVh={controls.setScrollHeightVh}
           />
 
           <div className="space-y-2">
@@ -243,19 +250,92 @@ export function DevFlowPanel() {
 
 type DragMode = "move" | "left" | "right"
 
+type PaperMarkerKey = "scaleMidProgress" | "opacityFadeStart" | "opacityFadeEnd"
+
+const PAPER_MARKERS: ReadonlyArray<{
+  key: PaperMarkerKey
+  symbol: string
+  label: string
+  color: string
+}> = [
+  {
+    key: "scaleMidProgress",
+    symbol: "▲",
+    label: "scale mid",
+    color: "#7c3aed",
+  },
+  {
+    key: "opacityFadeStart",
+    symbol: "◆",
+    label: "fade in",
+    color: "#0ea5e9",
+  },
+  {
+    key: "opacityFadeEnd",
+    symbol: "○",
+    label: "fade out",
+    color: "#0f172a",
+  },
+]
+
 function Timeline({
   progress,
   stages,
   setStage,
+  paper,
+  setPaperCard,
+  view,
+  setView,
+  scrollHeightVh,
+  setScrollHeightVh,
 }: {
   progress: number
   stages: readonly StageDef[]
   setStage: (id: StageId, patch: StageRectPatch) => void
+  paper: PaperCardConfig
+  setPaperCard: (patch: PaperCardPatch) => void
+  view: TimelineView
+  setView: (view: TimelineView) => void
+  scrollHeightVh: number
+  setScrollHeightVh: (vh: number) => void
 }) {
   const trackRef = useRef<HTMLDivElement>(null)
   const [dragHint, setDragHint] = useState<DragHint | null>(null)
 
   const stageById = (id: StageId) => stages.find((s) => s.id === id)!
+
+  // View-zoom math. Visual position (in CSS percent) for a progress p
+  // and inverse mouse-to-progress for drag interactions. Falls through
+  // to identity when view = [0, 1] (the default).
+  const viewSpan = Math.max(view.end - view.start, 1e-6)
+  const pToVisual = (p: number) => ((p - view.start) / viewSpan) * 100
+  const mouseToProgress = (clientX: number, rect: DOMRect) =>
+    clamp01(view.start + ((clientX - rect.left) / rect.width) * viewSpan)
+
+  // Active-region span used by the "Fit" zoom button — covers the
+  // outermost stage edges + the paper-card opacityFadeEnd, with a
+  // small margin so handles aren't flush against the edges.
+  const fitView = (): TimelineView => {
+    const lo = Math.min(stages[0].window[0], paper.scaleMidProgress)
+    const hi = Math.max(
+      stages[stages.length - 1].window[1],
+      paper.opacityFadeEnd
+    )
+    const margin = Math.max((hi - lo) * 0.08, 0.01)
+    return {
+      start: clamp01(lo - margin),
+      end: clamp01(hi + margin),
+    }
+  }
+
+  const zoomBy = (factor: number) => {
+    const center = (view.start + view.end) / 2
+    const half = (viewSpan * factor) / 2
+    setView({
+      start: clamp01(center - half),
+      end: clamp01(center + half),
+    })
+  }
 
   const applyEdgeMin = (next: FlowWindow): FlowWindow => {
     const lo = clamp01(next[0])
@@ -276,10 +356,10 @@ function Timeline({
     if (!track) return
     const rect = track.getBoundingClientRect()
     const startWindow = stageById(id).window
-    const rawStart = clamp01((e.clientX - rect.left) / rect.width)
+    const rawStart = mouseToProgress(e.clientX, rect)
 
     const onMove = (ev: PointerEvent) => {
-      const raw = clamp01((ev.clientX - rect.left) / rect.width)
+      const raw = mouseToProgress(ev.clientX, rect)
       const p = quantize(raw, ev.shiftKey, ev.altKey)
       let next: FlowWindow
       if (mode === "left") {
@@ -315,8 +395,43 @@ function Timeline({
     const track = trackRef.current
     if (!track) return
     const rect = track.getBoundingClientRect()
-    const p = clamp01((e.clientX - rect.left) / rect.width)
+    const p = mouseToProgress(e.clientX, rect)
     scrubToProgress(p)
+  }
+
+  const beginPaperMarkerDrag = (
+    e: ReactPointerEvent<HTMLElement>,
+    key: PaperMarkerKey
+  ) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const track = trackRef.current
+    if (!track) return
+    const rect = track.getBoundingClientRect()
+    const onMove = (ev: PointerEvent) => {
+      const raw = mouseToProgress(ev.clientX, rect)
+      const p = quantize(raw, ev.shiftKey, ev.altKey)
+      setPaperCard({ [key]: p } as PaperCardPatch)
+    }
+    const onUp = () => {
+      window.removeEventListener("pointermove", onMove)
+      window.removeEventListener("pointerup", onUp)
+      window.removeEventListener("pointercancel", onUp)
+    }
+    window.addEventListener("pointermove", onMove)
+    window.addEventListener("pointerup", onUp)
+    window.addEventListener("pointercancel", onUp)
+  }
+
+  const onPaperMarkerKeyDown = (
+    e: ReactKeyboardEvent<HTMLElement>,
+    key: PaperMarkerKey
+  ) => {
+    if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return
+    e.preventDefault()
+    const sign = e.key === "ArrowRight" ? 1 : -1
+    const step = (e.shiftKey ? 0.001 : 0.01) * sign
+    setPaperCard({ [key]: clamp01(paper[key] + step) } as PaperCardPatch)
   }
 
   const onBandKeyDown = (
@@ -340,22 +455,83 @@ function Timeline({
     setStage(id, { window: next })
   }
 
+  // Filter ticks to those inside the current view window (with a small
+  // outside-edge tolerance so view edges still anchor a labeled tick).
+  const visibleTicks = TICKS.filter(
+    (t) => t.p >= view.start - 1e-9 && t.p <= view.end + 1e-9
+  )
+  const isFullView = view.start <= 0 && view.end >= 1
+
   return (
     <div>
-      <div className="mb-1 flex items-center justify-between text-[10px] tracking-wider text-black/50 uppercase">
+      <div className="mb-1 flex items-center justify-between gap-2 text-[10px] tracking-wider text-black/50 uppercase">
         <span>Timeline</span>
-        <span className="font-mono normal-case">
-          drag · ⇧ fine · ⌥ raw · ⇥ then ←/→
+        <span className="ml-auto flex items-center gap-1 font-mono text-[10px] normal-case text-black/55">
+          <button
+            className="rounded border border-black/10 px-1.5 py-0.5 hover:bg-black/5 hover:text-black"
+            onClick={() => setView(fitView())}
+            title="Zoom to active region (stages + paper-card envelope)"
+            type="button"
+          >
+            fit
+          </button>
+          <button
+            className="rounded border border-black/10 px-1.5 py-0.5 hover:bg-black/5 hover:text-black disabled:cursor-not-allowed disabled:opacity-40"
+            disabled={isFullView}
+            onClick={() => setView({ start: 0, end: 1 })}
+            title="Reset view to [0, 1]"
+            type="button"
+          >
+            1:1
+          </button>
+          <button
+            className="rounded border border-black/10 px-1.5 py-0.5 hover:bg-black/5 hover:text-black"
+            onClick={() => zoomBy(0.6)}
+            title="Zoom in"
+            type="button"
+          >
+            +
+          </button>
+          <button
+            className="rounded border border-black/10 px-1.5 py-0.5 hover:bg-black/5 hover:text-black disabled:cursor-not-allowed disabled:opacity-40"
+            disabled={isFullView}
+            onClick={() => zoomBy(1.5)}
+            title="Zoom out"
+            type="button"
+          >
+            −
+          </button>
+          <label
+            className="ml-2 flex items-center gap-1 normal-case"
+            title="Total scroll-section height in lvh"
+          >
+            <span className="text-[10px] text-black/55">section</span>
+            <input
+              className="w-12 rounded border border-black/15 bg-white px-1 py-0.5 font-mono text-[10px] tabular-nums"
+              max={1000}
+              min={110}
+              onChange={(e) => setScrollHeightVh(Number(e.target.value))}
+              step={10}
+              type="number"
+              value={scrollHeightVh}
+            />
+            <span className="text-[10px] text-black/45">lvh</span>
+          </label>
         </span>
       </div>
 
+      <div className="mb-1 text-[10px] font-mono text-black/45 normal-case">
+        view {fmtNumber(view.start)} → {fmtNumber(view.end)} (
+        {fmtNumber(view.end - view.start)}) · drag · ⇧ fine · ⌥ raw · ⇥ then ←/→
+      </div>
+
       <div className="relative mb-0.5 h-3 font-mono text-[9px] text-black/40">
-        {TICKS.map((t) =>
+        {visibleTicks.map((t) =>
           t.label ? (
             <span
               className="absolute top-0 -translate-x-1/2"
               key={`l-${t.p}`}
-              style={{ left: `${t.p * 100}%` }}
+              style={{ left: `${pToVisual(t.p)}%` }}
             >
               {t.label}
             </span>
@@ -363,27 +539,70 @@ function Timeline({
         )}
       </div>
       <div className="relative mb-1 h-1.5">
-        {TICKS.map((t) => (
+        {visibleTicks.map((t) => (
           <span
             aria-hidden
             className={`absolute top-0 w-px ${
               t.label ? "h-1.5 bg-black/30" : "h-1 bg-black/15"
             }`}
             key={`t-${t.p}`}
-            style={{ left: `${t.p * 100}%` }}
+            style={{ left: `${pToVisual(t.p)}%` }}
           />
         ))}
       </div>
 
+      {/* Video-zoom envelope strip — visualizes paper-card opacity (faded
+          band from opacityFadeStart → opacityFadeEnd) and exposes 3
+          draggable markers (scaleMidProgress, opacityFadeStart,
+          opacityFadeEnd) sharing the same horizontal scale as the
+          stage-track below. All positions use pToVisual so they track
+          the active timeline view. */}
+      <div className="relative mb-1 h-3.5 w-full overflow-hidden">
+        <div
+          aria-hidden
+          className="absolute top-1/2 h-1 -translate-y-1/2 rounded bg-sky-500/25"
+          style={{
+            left: `${pToVisual(0)}%`,
+            width: `${(paper.opacityFadeStart / viewSpan) * 100}%`,
+          }}
+        />
+        <div
+          aria-hidden
+          className="absolute top-1/2 h-1 -translate-y-1/2 rounded bg-gradient-to-r from-sky-500/25 to-transparent"
+          style={{
+            left: `${pToVisual(paper.opacityFadeStart)}%`,
+            width: `${(Math.max(0, paper.opacityFadeEnd - paper.opacityFadeStart) / viewSpan) * 100}%`,
+          }}
+        />
+        {PAPER_MARKERS.map((m) => (
+          <button
+            aria-label={`${m.label}: ${fmtNumber(paper[m.key])}`}
+            aria-valuemax={1}
+            aria-valuemin={0}
+            aria-valuenow={paper[m.key]}
+            className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-ew-resize text-[10px] leading-none outline-none focus-visible:ring-2 focus-visible:ring-black/60"
+            key={m.key}
+            onKeyDown={(e) => onPaperMarkerKeyDown(e, m.key)}
+            onPointerDown={(e) => beginPaperMarkerDrag(e, m.key)}
+            role="slider"
+            style={{ left: `${pToVisual(paper[m.key])}%`, color: m.color }}
+            title={`${m.label}: ${fmtNumber(paper[m.key])}`}
+            type="button"
+          >
+            {m.symbol}
+          </button>
+        ))}
+      </div>
+
       <div
-        className="relative h-8 w-full overflow-visible rounded bg-black/5"
+        className="relative h-8 w-full overflow-hidden rounded bg-black/5"
         onPointerDown={onTrackPointerDown}
         ref={trackRef}
       >
         {STAGE_ORDER.map((id) => {
           const w = stageById(id).window
-          const left = `${w[0] * 100}%`
-          const width = `${(w[1] - w[0]) * 100}%`
+          const left = `${pToVisual(w[0])}%`
+          const width = `${((w[1] - w[0]) / viewSpan) * 100}%`
           return (
             <div
               className="group absolute top-0 flex h-full cursor-grab items-center justify-center rounded text-[9px] font-medium text-black/70 outline-none ring-offset-1 focus-visible:ring-2 focus-visible:ring-black/60 active:cursor-grabbing"
@@ -422,7 +641,7 @@ function Timeline({
           <div
             className="pointer-events-none absolute -top-7 z-20 rounded bg-black/85 px-1.5 py-0.5 font-mono text-[10px] whitespace-nowrap text-white"
             style={{
-              left: `${((dragHint.lo + dragHint.hi) / 2) * 100}%`,
+              left: `${pToVisual((dragHint.lo + dragHint.hi) / 2)}%`,
               transform: "translateX(-50%)",
             }}
           >
@@ -434,7 +653,7 @@ function Timeline({
         <div
           aria-hidden
           className="pointer-events-none absolute top-0 h-full w-[2px] bg-black"
-          style={{ left: `${progress * 100}%` }}
+          style={{ left: `${pToVisual(progress)}%` }}
         />
       </div>
 

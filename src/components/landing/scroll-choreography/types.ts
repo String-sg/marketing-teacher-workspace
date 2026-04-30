@@ -66,9 +66,17 @@ export type ScrollChoreographyMode = "choreography" | "static"
 /**
  * Context value — Phase 1 ships the type and a stub provider (Plan 04).
  * Phase 2 wires `useScroll` and replaces the stub `MotionValue<number>`.
+ *
+ * `paperCardScale` is the shared MotionValue published by the
+ * orchestrator so that <ProductScreen> (now bundled inside <PaperBackdrop>)
+ * can divide its own transform by the same value to keep its visual
+ * scale/translate stable inside the scaled paper-card. Outside dev /
+ * production both PaperBackdrop and ProductScreen consume the same
+ * instance — no duplication, no drift between two derivations.
  */
 export type ScrollChoreographyContextValue = {
   readonly scrollYProgress: MotionValue<number>
+  readonly paperCardScale: MotionValue<number>
   readonly stages: readonly StageDef[]
   readonly reducedMotion: boolean
   readonly mode: ScrollChoreographyMode

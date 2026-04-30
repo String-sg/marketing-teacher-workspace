@@ -54,22 +54,38 @@ export type PaperCardConfig = {
 }
 
 export const PAPER_CARD_DEFAULTS: PaperCardConfig = {
-  scaleMidProgress: 0.4,
+  scaleMidProgress: 0.09,
   scaleMidValue: 2.4,
   scaleEndValue: 5.2,
-  opacityFadeStart: 0.45,
-  opacityFadeEnd: 0.55,
+  opacityFadeStart: 0.19,
+  opacityFadeEnd: 0.27,
 }
 
 export type PaperCardPatch = Partial<PaperCardConfig>
+
+/** Tall outer-section height in lvh (large-viewport-heights). The sticky
+ *  inner shell pins to viewport, so scrollable span = (this - 100) lvh.
+ *  Compile-time default 400 (= h-[400lvh] in the source). */
+export const SCROLL_HEIGHT_DEFAULT_VH = 400
+
+/** Timeline view window for the dev panel. [0, 1] shows the full timeline;
+ *  narrower ranges zoom in on a sub-region for finer tuning of compact
+ *  schedules (e.g. when all stages cluster in [0, 0.4]). */
+export type TimelineView = { readonly start: number; readonly end: number }
+
+export const TIMELINE_VIEW_DEFAULT: TimelineView = { start: 0, end: 1 }
 
 type FlowStagesState = Record<StageId, StageDef>
 
 type FlowControlsContextValue = {
   readonly stages: readonly StageDef[]
   readonly paperCard: PaperCardConfig
+  readonly scrollHeightVh: number
+  readonly view: TimelineView
   readonly setStage: (id: StageId, patch: StageRectPatch) => void
   readonly setPaperCard: (patch: PaperCardPatch) => void
+  readonly setScrollHeightVh: (vh: number) => void
+  readonly setView: (view: TimelineView) => void
   readonly resetAll: () => void
 }
 
@@ -96,6 +112,10 @@ export function DevFlowProvider({ children }: { children: ReactNode }) {
   const [paperCard, setPaperCardState] = useState<PaperCardConfig>(
     PAPER_CARD_DEFAULTS
   )
+  const [scrollHeightVh, setScrollHeightVhState] = useState<number>(
+    SCROLL_HEIGHT_DEFAULT_VH
+  )
+  const [view, setViewState] = useState<TimelineView>(TIMELINE_VIEW_DEFAULT)
 
   const setStage = useCallback((id: StageId, patch: StageRectPatch) => {
     setState((prev) => {
@@ -131,16 +151,60 @@ export function DevFlowProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
+  const setScrollHeightVh = useCallback((vh: number) => {
+    // Section must always be taller than the viewport for sticky to work,
+    // so floor at 110lvh. Cap at 1000lvh just to keep the input sane.
+    setScrollHeightVhState(Math.min(Math.max(vh, 110), 1000))
+  }, [])
+
+  const setView = useCallback((next: TimelineView) => {
+    const lo = clamp01(next.start)
+    const hi = clamp01(next.end)
+    // Keep at least a 1% window so dragging stays usable.
+    const minSpan = 0.01
+    if (hi - lo < minSpan) {
+      const center = (lo + hi) / 2
+      setViewState({
+        start: clamp01(center - minSpan / 2),
+        end: clamp01(center + minSpan / 2),
+      })
+      return
+    }
+    setViewState({ start: lo, end: hi })
+  }, [])
+
   const resetAll = useCallback(() => {
     setState(cloneStages())
     setPaperCardState(PAPER_CARD_DEFAULTS)
+    setScrollHeightVhState(SCROLL_HEIGHT_DEFAULT_VH)
+    setViewState(TIMELINE_VIEW_DEFAULT)
   }, [])
 
   const stages = useMemo(() => orderedFromState(state), [state])
 
   const value = useMemo(
-    () => ({ stages, paperCard, setStage, setPaperCard, resetAll }),
-    [stages, paperCard, setStage, setPaperCard, resetAll]
+    () => ({
+      stages,
+      paperCard,
+      scrollHeightVh,
+      view,
+      setStage,
+      setPaperCard,
+      setScrollHeightVh,
+      setView,
+      resetAll,
+    }),
+    [
+      stages,
+      paperCard,
+      scrollHeightVh,
+      view,
+      setStage,
+      setPaperCard,
+      setScrollHeightVh,
+      setView,
+      resetAll,
+    ]
   )
 
   return (
@@ -164,6 +228,13 @@ export function useFlowStages(): readonly StageDef[] {
 export function usePaperCardConfig(): PaperCardConfig {
   const ctx = useContext(FlowControlsContext)
   return ctx?.paperCard ?? PAPER_CARD_DEFAULTS
+}
+
+/** Read the tunable scroll-section height in lvh. Falls back to the
+ *  compile-time default outside dev so production matches. */
+export function useScrollHeightVh(): number {
+  const ctx = useContext(FlowControlsContext)
+  return ctx?.scrollHeightVh ?? SCROLL_HEIGHT_DEFAULT_VH
 }
 
 /** Returns null when no provider is mounted (so the panel can no-op). */

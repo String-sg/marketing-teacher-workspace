@@ -32,6 +32,7 @@ function renderWithMockProgress(progress = 0) {
   const mv = motionValue(progress)
   const value: ScrollChoreographyContextValue = {
     scrollYProgress: mv,
+    paperCardScale: motionValue(1),
     stages: STAGES,
     reducedMotion: false,
     mode: "choreography",

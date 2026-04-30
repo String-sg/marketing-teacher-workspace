@@ -76,8 +76,79 @@ const OPACITY_EASES = [
   LINEAR, // docked hold
 ]
 
+/**
+ * Vertical offset of paper-card's transform-origin from its own center,
+ * in viewport-height percent. Paper-backdrop sets `transformOrigin:
+ * "50% 92%"`, so the origin is 42% of paper-card's height BELOW the
+ * paper-card's center. As the paper-card scales by Sp, its content-area's
+ * vertical center drifts UP by `42 * (Sp - 1)` vh in viewport coords —
+ * `compensatedY` re-anchors the bundled child to compensate.
+ *
+ * Baked as a constant rather than parsed from PaperBackdrop's CSS to keep
+ * the math local. If the paper-card's transform-origin ever changes, this
+ * constant must change in lock-step.
+ */
+const PAPER_CARD_ORIGIN_Y_OFFSET_VH = 42
+
+/**
+ * Parse a CSS length string ("+28vw", "-2.2vw", "0", "+23vh") to a number.
+ * Returns 0 for "0" (no unit) and parses through the leading sign.
+ * Doesn't validate the unit — the caller knows the axis (vw vs vh).
+ */
+function parseCssLength(value: string): number {
+  const match = value.match(/^([+-]?\d+(?:\.\d+)?)/)
+  return match ? parseFloat(match[1]) : 0
+}
+
+/**
+ * Divide a CSS length string ("+28vw", "-2.2vw", "0") by a numeric
+ * scale factor and re-stringify, preserving the unit. Used for x
+ * compensation (paper-card's transform-origin x = 50%, so x has no
+ * origin-shift component — purely multiplicative).
+ */
+function divideCssLength(value: string, scale: number): string {
+  if (scale === 0 || !Number.isFinite(scale)) return value
+  const match = value.match(/^([+-]?\d+(?:\.\d+)?)([a-z%]*)$/i)
+  if (!match) return value
+  const num = parseFloat(match[1])
+  const unit = match[2]
+  if (num === 0) return "0"
+  const compensated = num / scale
+  const rounded = Math.round(compensated * 10000) / 10000
+  return `${rounded}${unit}`
+}
+
+/**
+ * Compensate a vh-based child translate for both paper-card scale AND
+ * its off-center transform-origin (50%, 92%). Derivation:
+ *
+ *   parent scales by Sp around origin at (50%, 92%) of its bounding box.
+ *   the parent's content-area center maps to viewport-y =
+ *     92 + (50 - 92) * Sp = 92 - 42*Sp
+ *   so a child at parent-local center (with no translate) ends up at
+ *     viewport-y = 92 - 42*Sp vh   (NOT 50vh as ideal!)
+ *
+ *   to land at viewport-y = 50 + yRect (the rect's intent), the child
+ *   needs translate ty such that
+ *     92 + (50 + ty - 92) * Sp = 50 + yRect
+ *   solving:
+ *     ty = 42*(1 - 1/Sp) + yRect/Sp
+ *
+ * At Sp = 1 the first term is 0 and the second reduces to yRect, so
+ * compensation is a no-op during the hero hold (and outside the
+ * orchestrator).
+ */
+function compensateYTranslate(yStr: string, scale: number): string {
+  if (scale === 0 || !Number.isFinite(scale)) return yStr
+  const yVh = parseCssLength(yStr)
+  const tyVh =
+    PAPER_CARD_ORIGIN_Y_OFFSET_VH * (1 - 1 / scale) + yVh / scale
+  const rounded = Math.round(tyVh * 10000) / 10000
+  return `${rounded}vh`
+}
+
 export function ProductScreen() {
-  const { scrollYProgress } = useScrollChoreography()
+  const { scrollYProgress, paperCardScale } = useScrollChoreography()
   // Reads live overrides from <DevFlowPanel> when mounted; falls back to
   // compile-time STAGES outside dev. Keyframes re-derive on each render so
   // visual changes are visible the same frame in dev tuning.
@@ -180,15 +251,41 @@ export function ProductScreen() {
     { ease: OPACITY_EASES, clamp: false }
   )
 
+  // Bundled-into-paper-card compensation. The outer paper-card's scale
+  // multiplies through to this child's transform space, so we divide each
+  // visual property by `paperCardScale` and the rendered transform reads
+  // as the rect's intrinsic value. With paperCardScale = 1 (hero hold,
+  // and outside the orchestrator) compensation is a no-op.
+  //
+  // We trigger the compensation off `scrollYProgress` and read the other
+  // motion values via `.get()` to avoid motion's homogeneous-typed
+  // multi-input overload (it doesn't model mixed [string, number] tuples).
+  // This is safe because scale, x, y, and paperCardScale are all
+  // derivatives of scrollYProgress — motion fires derivatives in
+  // creation order in the same frame, so by the time the compensated
+  // value's transformer runs, all upstream `.get()` calls return the
+  // latest frame's values.
+  const compensatedScale = useTransform(scrollYProgress, () => {
+    const s = scale.get()
+    const ps = paperCardScale.get()
+    return ps === 0 ? s : s / ps
+  })
+  const compensatedX = useTransform(scrollYProgress, () =>
+    divideCssLength(x.get(), paperCardScale.get())
+  )
+  const compensatedY = useTransform(scrollYProgress, () =>
+    compensateYTranslate(y.get(), paperCardScale.get())
+  )
+
   return (
     <motion.div
       aria-hidden
       className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center px-4 sm:px-10 lg:px-16"
-      style={{ opacity, x, y }}
+      style={{ opacity, x: compensatedX, y: compensatedY }}
     >
       <motion.div
         className="relative w-full max-w-[1280px] overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_30px_120px_-40px_rgb(15_23_42/0.45)]"
-        style={{ scale }}
+        style={{ scale: compensatedScale }}
       >
         <div className="flex items-center gap-2 border-b border-black/5 bg-[#f7f7f5] px-4 py-2.5">
           <span className="size-3 rounded-full bg-[#ff5f57]" />

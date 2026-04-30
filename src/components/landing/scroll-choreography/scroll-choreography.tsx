@@ -25,12 +25,23 @@
  * outer also carries `.scroll-choreography-only` so the styles.css:226-230
  * mobile gate becomes defense-in-depth alongside the JS branch.
  */
-import { motion, useReducedMotion, useScroll, useTransform } from "motion/react"
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "motion/react"
+import type { MotionValue } from "motion/react"
 import { useRef } from "react"
-import type { RefObject } from "react"
+import type { ReactNode, RefObject } from "react"
 
 import { ScrollChoreographyContext } from "./context"
-import { DevFlowProvider } from "./dev-flow-context"
+import {
+  DevFlowProvider,
+  useFlowStages,
+  usePaperCardConfig,
+  useScrollHeightVh,
+} from "./dev-flow-context"
 import { DevFlowPanel } from "./dev-flow-panel"
 import { PaperBackdrop } from "./paper-backdrop"
 import { ProductScreen } from "./product-screen"
@@ -119,68 +130,146 @@ function ChoreographyTree({
     ["0px", HERO_COPY_LIFT_TRAVEL_PX, HERO_COPY_LIFT_TRAVEL_PX]
   )
 
-  // Provider value object — inline literal per RESEARCH Pattern 4 / Pitfall 6.
-  // Phase 2 has no consumers reading `mode` / `reducedMotion`; PaperBackdrop
-  // and ProductScreen consume `scrollYProgress` only (a stable MotionValue
-  // ref captured on mount). Phase 4 may wrap with useMemo when copy-track
-  // consumers land that read the non-MotionValue fields.
+  // Provider value lives in <ChoreographyContextShell> below — that shell
+  // sits inside <DevFlowProvider> so it can compute `paperCardScale` from
+  // the dev-tunable PaperCardConfig + heroHoldEnd. Both <PaperBackdrop>
+  // and <ProductScreen> consume the same MotionValue, so the bundled UI
+  // overlay can divide-by-paperCardScale to keep its visual transform
+  // stable inside the scaled paper-card.
   return (
     <DevFlowProvider>
-      <ScrollChoreographyContext.Provider
-        value={{
-          scrollYProgress,
-          stages: STAGES,
-          reducedMotion: false,
-          mode: "choreography",
-        }}
-      >
-      <section
-        aria-labelledby="hero-title"
-        className="scroll-choreography-only relative h-[400lvh]"
-        ref={sectionRef}
-      >
-        <div className="sticky top-0 flex h-svh items-stretch overflow-hidden p-3">
-          <PaperBackdrop>
-            <div className="px-4 pt-4 sm:px-6 sm:pt-6">
-              <SiteHeader />
-            </div>
-            <motion.div
-              className="mx-auto mt-10 flex w-fit flex-col items-center text-center sm:mt-14"
-              style={{ opacity: copyOpacity, y: copyY }}
-            >
-              <h1
-                className="font-heading text-[clamp(1.75rem,4.4vw,4rem)] leading-[1.05] font-medium tracking-tight text-[color:var(--paper-ink)]"
-                id="hero-title"
-              >
-                {hero.headline}
-              </h1>
-              <p className="mt-3 max-w-xl text-base leading-7 text-balance text-[color:var(--paper-muted)] sm:text-lg sm:leading-8">
-                {hero.subline}
-              </p>
-              <Button
-                asChild
-                className="mt-6 h-11 rounded-full bg-primary px-7 text-base text-primary-foreground hover:bg-primary/90 sm:mt-7"
-              >
-                <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
-                  {finalCtaCopy.cta}
-                </a>
-              </Button>
-            </motion.div>
-          </PaperBackdrop>
-          <ProductScreen />
-          <StageCopy stage="docked" />
-        </div>
-      </section>
-      {/* Page-tail sections are siblings of the choreography per
-          research/ARCHITECTURE.md System Overview. The choreography section
-          owns hero+wow only; ProofStrip and FinalCta render after it
-          regardless of mode. (Static branch reaches them via
-          <StaticChoreographyFallback />, which composes them itself —
-          this branch reaches them here.) */}
-      <ProofStrip />
-      <FinalCta />
-      {import.meta.env.DEV && <DevFlowPanel />}
-    </ScrollChoreographyContext.Provider>
+      <ChoreographyContextShell scrollYProgress={scrollYProgress}>
+        <ChoreographySection sectionRef={sectionRef}>
+          <div className="sticky top-0 flex h-svh items-stretch overflow-hidden p-3">
+            <PaperBackdrop>
+              {/* Hero copy slot — rendered above the backdrop layer
+                  inside PaperBackdrop's foreground (z-10). */}
+              <div className="relative z-10 flex w-full flex-col">
+                <div className="px-4 pt-4 sm:px-6 sm:pt-6">
+                  <SiteHeader />
+                </div>
+                <motion.div
+                  className="mx-auto mt-10 flex w-fit flex-col items-center text-center sm:mt-14"
+                  style={{ opacity: copyOpacity, y: copyY }}
+                >
+                  <h1
+                    className="font-heading text-[clamp(1.75rem,4.4vw,4rem)] leading-[1.05] font-medium tracking-tight text-[color:var(--paper-ink)]"
+                    id="hero-title"
+                  >
+                    {hero.headline}
+                  </h1>
+                  <p className="mt-3 max-w-xl text-base leading-7 text-balance text-[color:var(--paper-muted)] sm:text-lg sm:leading-8">
+                    {hero.subline}
+                  </p>
+                  <Button
+                    asChild
+                    className="mt-6 h-11 rounded-full bg-primary px-7 text-base text-primary-foreground hover:bg-primary/90 sm:mt-7"
+                  >
+                    <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
+                      {finalCtaCopy.cta}
+                    </a>
+                  </Button>
+                </motion.div>
+              </div>
+              {/* Bundled <ProductScreen> — shares the paper-card scale +
+                  transformOrigin so it stays locked to the cartoon
+                  laptop throughout the morph zone. */}
+              <ProductScreen />
+            </PaperBackdrop>
+            <StageCopy stage="docked" />
+          </div>
+        </ChoreographySection>
+        {/* Page-tail sections are siblings of the choreography per
+            research/ARCHITECTURE.md System Overview. The choreography section
+            owns hero+wow only; ProofStrip and FinalCta render after it
+            regardless of mode. (Static branch reaches them via
+            <StaticChoreographyFallback />, which composes them itself —
+            this branch reaches them here.) */}
+        <ProofStrip />
+        <FinalCta />
+        {import.meta.env.DEV && <DevFlowPanel />}
+      </ChoreographyContextShell>
     </DevFlowProvider>
+  )
+}
+
+/**
+ * Shell that lives inside <DevFlowProvider> and publishes the
+ * ScrollChoreographyContext value, including the shared
+ * `paperCardScale` MotionValue. Dev-tunable hooks (`useFlowStages`,
+ * `usePaperCardConfig`) only resolve correctly inside the provider,
+ * so the keyframe array sources its values here.
+ */
+function ChoreographyContextShell({
+  scrollYProgress,
+  children,
+}: {
+  scrollYProgress: MotionValue<number>
+  children: ReactNode
+}) {
+  const stages = useFlowStages()
+  const paper = usePaperCardConfig()
+  const heroHoldEnd = stages.find((s) => s.id === "hero")?.window[1] ?? 0.15
+
+  // Hold paper-card at scale 1 throughout the hero hold so the cartoon
+  // laptop stays visually locked; ramp to scaleMidValue at scaleMidProgress
+  // and to scaleEndValue at p=1.
+  const paperCardScale = useTransform(
+    scrollYProgress,
+    [0, heroHoldEnd, paper.scaleMidProgress, 1],
+    [1, 1, paper.scaleMidValue, paper.scaleEndValue]
+  )
+
+  return (
+    <ScrollChoreographyContext.Provider
+      value={{
+        scrollYProgress,
+        paperCardScale,
+        stages: STAGES,
+        reducedMotion: false,
+        mode: "choreography",
+      }}
+    >
+      {children}
+    </ScrollChoreographyContext.Provider>
+  )
+}
+
+/**
+ * The tall outer scroll-section. Lives below DevFlowProvider so its
+ * height tracks useScrollHeightVh() (default 400lvh, tunable in dev).
+ * The h-class is replaced by an inline style because the value is
+ * dynamic per-render in dev; outside dev the hook returns the default
+ * and the rendered height is identical to the original `h-[400lvh]`.
+ */
+function ChoreographySection({
+  sectionRef,
+  children,
+}: {
+  sectionRef: RefObject<HTMLElement | null>
+  children: ReactNode
+}) {
+  const heightVh = useScrollHeightVh()
+  // Set the actual `height` to a literal `var(...)` reference and bind the
+  // dynamic value through a CSS custom property. Two reasons:
+  //   1. PERF-04 AST check (migrate-perf-04.test.ts) rejects non-literal
+  //      values on forbidden style keys (width/height/top/left). A literal
+  //      `var(--scroll-h)` string passes; a template literal would not.
+  //   2. The custom property is animatable / overridable from CSS too if
+  //      we ever want media-query-driven defaults.
+  return (
+    <section
+      aria-labelledby="hero-title"
+      className="scroll-choreography-only relative"
+      ref={sectionRef}
+      style={
+        {
+          "--scroll-h": `${heightVh}lvh`,
+          height: "var(--scroll-h)",
+        } as React.CSSProperties
+      }
+    >
+      {children}
+    </section>
   )
 }
