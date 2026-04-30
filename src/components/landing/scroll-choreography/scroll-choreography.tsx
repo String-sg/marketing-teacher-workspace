@@ -32,6 +32,8 @@ import { useRef } from "react"
 import type { RefObject } from "react"
 
 import { ScrollChoreographyContext } from "./context"
+import { DevFlowProvider } from "./dev-flow-context"
+import { DevFlowPanel } from "./dev-flow-panel"
 import { PaperBackdrop } from "./paper-backdrop"
 import { ProductScreen } from "./product-screen"
 import { StageCopy } from "./stage-copy"
@@ -124,14 +126,15 @@ function ChoreographyTree({
   // ref captured on mount). Phase 4 may wrap with useMemo when copy-track
   // consumers land that read the non-MotionValue fields.
   return (
-    <ScrollChoreographyContext.Provider
-      value={{
-        scrollYProgress,
-        stages: STAGES,
-        reducedMotion: false,
-        mode: "choreography",
-      }}
-    >
+    <DevFlowProvider>
+      <ScrollChoreographyContext.Provider
+        value={{
+          scrollYProgress,
+          stages: STAGES,
+          reducedMotion: false,
+          mode: "choreography",
+        }}
+      >
       <section
         aria-labelledby="hero-title"
         className="scroll-choreography-only relative h-[400lvh]"
@@ -175,6 +178,8 @@ function ChoreographyTree({
           this branch reaches them here.) */}
       <ProofStrip />
       <FinalCta />
+      {import.meta.env.DEV && <DevFlowPanel />}
     </ScrollChoreographyContext.Provider>
+    </DevFlowProvider>
   )
 }

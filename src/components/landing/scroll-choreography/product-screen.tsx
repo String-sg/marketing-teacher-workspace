@@ -55,7 +55,8 @@ import { cubicBezier, easeInOut, easeOut } from "motion"
 import { motion, useTransform } from "motion/react"
 
 import { useScrollChoreography } from "./context"
-import { SCREEN_TARGETS, STAGES } from "./stages"
+import { useFlowTargets } from "./dev-flow-context"
+import { STAGES } from "./stages"
 
 import { TEACHER_WORKSPACE_APP_URL } from "@/content/landing"
 
@@ -116,6 +117,11 @@ const OPACITY_EASES = [
 
 export function ProductScreen() {
   const { scrollYProgress } = useScrollChoreography()
+  // Reads the live override from <DevFlowPanel> when mounted, else falls back
+  // to compile-time SCREEN_TARGETS. The output values in every useTransform
+  // below resolve through `targets` so dev tuning re-derives motion mappings
+  // on each render. Input keyframes stay STAGES-bound (D-12 walker).
+  const targets = useFlowTargets()
 
   // The keyframe arrays are inlined as literal ArrayExpressions of
   // MemberExpressions binding to STAGES + SCREEN_TARGETS — the MIGRATE-03
@@ -141,15 +147,15 @@ export function ProductScreen() {
       STAGES[3].window[1],
     ],
     [
-      SCREEN_TARGETS[STAGES[0].screen].scale,
-      SCREEN_TARGETS[STAGES[0].screen].scale,
-      SCREEN_TARGETS[STAGES[1].screen].scale,
-      SCREEN_TARGETS[STAGES[1].screen].scale,
-      SCREEN_TARGETS[STAGES[2].screen].scale,
-      SCREEN_TARGETS[STAGES[2].screen].scale,
+      targets[STAGES[0].screen].scale,
+      targets[STAGES[0].screen].scale,
+      targets[STAGES[1].screen].scale,
+      targets[STAGES[1].screen].scale,
+      targets[STAGES[2].screen].scale,
+      targets[STAGES[2].screen].scale,
       FA_TO_FB_SCALE_DIP_VALUE,
-      SCREEN_TARGETS[STAGES[3].screen].scale,
-      SCREEN_TARGETS[STAGES[3].screen].scale,
+      targets[STAGES[3].screen].scale,
+      targets[STAGES[3].screen].scale,
     ],
     { ease: SCALE_EASES }
   )
@@ -167,14 +173,14 @@ export function ProductScreen() {
       STAGES[3].window[1],
     ],
     [
-      SCREEN_TARGETS[STAGES[0].screen].x,
-      SCREEN_TARGETS[STAGES[0].screen].x,
-      SCREEN_TARGETS[STAGES[1].screen].x,
-      SCREEN_TARGETS[STAGES[1].screen].x,
-      SCREEN_TARGETS[STAGES[2].screen].x,
-      SCREEN_TARGETS[STAGES[2].screen].x,
-      SCREEN_TARGETS[STAGES[3].screen].x,
-      SCREEN_TARGETS[STAGES[3].screen].x,
+      targets[STAGES[0].screen].x,
+      targets[STAGES[0].screen].x,
+      targets[STAGES[1].screen].x,
+      targets[STAGES[1].screen].x,
+      targets[STAGES[2].screen].x,
+      targets[STAGES[2].screen].x,
+      targets[STAGES[3].screen].x,
+      targets[STAGES[3].screen].x,
     ],
     { ease: X_EASES }
   )
@@ -194,14 +200,14 @@ export function ProductScreen() {
       STAGES[3].window[1],
     ],
     [
-      SCREEN_TARGETS[STAGES[0].screen].y,
-      SCREEN_TARGETS[STAGES[0].screen].y,
-      SCREEN_TARGETS[STAGES[1].screen].y,
-      SCREEN_TARGETS[STAGES[1].screen].y,
-      SCREEN_TARGETS[STAGES[2].screen].y,
-      SCREEN_TARGETS[STAGES[2].screen].y,
-      SCREEN_TARGETS[STAGES[3].screen].y,
-      SCREEN_TARGETS[STAGES[3].screen].y,
+      targets[STAGES[0].screen].y,
+      targets[STAGES[0].screen].y,
+      targets[STAGES[1].screen].y,
+      targets[STAGES[1].screen].y,
+      targets[STAGES[2].screen].y,
+      targets[STAGES[2].screen].y,
+      targets[STAGES[3].screen].y,
+      targets[STAGES[3].screen].y,
     ],
     { ease: X_EASES }
   )
@@ -226,14 +232,14 @@ export function ProductScreen() {
       STAGES[3].window[1],
     ],
     [
-      SCREEN_TARGETS[STAGES[0].screen].opacity,
-      SCREEN_TARGETS[STAGES[0].screen].opacity,
-      SCREEN_TARGETS[STAGES[1].screen].opacity,
-      SCREEN_TARGETS[STAGES[1].screen].opacity,
-      SCREEN_TARGETS[STAGES[2].screen].opacity,
-      SCREEN_TARGETS[STAGES[2].screen].opacity,
-      SCREEN_TARGETS[STAGES[3].screen].opacity,
-      SCREEN_TARGETS[STAGES[3].screen].opacity,
+      targets[STAGES[0].screen].opacity,
+      targets[STAGES[0].screen].opacity,
+      targets[STAGES[1].screen].opacity,
+      targets[STAGES[1].screen].opacity,
+      targets[STAGES[2].screen].opacity,
+      targets[STAGES[2].screen].opacity,
+      targets[STAGES[3].screen].opacity,
+      targets[STAGES[3].screen].opacity,
     ],
     { ease: OPACITY_EASES, clamp: false }
   )
