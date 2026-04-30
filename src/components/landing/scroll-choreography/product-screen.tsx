@@ -179,6 +179,33 @@ export function ProductScreen() {
     { ease: X_EASES }
   )
 
+  // y mirrors the x channel — non-zero only on tiny so the screen overlays
+  // the laptop in the cartoon illustration during hero stage.
+  const y = useTransform(
+    scrollYProgress,
+    [
+      STAGES[0].window[0],
+      STAGES[0].window[1],
+      STAGES[1].window[0],
+      STAGES[1].window[1],
+      STAGES[2].window[0],
+      STAGES[2].window[1],
+      STAGES[3].window[0],
+      STAGES[3].window[1],
+    ],
+    [
+      SCREEN_TARGETS[STAGES[0].screen].y,
+      SCREEN_TARGETS[STAGES[0].screen].y,
+      SCREEN_TARGETS[STAGES[1].screen].y,
+      SCREEN_TARGETS[STAGES[1].screen].y,
+      SCREEN_TARGETS[STAGES[2].screen].y,
+      SCREEN_TARGETS[STAGES[2].screen].y,
+      SCREEN_TARGETS[STAGES[3].screen].y,
+      SCREEN_TARGETS[STAGES[3].screen].y,
+    ],
+    { ease: X_EASES }
+  )
+
   // clamp:false disables motion 12's accelerate/WAAPI path on opacity. Without
   // it the derived MotionValue carries `accelerate` metadata that the
   // motion.div binder routes to a native WAAPI animation (acceleratedValues
@@ -215,7 +242,7 @@ export function ProductScreen() {
     <motion.div
       aria-hidden
       className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center px-4 sm:px-10 lg:px-16"
-      style={{ opacity, x }}
+      style={{ opacity, x, y }}
     >
       <motion.div
         className="relative w-full max-w-[1280px] overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_30px_120px_-40px_rgb(15_23_42/0.45)]"

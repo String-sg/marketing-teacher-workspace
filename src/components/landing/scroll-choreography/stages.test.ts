@@ -76,12 +76,17 @@ describe("SCREEN_TARGETS map (D-04 / D-08)", () => {
     ])
   })
 
-  it("tiny target — D-05 hidden contract: opacity = 0, scale = 0.55", () => {
+  it("tiny target — laptop-overlay contract: visible, small, offset over the cartoon laptop", () => {
     const t = SCREEN_TARGETS["tiny"]
-    expect(t.opacity).toBe(0)
-    expect(t.scale).toBe(0.55)
-    expect(t.x).toBe("0")
-    expect(t.y).toBe("0")
+    // Phase 3 retune: tiny is the laptop overlay at hero stage. Opacity=1
+    // (visible), small scale to fit the cartoon laptop's screen, x/y
+    // offsets in vw/vh that translate the centered ProductScreen to sit
+    // over the laptop in the paper-card illustration.
+    expect(t.opacity).toBe(1)
+    expect(t.scale).toBeGreaterThan(0)
+    expect(t.scale).toBeLessThan(0.2)
+    expect(t.x).toMatch(/^[+-]?[\d.]+vw$/)
+    expect(t.y).toMatch(/^[+-]?[\d.]+vh$/)
   })
 
   it("centered target — wow plateau: scale = 1.00, opacity = 1, x = '0'", () => {

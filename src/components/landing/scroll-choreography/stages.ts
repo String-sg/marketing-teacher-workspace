@@ -46,16 +46,18 @@ export function byId(id: StageId): StageDef {
  * Conventions:
  *   - x sign convention (D-07): negative = leftward (docked-left toward
  *     viewport left), positive = rightward (docked-right toward viewport
- *     right). String values include CSS units (vw) so motion's mix()
+ *     right). String values include CSS units (vw / vh) so motion's mix()
  *     interpolates them as units, not numbers.
- *   - tiny.opacity = 0 (D-05): the hero target is a geometric starting
- *     point; the screen is hidden until the hero→wow morph fades it in.
- *   - y is "0" for all targets (D-03 — no vertical morph in Phase 3);
- *     the field is declared on ScreenTargetRect but unused.
+ *   - tiny: positioned over the laptop screen in the paper-card
+ *     illustration (offset right + down from viewport center, scaled to
+ *     fit inside the cartoon laptop's screen). The hero→wow morph
+ *     enlarges it to "centered" while moving it back to viewport center.
+ *   - y values express vertical translate in vh; non-zero only on tiny
+ *     (the laptop sits well below viewport center).
  *   - clipPath stays undefined (D-03 — no shape morph in Phase 3).
  */
 export const SCREEN_TARGETS: Record<ScreenTarget, ScreenTargetRect> = {
-  tiny: { scale: 0.55, x: "0", y: "0", opacity: 0 },
+  tiny: { scale: 0.085, x: "+4.3vw", y: "+35vh", opacity: 1 },
   centered: { scale: 1.0, x: "0", y: "0", opacity: 1 },
   "docked-left": { scale: 0.5, x: "-28vw", y: "0", opacity: 1 },
   "docked-right": { scale: 0.5, x: "+28vw", y: "0", opacity: 1 },
