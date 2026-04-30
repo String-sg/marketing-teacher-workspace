@@ -91,7 +91,7 @@ describe("PaperBackdrop video gate (D-15 / D-16 / CHOREO-08, revised 2026-04-29)
     // jsdom we mark it explicitly so the next event sees paused=true and
     // can decide to call play().
     Object.defineProperty(video, "paused", { value: true, configurable: true })
-    scrollYProgress.set(0.3)
+    scrollYProgress.set(byId("wow").window[1] - 0.05)
     expect(playSpy).toHaveBeenCalled()
   })
 
