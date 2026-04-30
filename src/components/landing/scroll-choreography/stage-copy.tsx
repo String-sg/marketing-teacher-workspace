@@ -22,7 +22,7 @@ import { useScrollChoreography } from "./context"
 import { useFlowStages } from "./dev-flow-context"
 
 import { Button } from "@/components/ui/button"
-import { stages, TEACHER_WORKSPACE_APP_URL } from "@/content/landing"
+import { stages } from "@/content/landing"
 
 type StageCopyProps = { stage: "docked" }
 
@@ -36,7 +36,7 @@ export function StageCopy({ stage }: StageCopyProps) {
   if (!entry || entry.id !== "docked") {
     throw new Error(`StageCopy: unknown stage "${stage}"`)
   }
-  const { kicker, heading, paragraph, bullets } = entry.copy
+  const { kicker, heading, paragraph, bullets, cta } = entry.copy
 
   const fadeInStart = byFlowId("wow")!.window[1]
   const holdStart = byFlowId("docked")!.window[0]
@@ -68,15 +68,20 @@ export function StageCopy({ stage }: StageCopyProps) {
           {bullets.map((bullet) => (
             <article
               className="border-t border-[color:var(--paper-rule)]/55 py-5 first:border-t-0 first:pt-0"
-              key={bullet}
+              key={bullet.title}
             >
               <div className="flex gap-4">
                 <span className="mt-1 grid size-6 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
                   <CheckIcon aria-hidden className="size-3.5" />
                 </span>
-                <p className="leading-7 text-[color:var(--paper-ink)]">
-                  {bullet}
-                </p>
+                <div>
+                  <p className="font-medium leading-7 text-[color:var(--paper-ink)]">
+                    {bullet.title}
+                  </p>
+                  <p className="mt-1 leading-7 text-[color:var(--paper-muted)]">
+                    {bullet.body}
+                  </p>
+                </div>
               </div>
             </article>
           ))}
@@ -86,8 +91,8 @@ export function StageCopy({ stage }: StageCopyProps) {
           asChild
           className="mt-8 h-11 rounded-full bg-primary px-7 text-base text-primary-foreground hover:bg-primary/90"
         >
-          <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
-            See it live
+          <a href={cta.href} rel="noreferrer">
+            {cta.label}
             <ArrowUpRightIcon data-icon="inline-end" />
           </a>
         </Button>

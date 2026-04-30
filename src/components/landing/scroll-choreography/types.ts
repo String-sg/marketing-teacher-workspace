@@ -38,6 +38,16 @@ export type StageDef = {
  * The exact-3-bullets tuple enforces CONTENT-03/04 at compile time:
  * adding a fourth bullet to docked is a TypeScript error.
  */
+export type BulletItem = {
+  readonly title: string
+  readonly body: string
+}
+
+export type CtaLink = {
+  readonly label: string
+  readonly href: string
+}
+
 export type StageCopyContent =
   | {
       readonly id: "hero"
@@ -56,7 +66,8 @@ export type StageCopyContent =
         readonly kicker: string
         readonly heading: string
         readonly paragraph: string
-        readonly bullets: readonly [string, string, string]
+        readonly bullets: readonly [BulletItem, BulletItem, BulletItem]
+        readonly cta: CtaLink
       }
     }
 

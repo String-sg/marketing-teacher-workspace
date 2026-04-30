@@ -11,7 +11,7 @@ import { useIsDesktop } from "@/components/landing/scroll-choreography/use-is-de
 import { SiteHeader } from "@/components/landing/site-header"
 import { Button } from "@/components/ui/button"
 import {
-  finalCtaCopy,
+  siteCtaCopy,
   stages,
   TEACHER_WORKSPACE_APP_URL,
 } from "@/content/landing"
@@ -167,7 +167,7 @@ export function PaperHero() {
                 className="mt-6 h-11 rounded-full bg-primary px-7 text-base text-primary-foreground hover:bg-primary/90 sm:mt-7"
               >
                 <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
-                  {finalCtaCopy.cta}
+                  {siteCtaCopy.primary}
                 </a>
               </Button>
             </motion.div>

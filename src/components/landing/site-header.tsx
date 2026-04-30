@@ -2,8 +2,8 @@ import { ArrowRightIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
-  finalCtaCopy,
   navItems,
+  siteCtaCopy,
   TEACHER_WORKSPACE_APP_URL,
 } from "@/content/landing"
 
@@ -49,7 +49,7 @@ export function SiteHeader() {
             variant="outline"
           >
             <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
-              {finalCtaCopy.cta}
+              {siteCtaCopy.primary}
               <ArrowRightIcon data-icon="inline-end" />
             </a>
           </Button>

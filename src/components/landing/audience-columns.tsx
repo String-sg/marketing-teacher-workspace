@@ -1,0 +1,47 @@
+import { audienceCopy } from "@/content/landing"
+
+/**
+ * Section 4 — Built for the way schools work.
+ *
+ * Three audience columns (Form Teachers / Year Heads & SDT / School
+ * Leaders). Open-paper layout — no cards — with a top-rule divider per
+ * column. Sits between the cards of "In schools today" and the centered
+ * paper-card of the final CTA so the page rhythm reads:
+ *
+ *   cards (Section 3) → open paper (Section 4) → card (Section 5).
+ */
+export function AudienceColumns() {
+  return (
+    <section
+      className="relative px-5 py-20 sm:px-8 lg:py-24"
+      id="audiences"
+    >
+      <div className="mx-auto w-[1024px] max-w-full">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="text-xs font-medium tracking-[0.18em] text-[color:var(--paper-muted)] uppercase sm:text-sm">
+            {audienceCopy.kicker}
+          </p>
+          <h2 className="mt-4 font-heading text-[clamp(1.5rem,3.6vw,3.25rem)] leading-[1.08] font-medium tracking-tight text-balance text-[color:var(--paper-ink)]">
+            {audienceCopy.heading}
+          </h2>
+        </div>
+
+        <div className="mt-12 grid grid-cols-1 gap-10 lg:mt-16 lg:grid-cols-3">
+          {audienceCopy.columns.map((column) => (
+            <article
+              className="border-t border-[color:var(--paper-rule)]/55 pt-6"
+              key={column.label}
+            >
+              <p className="font-heading text-lg font-medium leading-[1.2] tracking-tight text-[color:var(--paper-ink)] sm:text-xl">
+                {column.label}
+              </p>
+              <p className="mt-3 text-base leading-7 text-[color:var(--paper-muted)]">
+                {column.body}
+              </p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}

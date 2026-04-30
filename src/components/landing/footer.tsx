@@ -1,11 +1,9 @@
 import { footerCopy } from "@/content/landing"
 
 /**
- * Minimal footer per CONTEXT.md D-05: copyright + trust line + single
- * mailto support link. Privacy and Terms are deferred until real policies
- * exist — fabricating policy stubs adds legal risk for an early-access
- * marketing site. (This is the documented departure from Phase 1 success
- * criterion #5's literal phrasing.)
+ * Minimal footer: copyright + trust line + feedback link. The feedback
+ * link replaced the prior mailto support address with the canonical
+ * go.gov.sg short URL — see CONTENT-07 in the rewrite spec.
  */
 export function SiteFooter() {
   return (
@@ -17,9 +15,11 @@ export function SiteFooter() {
         </p>
         <a
           className="transition-colors hover:text-primary focus-visible:rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-          href={`mailto:${footerCopy.supportEmail}`}
+          href={footerCopy.feedbackUrl}
+          rel="noreferrer"
+          target="_blank"
         >
-          {footerCopy.supportEmail}
+          {footerCopy.feedbackLabel}
         </a>
       </div>
     </footer>

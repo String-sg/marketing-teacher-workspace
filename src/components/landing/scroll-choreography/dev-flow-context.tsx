@@ -54,7 +54,7 @@ export type PaperCardConfig = {
 }
 
 export const PAPER_CARD_DEFAULTS: PaperCardConfig = {
-  scaleMidProgress: 0.09,
+  scaleMidProgress: 0.19,
   scaleMidValue: 2.4,
   scaleEndValue: 5.2,
   opacityFadeStart: 0.19,
@@ -65,8 +65,9 @@ export type PaperCardPatch = Partial<PaperCardConfig>
 
 /** Tall outer-section height in lvh (large-viewport-heights). The sticky
  *  inner shell pins to viewport, so scrollable span = (this - 100) lvh.
- *  Compile-time default 400 (= h-[400lvh] in the source). */
-export const SCROLL_HEIGHT_DEFAULT_VH = 400
+ *  Default 220lvh = ~120lvh of scrollable distance, which paces the
+ *  choreography without trailing empty hold once the docked stage ends. */
+export const SCROLL_HEIGHT_DEFAULT_VH = 220
 
 /** Timeline view window for the dev panel. [0, 1] shows the full timeline;
  *  narrower ranges zoom in on a sub-region for finer tuning of compact

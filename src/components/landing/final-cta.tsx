@@ -1,4 +1,3 @@
-import { EmailCapture } from "@/components/landing/email-capture"
 import { finalCtaCopy } from "@/content/landing"
 
 export function FinalCta() {
@@ -35,12 +34,6 @@ export function FinalCta() {
         <h2 className="mt-4 font-heading text-[clamp(1.75rem,4.4vw,4rem)] leading-[1.05] font-medium tracking-tight text-balance text-[color:var(--paper-ink)]">
           {finalCtaCopy.headline}
         </h2>
-        <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-[color:var(--paper-muted)] sm:text-lg sm:leading-8">
-          {finalCtaCopy.body}
-        </p>
-        <div className="mx-auto mt-10 max-w-xl">
-          <EmailCapture />
-        </div>
       </div>
     </section>
   )

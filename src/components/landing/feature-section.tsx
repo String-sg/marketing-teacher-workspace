@@ -1,53 +1,95 @@
 import { ArrowUpRightIcon, CheckIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import type { StageId } from "@/components/landing/scroll-choreography/types"
+import type {
+  BulletItem,
+  CtaLink,
+} from "@/components/landing/scroll-choreography/types"
 import { stages, TEACHER_WORKSPACE_APP_URL } from "@/content/landing"
 
-type FeatureStageId = Extract<StageId, "docked">
-type FeatureSectionProps = { stage: FeatureStageId }
-
-const SECTION_IDS: Record<FeatureStageId, string> = {
-  docked: "features",
+export type FeatureSectionContent = {
+  readonly kicker: string
+  readonly heading: string
+  readonly paragraph: string
+  readonly bullets: readonly [BulletItem, BulletItem, BulletItem]
+  readonly cta: CtaLink
 }
 
-export function FeatureSection({ stage }: FeatureSectionProps) {
-  const entry = stages.find((s) => s.id === stage)
+type FeatureSectionProps = {
+  readonly id?: string
+  /**
+   * Reverses the 2-column layout so the screenshot sits on the left and
+   * the copy on the right — used to give Section 2 (Student Insights)
+   * visual rhythm against Section 1 (Holistic Profile).
+   */
+  readonly reverse?: boolean
+} & (
+  | { readonly stage: "docked"; readonly content?: never }
+  | { readonly stage?: never; readonly content: FeatureSectionContent }
+)
+
+function resolveContent(
+  props: FeatureSectionProps
+): FeatureSectionContent {
+  if (props.content) return props.content
+  const entry = stages.find((s) => s.id === "docked")
   if (!entry || entry.id !== "docked") {
-    throw new Error(`FeatureSection: unknown stage "${stage}"`)
+    throw new Error("FeatureSection: docked stage missing from stages")
   }
-  const { kicker, heading, paragraph, bullets } = entry.copy
+  return entry.copy
+}
+
+export function FeatureSection(props: FeatureSectionProps) {
+  const content = resolveContent(props)
+  const sectionId = props.id ?? (props.stage === "docked" ? "features" : undefined)
 
   return (
     <section
       className="relative px-5 py-24 sm:px-8 lg:py-32"
-      id={SECTION_IDS[stage]}
+      id={sectionId}
     >
-      <div className="mx-auto grid max-w-[110rem] gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:items-center lg:gap-20">
-        <div className="max-w-xl">
+      <div
+        className={[
+          "mx-auto grid max-w-[110rem] gap-12 lg:items-center lg:gap-20",
+          props.reverse
+            ? "lg:grid-cols-[1.15fr_0.85fr]"
+            : "lg:grid-cols-[0.85fr_1.15fr]",
+        ].join(" ")}
+      >
+        <div
+          className={[
+            "max-w-xl",
+            props.reverse ? "lg:order-2 lg:ml-auto" : "",
+          ].join(" ")}
+        >
           <p className="text-xs font-medium tracking-[0.18em] text-[color:var(--paper-muted)] uppercase sm:text-sm">
-            {kicker}
+            {content.kicker}
           </p>
           <h2 className="mt-4 font-heading text-[clamp(1.5rem,3.6vw,3.25rem)] leading-[1.08] font-medium tracking-tight text-balance text-[color:var(--paper-ink)]">
-            {heading}
+            {content.heading}
           </h2>
           <p className="mt-6 text-base leading-7 text-[color:var(--paper-muted)] sm:text-lg sm:leading-8">
-            {paragraph}
+            {content.paragraph}
           </p>
 
           <div className="mt-10 flex flex-col">
-            {bullets.map((bullet) => (
+            {content.bullets.map((bullet) => (
               <article
                 className="border-t border-[color:var(--paper-rule)]/55 py-5 first:border-t-0 first:pt-0"
-                key={bullet}
+                key={bullet.title}
               >
                 <div className="flex gap-4">
                   <span className="mt-1 grid size-6 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
                     <CheckIcon aria-hidden className="size-3.5" />
                   </span>
-                  <p className="leading-7 text-[color:var(--paper-ink)]">
-                    {bullet}
-                  </p>
+                  <div>
+                    <p className="font-medium leading-7 text-[color:var(--paper-ink)]">
+                      {bullet.title}
+                    </p>
+                    <p className="mt-1 leading-7 text-[color:var(--paper-muted)]">
+                      {bullet.body}
+                    </p>
+                  </div>
                 </div>
               </article>
             ))}
@@ -57,14 +99,14 @@ export function FeatureSection({ stage }: FeatureSectionProps) {
             asChild
             className="mt-10 h-11 rounded-full bg-primary px-7 text-base text-primary-foreground hover:bg-primary/90"
           >
-            <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
-              See it live
+            <a href={content.cta.href} rel="noreferrer">
+              {content.cta.label}
               <ArrowUpRightIcon data-icon="inline-end" />
             </a>
           </Button>
         </div>
 
-        <div className="relative">
+        <div className={["relative", props.reverse ? "lg:order-1" : ""].join(" ")}>
           <div className="paper-card relative overflow-hidden rounded-[20px] border border-black/10 bg-white shadow-[0_30px_120px_-40px_rgb(15_23_42/0.45)]">
             <div className="flex items-center gap-2 border-b border-black/5 bg-[#f7f7f5] px-4 py-2.5">
               <span className="size-3 rounded-full bg-[#ff5f57]" />

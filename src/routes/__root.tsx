@@ -19,12 +19,12 @@ export const Route = createRootRoute({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "Teacher Workspace | A calmer teaching day",
+        title: "Teacher Workspace. Every student. One View.",
       },
       {
         name: "description",
         content:
-          "A calm workspace for teachers to plan lessons, take attendance, grade faster, message home, and keep the school day in one tab.",
+          "The whole child on a single profile. Built with educators, for educators.",
       },
     ],
     links: [

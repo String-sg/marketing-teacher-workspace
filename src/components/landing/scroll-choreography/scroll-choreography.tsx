@@ -50,12 +50,13 @@ import { STAGES } from "./stages"
 import { StaticChoreographyFallback } from "./static-choreography-fallback"
 import { useIsDesktop } from "./use-is-desktop"
 
+import { AudienceColumns } from "@/components/landing/audience-columns"
 import { FinalCta } from "@/components/landing/final-cta"
-import { ProofStrip } from "@/components/landing/proof-strip"
+import { SchoolsToday } from "@/components/landing/schools-today"
 import { SiteHeader } from "@/components/landing/site-header"
 import { Button } from "@/components/ui/button"
 import {
-  finalCtaCopy,
+  siteCtaCopy,
   stages,
   TEACHER_WORKSPACE_APP_URL,
 } from "@/content/landing"
@@ -166,7 +167,7 @@ function ChoreographyTree({
                     className="mt-6 h-11 rounded-full bg-primary px-7 text-base text-primary-foreground hover:bg-primary/90 sm:mt-7"
                   >
                     <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
-                      {finalCtaCopy.cta}
+                      {siteCtaCopy.primary}
                     </a>
                   </Button>
                 </motion.div>
@@ -179,13 +180,12 @@ function ChoreographyTree({
             <StageCopy stage="docked" />
           </div>
         </ChoreographySection>
-        {/* Page-tail sections are siblings of the choreography per
-            research/ARCHITECTURE.md System Overview. The choreography section
-            owns hero+wow only; ProofStrip and FinalCta render after it
-            regardless of mode. (Static branch reaches them via
-            <StaticChoreographyFallback />, which composes them itself —
-            this branch reaches them here.) */}
-        <ProofStrip />
+        {/* Page-tail sections are siblings of the choreography. The
+            docked stage carries the Student Insights copy alongside the
+            parked product screen; the rest of the marketing sections
+            render below the choreography. */}
+        <SchoolsToday />
+        <AudienceColumns />
         <FinalCta />
         {import.meta.env.DEV && <DevFlowPanel />}
       </ChoreographyContextShell>
@@ -210,14 +210,20 @@ function ChoreographyContextShell({
   const stages = useFlowStages()
   const paper = usePaperCardConfig()
   const heroHoldEnd = stages.find((s) => s.id === "hero")?.window[1] ?? 0.15
+  const dockedStart = stages.find((s) => s.id === "docked")?.window[0] ?? 0.3
 
   // Hold paper-card at scale 1 throughout the hero hold so the cartoon
   // laptop stays visually locked; ramp to scaleMidValue at scaleMidProgress
-  // and to scaleEndValue at p=1.
+  // and to scaleEndValue by the docked stage entry — then HOLD through the
+  // rest of the timeline. The bundled <ProductScreen> divides its transform
+  // by paperCardScale, so any continued change here would visually drift
+  // the docked UI even when its own scale/x/y rect is held. Capping at
+  // dockedStart freezes the docked UI in place from the moment it parks.
+  const scaleEndAt = Math.max(dockedStart, paper.scaleMidProgress + 0.0001)
   const paperCardScale = useTransform(
     scrollYProgress,
-    [0, heroHoldEnd, paper.scaleMidProgress, 1],
-    [1, 1, paper.scaleMidValue, paper.scaleEndValue]
+    [0, heroHoldEnd, paper.scaleMidProgress, scaleEndAt, 1],
+    [1, 1, paper.scaleMidValue, paper.scaleEndValue, paper.scaleEndValue]
   )
 
   return (

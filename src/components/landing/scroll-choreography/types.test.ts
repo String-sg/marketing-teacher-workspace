@@ -31,8 +31,9 @@ describe("scroll-choreography type module", () => {
 
   it("StageCopyContent for docked has exactly-3-bullets tuple", () => {
     type Docked = Extract<StageCopyContent, { id: "docked" }>
+    type Bullet = { readonly title: string; readonly body: string }
     expectTypeOf<Docked["copy"]["bullets"]>().toEqualTypeOf<
-      readonly [string, string, string]
+      readonly [Bullet, Bullet, Bullet]
     >()
   })
 

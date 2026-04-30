@@ -24,7 +24,7 @@ import type { StageDef, StageId } from "./types"
 export const STAGES = [
   {
     id: "hero",
-    window: [0, 0.04] as const,
+    window: [0, 0.12] as const,
     scale: 0.068,
     x: "+0vw",
     y: "+23vh",
@@ -32,7 +32,7 @@ export const STAGES = [
   },
   {
     id: "wow",
-    window: [0.24, 0.28] as const,
+    window: [0.24, 0.26] as const,
     scale: 1,
     x: "0",
     y: "0",
@@ -40,7 +40,7 @@ export const STAGES = [
   },
   {
     id: "docked",
-    window: [0.33, 0.4] as const,
+    window: [0.3, 0.85] as const,
     scale: 0.5,
     x: "+28vw",
     y: "0",

@@ -9,12 +9,12 @@ describe("SiteFooter", () => {
     expect(screen.getByRole("contentinfo")).not.toBeNull()
   })
 
-  it("renders a mailto support link", () => {
+  it("renders a feedback link to the go.gov.sg URL", () => {
     render(<SiteFooter />)
-    const mailto = screen
+    const feedback = screen
       .getAllByRole("link")
-      .find((a) => a.getAttribute("href")?.startsWith("mailto:"))
-    expect(mailto).not.toBeUndefined()
+      .find((a) => a.getAttribute("href")?.startsWith("https://go.gov.sg/"))
+    expect(feedback).not.toBeUndefined()
   })
 
   it("renders the trust line text", () => {

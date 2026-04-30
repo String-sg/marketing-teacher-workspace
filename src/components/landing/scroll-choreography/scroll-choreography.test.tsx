@@ -122,7 +122,8 @@ describe("ScrollChoreography container shape (CHOREO-07 / D-18)", () => {
       )
       expect(section).not.toBeNull()
       // Section height now flows through a CSS custom property so the dev
-      // tuner can override it at runtime; the default still maps to 400lvh.
+      // tuner can override it at runtime; the default tracks
+      // SCROLL_HEIGHT_DEFAULT_VH (currently 220lvh).
       const sectionEl = section as HTMLElement | null
       const scrollH = sectionEl?.style.getPropertyValue("--scroll-h") ?? ""
       expect(scrollH).toMatch(/^\d+(\.\d+)?lvh$/)

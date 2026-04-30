@@ -15,82 +15,129 @@ export const navItems: readonly NavItem[] = [
 ] as const
 
 /**
+ * Site-wide CTA copy shared by the nav and hero primary CTA. Single
+ * source of truth so the call-to-action label stays in lockstep across
+ * the page.
+ */
+export const siteCtaCopy = {
+  primary: "Get started",
+} as const
+
+/**
  * Per-stage copy keyed by StageId. Discriminated union enforces correct
  * shape per stage at compile time (e.g., docked MUST have exactly 3
  * bullets — adding a fourth is a TypeScript error).
- *
- * Phase 4 (CONTENT-01..05) owns the final copy rewrite — Phase 1 ships
- * first-pass values so the static fallback renders meaningfully.
  */
 export const stages: readonly StageCopyContent[] = [
   {
     id: "hero",
     copy: {
-      headline: "See every student's full picture.",
+      headline: "Every student's full picture. One View.",
       subline:
-        "Grades, attendance, notes, and family conversations on one profile per student — so you walk in tomorrow already knowing what each kid needs.",
+        "Attendance, grades, conduct, counselling, SEN, FAS, family — in one picture. So your day starts with context, not a scavenger hunt.",
     },
   },
   {
     id: "wow",
-    copy: {
-      // Phase 4 (CONTENT-02) decides whether Wow gets a caption.
-      // Phase 1 ships caption undefined — see RESEARCH.md § Wow stage gap analysis.
-    },
+    copy: {},
   },
   {
     id: "docked",
     copy: {
-      kicker: "A profile for every student",
-      heading: "Every student, in context.",
+      kicker: "STUDENT INSIGHTS",
+      heading: "Spot the pattern. Early.",
       paragraph:
-        "Open a name and see the term so far — the assignments, the missing days, the parent message you sent last Tuesday. The patterns that matter, before they become problems.",
+        "Find the cohort in seconds. Save it once. Know the moment it changes.",
       bullets: [
-        "Grades, attendance, behavior notes, and messages home, gathered on a single page per student.",
-        "Mastery curves and attendance dips surface early, so the student who's slipping doesn't slip past you.",
-        "What you noticed in class, what worked last term, what the family asked for — all attached to the profile.",
+        {
+          title: "Quick filters.",
+          body: "FAS, SEN, low attendance, peer isolation, pre-LTA. Name it. See it.",
+        },
+        {
+          title: "Saved groups.",
+          body: "Define a cohort. Instantly review it anytime.",
+        },
+        {
+          title: "One source of truth.",
+          body: "Form Teachers, Year Heads and School Leaders — same view, same evidence. (Data access control applies.)",
+        },
       ],
+      cta: { label: "Take a closer look", href: TEACHER_WORKSPACE_APP_URL },
     },
   },
 ] as const
 
 /**
- * Proof strip copy. `subheading` is added beyond CONTEXT.md D-08's stated
- * shape because the existing proof-strip h2 has no other home (D-18).
- * Phase 4 (CONTENT-06) owns the trust-line rewrite.
+ * Section 3 — In schools today. Replaces the prior single-card proof
+ * strip with three source-cited mini-cases.
  */
-export const proofCopy = {
-  heading: "Built around the student",
+export const schoolsTodayCopy = {
+  kicker: "IN SCHOOLS TODAY",
+  heading: "Real schools. Real time saved.",
   subheading:
-    "The grade, the absence, the parent message — finally on the same page.",
-  points: [
-    "Spot a struggling student before the next quiz",
-    "Walk into class already knowing the room",
-    "Hand off context cleanly when the year ends",
+    "Pilot schools shaped what Teacher Workspace does. Here's what changed.",
+  cases: [
+    {
+      number: "01",
+      title: "Bursary nominations. In one filter.",
+      source: "Lianhua Primary. Year Heads.",
+      body: "What used to mean toggling between FAS, academic results, offences and Cockpit reports became one filter, one shortlist. Fewer steps. Fewer errors. Hours back.",
+    },
+    {
+      number: "02",
+      title: "New Form Teachers. Day-one fluent.",
+      source: "Lianhua Primary. Form Teachers.",
+      body: "Custody, SEN, counselling and offence history — known before the first conversation. Week-one shifted from “where do I find this?” to “how do I engage this student?”",
+    },
+    {
+      number: "03",
+      title: "SwANs. Surfaced earlier.",
+      source: "Westwood Secondary. Year Heads.",
+      body: "A student flagged only on the FAS list — surfaced in the same view with SEN needs, peer isolation and pre-LTA signals. Days of prep, one focused session.",
+    },
   ],
 } as const
 
 /**
- * Final CTA copy. `kicker` is added beyond CONTEXT.md D-08's stated shape
- * because the existing final-cta kicker has no other home (D-18).
+ * Section 4 — Built for the way schools work. Three open-paper columns.
+ */
+export const audienceCopy = {
+  kicker: "BUILT FOR THE WAY SCHOOLS WORK",
+  heading: "Built for the way schools work.",
+  columns: [
+    {
+      label: "Form Teachers.",
+      body: "Walk in fluent in your class. The context is already on the profile.",
+    },
+    {
+      label: "Year Heads & SDT.",
+      body: "Nominations, SwAN identification, level briefings — from one place.",
+    },
+    {
+      label: "School Leaders.",
+      body: "Adoption in real time. The whole school in one lens. Access mirrors source systems (e.g. School Cockpit, AllEars). Nothing new exposed.",
+    },
+  ],
+} as const
+
+/**
+ * Final CTA copy — a closing card with kicker + headline only. The
+ * primary conversion path lives at the top (nav + hero "Get started"),
+ * so the bottom card is a visual full-stop, not a second action.
  */
 export const finalCtaCopy = {
   kicker: "Free for individual teachers",
   headline: "Know every student before tomorrow's bell.",
-  body: "Join the early list for Teacher Workspace. Schools are welcome, and individual teachers can start free.",
-  cta: "Start",
-  emailPlaceholder: "Enter your school email",
 } as const
 
 /**
- * Footer copy per D-05 minimal footer (CONTENT-07):
- * © + single mailto + "Built with teachers" trust line.
- * Privacy and Terms are deferred (no fabricated policy stubs).
- *
- * [CONFIRM] supportEmail = "support@teacherworkspace.app" per D-19.
+ * Footer copy. The earlier mailto support email was replaced by a
+ * go.gov.sg feedback URL — `feedbackUrl` is the canonical link target;
+ * `feedbackLabel` is the human-readable footer label.
  */
 export const footerCopy = {
   copyright: "© Teacher Workspace",
-  supportEmail: "support@teacherworkspace.app",
-  trustLine: "Built with teachers, for teachers",
+  feedbackUrl: "https://go.gov.sg/teacherworkspace-feedback",
+  feedbackLabel: "Send feedback",
+  trustLine: "Built with teachers. For every educator.",
 } as const
