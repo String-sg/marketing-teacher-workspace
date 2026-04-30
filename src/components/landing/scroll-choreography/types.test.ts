@@ -12,10 +12,8 @@ import type {
 } from "./types"
 
 describe("scroll-choreography type module", () => {
-  it("StageId is a string-literal union of exactly 4 ids", () => {
-    expectTypeOf<StageId>().toEqualTypeOf<
-      "hero" | "wow" | "feature-a" | "feature-b"
-    >()
+  it("StageId is a string-literal union of exactly 3 ids", () => {
+    expectTypeOf<StageId>().toEqualTypeOf<"hero" | "wow" | "feature-a">()
   })
 
   it("StageWindow is a readonly [number, number] tuple", () => {
@@ -24,9 +22,9 @@ describe("scroll-choreography type module", () => {
     >()
   })
 
-  it("ScreenTarget is a string-literal union of 4 presets", () => {
+  it("ScreenTarget is a string-literal union of 3 presets", () => {
     expectTypeOf<ScreenTarget>().toEqualTypeOf<
-      "tiny" | "centered" | "docked-left" | "docked-right"
+      "tiny" | "centered" | "docked-left"
     >()
   })
 

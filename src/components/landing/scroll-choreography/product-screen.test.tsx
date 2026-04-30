@@ -1,11 +1,10 @@
 /**
- * Phase 3 unit tests for <ProductScreen>.
+ * Unit tests for <ProductScreen>.
  *
  * Covers:
  *   - CHOREO-01 mount stability: single motion.div, never unmounts, no
  *     shared-element layout-id attribute
- *   - CHOREO-03/04/05: 4-stage stitched morph (hero/wow/feature-a/feature-b
- *     all emit visible state — no Phase 2 D-09 "feature-a/b not emitted" gate)
+ *   - 3-stage stitched morph (hero/wow/feature-a all emit visible state)
  *   - CHOREO-06 / D-10: visual props flow direct from useTransform into style
  *   - VISUAL-03 / D-10 / D-11: <picture> renders 3 image-format sources
  *   - A11Y-05 / D-13: alt text is the spec-verbatim string
@@ -53,7 +52,7 @@ function innerMorphFromImg(img: Element | null): HTMLElement | null {
 }
 
 describe("ProductScreen mount stability (CHOREO-01)", () => {
-  it("the morphing element instance is the same node across 5 scroll updates spanning all 4 stages", () => {
+  it("the morphing element instance is the same node across scroll updates spanning all 3 stages", () => {
     const { scrollYProgress, container } = renderWithMockProgress(0)
     const initialNode = innerMorphFromImg(
       container.querySelector(`img[src='${FALLBACK_IMG_SRC}']`)
@@ -61,7 +60,7 @@ describe("ProductScreen mount stability (CHOREO-01)", () => {
     expect(initialNode).not.toBeNull()
 
     // Probe one progress value inside each stage's hold + one mid-morph
-    for (const p of [0.05, 0.35, 0.71, 0.815, 0.92]) {
+    for (const p of [0.05, 0.35, 0.6, 0.8]) {
       scrollYProgress.set(p)
     }
 
@@ -153,9 +152,9 @@ describe("ProductScreen alt text (A11Y-05 / D-13)", () => {
     expect(img?.getAttribute("alt")).toBe(D_13_ALT_TEXT)
   })
 
-  it("alt text is identical across all 4 stage hold positions (mount-stable)", () => {
+  it("alt text is identical across all 3 stage hold positions (mount-stable)", () => {
     const { scrollYProgress, container } = renderWithMockProgress(0.05)
-    for (const p of [0.05, 0.35, 0.71, 0.92]) {
+    for (const p of [0.05, 0.35, 0.8]) {
       scrollYProgress.set(p)
       const img = container.querySelector(`img[src='${FALLBACK_IMG_SRC}']`)
       expect(img?.getAttribute("alt")).toBe(D_13_ALT_TEXT)

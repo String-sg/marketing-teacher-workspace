@@ -1,7 +1,7 @@
 import type { MotionValue } from "motion/react"
 
-/** The four scroll-driven stages, ordered by narrative beat. */
-export type StageId = "hero" | "wow" | "feature-a" | "feature-b"
+/** The three scroll-driven stages, ordered by narrative beat. */
+export type StageId = "hero" | "wow" | "feature-a"
 
 /** Scroll-progress window: [enter, exit] in master scrollYProgress (0..1). */
 export type StageWindow = readonly [start: number, end: number]
@@ -11,7 +11,6 @@ export type ScreenTarget =
   | "tiny" // hero — small inside the illustration
   | "centered" // wow — near-full-viewport reveal
   | "docked-left" // feature-a — docked one side
-  | "docked-right" // feature-b — docked other side
 
 /**
  * Shape filled in Phase 3 — declared in Phase 1 as a type-only contract.
@@ -51,15 +50,6 @@ export type StageCopyContent =
     }
   | {
       readonly id: "feature-a"
-      readonly copy: {
-        readonly kicker: string
-        readonly heading: string
-        readonly paragraph: string
-        readonly bullets: readonly [string, string, string]
-      }
-    }
-  | {
-      readonly id: "feature-b"
       readonly copy: {
         readonly kicker: string
         readonly heading: string

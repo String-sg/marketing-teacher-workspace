@@ -42,19 +42,18 @@ type FlowControlsContextValue = {
 
 const FlowControlsContext = createContext<FlowControlsContextValue | null>(null)
 
-const cloneTargets = (): FlowTargets => ({
-  tiny: { ...SCREEN_TARGETS.tiny },
-  centered: { ...SCREEN_TARGETS.centered },
-  "docked-left": { ...SCREEN_TARGETS["docked-left"] },
-  "docked-right": { ...SCREEN_TARGETS["docked-right"] },
-})
+const cloneTargets = (): FlowTargets =>
+  Object.fromEntries(
+    (Object.keys(SCREEN_TARGETS) as ScreenTarget[]).map((key) => [
+      key,
+      { ...SCREEN_TARGETS[key] },
+    ])
+  ) as FlowTargets
 
-const cloneWindows = (): FlowStageWindows => ({
-  hero: [STAGES[0].window[0], STAGES[0].window[1]],
-  wow: [STAGES[1].window[0], STAGES[1].window[1]],
-  "feature-a": [STAGES[2].window[0], STAGES[2].window[1]],
-  "feature-b": [STAGES[3].window[0], STAGES[3].window[1]],
-})
+const cloneWindows = (): FlowStageWindows =>
+  Object.fromEntries(
+    STAGES.map((s) => [s.id, [s.window[0], s.window[1]] as FlowWindow])
+  ) as FlowStageWindows
 
 export function DevFlowProvider({ children }: { children: ReactNode }) {
   const [targets, setTargets] = useState<FlowTargets>(cloneTargets)

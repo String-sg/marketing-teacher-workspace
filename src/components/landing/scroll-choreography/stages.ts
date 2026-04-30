@@ -24,10 +24,9 @@ import type { ScreenTarget, ScreenTargetRect, StageDef, StageId } from "./types"
  * (STAGE_OPACITY_FADE_*, STAGE_SCALE_*) retune in Plan 04 alongside this.
  */
 export const STAGES = [
-  { id: "hero", window: [0.0, 0.1] as const, screen: "tiny" },
-  { id: "wow", window: [0.2, 0.55] as const, screen: "centered" },
-  { id: "feature-a", window: [0.65, 0.78] as const, screen: "docked-left" },
-  { id: "feature-b", window: [0.85, 1.0] as const, screen: "docked-right" },
+  { id: "hero", window: [0.0, 0.15] as const, screen: "tiny" },
+  { id: "wow", window: [0.25, 0.55] as const, screen: "centered" },
+  { id: "feature-a", window: [0.65, 1.0] as const, screen: "docked-left" },
 ] as const satisfies readonly StageDef[]
 
 /** Throws on unknown id — see CONTEXT.md note that strict-types philosophy
@@ -60,5 +59,4 @@ export const SCREEN_TARGETS: Record<ScreenTarget, ScreenTargetRect> = {
   tiny: { scale: 0.062, x: "+2.2vw", y: "+26vh", opacity: 1 },
   centered: { scale: 1.0, x: "0", y: "0", opacity: 1 },
   "docked-left": { scale: 0.5, x: "-28vw", y: "0", opacity: 1 },
-  "docked-right": { scale: 0.5, x: "+28vw", y: "0", opacity: 1 },
 } as const

@@ -3,14 +3,9 @@ import { describe, expect, it } from "vitest"
 import { SCREEN_TARGETS, STAGES, byId } from "./stages"
 
 describe("STAGES data", () => {
-  it("contains exactly 4 stages in narrative order", () => {
-    expect(STAGES).toHaveLength(4)
-    expect(STAGES.map((s) => s.id)).toEqual([
-      "hero",
-      "wow",
-      "feature-a",
-      "feature-b",
-    ])
+  it("contains exactly 3 stages in narrative order", () => {
+    expect(STAGES).toHaveLength(3)
+    expect(STAGES.map((s) => s.id)).toEqual(["hero", "wow", "feature-a"])
   })
 
   it("each stage has a [start, end] window with start < end and both in [0, 1]", () => {
@@ -22,12 +17,11 @@ describe("STAGES data", () => {
     }
   })
 
-  it("screen target presets cover the 4 named values", () => {
+  it("screen target presets cover the 3 named values", () => {
     const screens = STAGES.map((s) => s.screen)
     expect(screens).toContain("tiny")
     expect(screens).toContain("centered")
     expect(screens).toContain("docked-left")
-    expect(screens).toContain("docked-right")
   })
 
   it("byId('hero') returns the hero stage", () => {
@@ -40,10 +34,9 @@ describe("STAGES data", () => {
     expect(() => byId("nope")).toThrow(/Unknown stage id/)
   })
 
-  it("byId('wow').window[1] is retuned to the Phase 3 D-02 value (0.55)", () => {
-    // Phase 3 D-02 retunes wow.window[1] to align with the moment the
-    // wow plateau ends (was Phase 2's 0.78). This is the single value
-    // PaperBackdrop's VIDEO_GATE_THRESHOLD auto-tracks (D-21).
+  it("byId('wow').window[1] is the wow plateau end (0.55)", () => {
+    // wow.window[1] is the single value PaperBackdrop's
+    // VIDEO_GATE_THRESHOLD auto-tracks (D-21).
     expect(byId("wow").window[1]).toBeCloseTo(0.55, 2)
   })
 
@@ -59,29 +52,27 @@ describe("STAGES data", () => {
   })
 
   it("STAGES window endpoints exactly match the D-02 schedule", () => {
-    expect(byId("hero").window).toEqual([0, 0.1])
-    expect(byId("wow").window).toEqual([0.2, 0.55])
-    expect(byId("feature-a").window).toEqual([0.65, 0.78])
-    expect(byId("feature-b").window).toEqual([0.85, 1])
+    expect(byId("hero").window).toEqual([0, 0.15])
+    expect(byId("wow").window).toEqual([0.25, 0.55])
+    expect(byId("feature-a").window).toEqual([0.65, 1])
   })
 })
 
 describe("SCREEN_TARGETS map (D-04 / D-08)", () => {
-  it("has exactly the 4 named ScreenTarget keys", () => {
+  it("has exactly the 3 named ScreenTarget keys", () => {
     expect(Object.keys(SCREEN_TARGETS).sort()).toEqual([
       "centered",
       "docked-left",
-      "docked-right",
       "tiny",
     ])
   })
 
   it("tiny target — laptop-overlay contract: visible, small, offset over the cartoon laptop", () => {
     const t = SCREEN_TARGETS["tiny"]
-    // Phase 3 retune: tiny is the laptop overlay at hero stage. Opacity=1
-    // (visible), small scale to fit the cartoon laptop's screen, x/y
-    // offsets in vw/vh that translate the centered ProductScreen to sit
-    // over the laptop in the paper-card illustration.
+    // tiny is the laptop overlay at hero stage. Opacity=1 (visible),
+    // small scale to fit the cartoon laptop's screen, x/y offsets in
+    // vw/vh that translate the centered ProductScreen to sit over the
+    // laptop in the paper-card illustration.
     expect(t.opacity).toBe(1)
     expect(t.scale).toBeGreaterThan(0)
     expect(t.scale).toBeLessThan(0.2)
@@ -101,22 +92,5 @@ describe("SCREEN_TARGETS map (D-04 / D-08)", () => {
     expect(dl.scale).toBe(0.5)
     expect(dl.opacity).toBe(1)
     expect(dl.x).toBe("-28vw")
-  })
-
-  it("docked-right target — D-07 positive-rightward sign, scale 0.5", () => {
-    const dr = SCREEN_TARGETS["docked-right"]
-    expect(dr.scale).toBe(0.5)
-    expect(dr.opacity).toBe(1)
-    expect(dr.x).toBe("+28vw")
-  })
-
-  it("docked-left and docked-right are mirror-symmetric on the x axis", () => {
-    const dl = SCREEN_TARGETS["docked-left"]
-    const dr = SCREEN_TARGETS["docked-right"]
-    expect(dl.x).toBe("-28vw")
-    expect(dr.x).toBe("+28vw")
-    // Same scale + opacity (only x differs): D-08 balanced-dock decision
-    expect(dl.scale).toBe(dr.scale)
-    expect(dl.opacity).toBe(dr.opacity)
   })
 })

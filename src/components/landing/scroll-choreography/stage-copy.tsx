@@ -1,21 +1,16 @@
 /**
- * Stage copy track for the docked feature-a / feature-b stages.
+ * Stage copy track for the docked feature-a stage.
  *
  * Renders the kicker / heading / paragraph / bullets / CTA on the side of
  * the viewport opposite where <ProductScreen> docks:
- *   - feature-a: screen docked-left  → copy ml-auto (right side)
- *   - feature-b: screen docked-right → copy mr-auto (left side)
+ *   - feature-a: screen docked-left → copy ml-auto (right side)
  *
  * Opacity is scroll-linked via useTransform: the copy fades in during the
- * preceding morph zone (so it arrives just as the screen finishes docking)
- * and fades back out during the following morph zone (so it leaves before
- * the next stage takes over).
+ * wow→feature-a morph zone (so it arrives just as the screen finishes
+ * docking) and holds through the rest of the timeline.
  *
  *   feature-a: fade in [wow.window[1] → fa.window[0]] = [0.55, 0.65]
- *              hold   [0.65, 0.78]
- *              fade out [0.78, 0.85]
- *   feature-b: fade in [0.78, 0.85]
- *              hold   [0.85, 1.00]
+ *              hold   [0.65, 1.00]
  *
  * clamp:false on opacity disables motion 12's WAAPI accelerate path that
  * otherwise hijacks scroll-linked opacity (see paper-backdrop.tsx).
@@ -29,40 +24,33 @@ import { useFlowStages } from "./dev-flow-context"
 import { Button } from "@/components/ui/button"
 import { stages, TEACHER_WORKSPACE_APP_URL } from "@/content/landing"
 
-type StageCopyProps = { stage: "feature-a" | "feature-b" }
+type StageCopyProps = { stage: "feature-a" }
 
 export function StageCopy({ stage }: StageCopyProps) {
   const { scrollYProgress } = useScrollChoreography()
   const flowStages = useFlowStages()
-  const byFlowId = (id: typeof stage | "wow" | "feature-a" | "feature-b") =>
+  const byFlowId = (id: "wow" | "feature-a") =>
     flowStages.find((s) => s.id === id)
 
   const entry = stages.find((s) => s.id === stage)
-  if (!entry || (entry.id !== "feature-a" && entry.id !== "feature-b")) {
+  if (!entry || entry.id !== "feature-a") {
     throw new Error(`StageCopy: unknown stage "${stage}"`)
   }
   const { kicker, heading, paragraph, bullets } = entry.copy
 
-  const isA = stage === "feature-a"
-  const fadeInStart = isA
-    ? byFlowId("wow")!.window[1]
-    : byFlowId("feature-a")!.window[1]
-  const holdStart = byFlowId(stage)!.window[0]
-  const holdEnd = byFlowId(stage)!.window[1]
-  const fadeOutEnd = isA ? byFlowId("feature-b")!.window[0] : 1
+  const fadeInStart = byFlowId("wow")!.window[1]
+  const holdStart = byFlowId("feature-a")!.window[0]
 
   const opacity = useTransform(
     scrollYProgress,
-    [0, fadeInStart, holdStart, holdEnd, fadeOutEnd],
-    [0, 0, 1, 1, isA ? 0 : 1],
+    [0, fadeInStart, holdStart, 1],
+    [0, 0, 1, 1],
     { clamp: false }
   )
 
-  const sideClass = isA ? "justify-end" : "justify-start"
-
   return (
     <motion.div
-      className={`pointer-events-none absolute inset-0 z-30 flex items-center px-4 sm:px-10 lg:px-16 ${sideClass}`}
+      className="pointer-events-none absolute inset-0 z-30 flex items-center justify-end px-4 sm:px-10 lg:px-16"
       style={{ opacity }}
     >
       <div className="pointer-events-auto w-full max-w-xl px-4 sm:px-6 lg:w-[44%] lg:max-w-2xl lg:px-8">

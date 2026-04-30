@@ -12,7 +12,6 @@ export const TEACHER_WORKSPACE_APP_URL =
 
 export const navItems: readonly NavItem[] = [
   { label: "Features", href: "#features" },
-  { label: "Testimonials", href: "#testimonials" },
 ] as const
 
 /**
@@ -50,20 +49,6 @@ export const stages: readonly StageCopyContent[] = [
         "Grades, attendance, behavior notes, and messages home, gathered on a single page per student.",
         "Mastery curves and attendance dips surface early, so the student who's slipping doesn't slip past you.",
         "What you noticed in class, what worked last term, what the family asked for — all attached to the profile.",
-      ],
-    },
-  },
-  {
-    id: "feature-b",
-    copy: {
-      kicker: "Trends you can act on",
-      heading: "Notice what's slipping, before it slips past you.",
-      paragraph:
-        "Mastery curves and attendance dips surface early. Notes travel with the student between classes and between years, so context never resets.",
-      bullets: [
-        "Mastery and attendance trends per student, per class.",
-        "Notes from last term carry forward — context survives the year.",
-        "Hand off cleanly when the year ends or a colleague picks up the class.",
       ],
     },
   },

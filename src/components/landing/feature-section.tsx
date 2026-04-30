@@ -4,17 +4,16 @@ import { Button } from "@/components/ui/button"
 import type { StageId } from "@/components/landing/scroll-choreography/types"
 import { stages, TEACHER_WORKSPACE_APP_URL } from "@/content/landing"
 
-type FeatureStageId = Extract<StageId, "feature-a" | "feature-b">
+type FeatureStageId = Extract<StageId, "feature-a">
 type FeatureSectionProps = { stage: FeatureStageId }
 
 const SECTION_IDS: Record<FeatureStageId, string> = {
   "feature-a": "features",
-  "feature-b": "testimonials",
 }
 
 export function FeatureSection({ stage }: FeatureSectionProps) {
   const entry = stages.find((s) => s.id === stage)
-  if (!entry || (entry.id !== "feature-a" && entry.id !== "feature-b")) {
+  if (!entry || entry.id !== "feature-a") {
     throw new Error(`FeatureSection: unknown stage "${stage}"`)
   }
   const { kicker, heading, paragraph, bullets } = entry.copy
