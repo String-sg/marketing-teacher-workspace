@@ -25,9 +25,9 @@
 
 - [x] **CHOREO-01**: A single product-screen `motion.div` is shared across all four stages; it never unmounts and is not assigned a `layoutId`
 - [x] **CHOREO-02**: Stage 1 (Hero) — product screen sits tiny inside the existing illustration; current scroll-linked hero video continues to play underneath
-- [ ] **CHOREO-03**: Stage 2 (Wow) — product screen scales to a centered, near-full-viewport reveal as the user enters the second scroll zone
-- [ ] **CHOREO-04**: Stage 3 (Feature A) — product screen docks to one side; "every signal" feature copy and bullets fade in alongside
-- [ ] **CHOREO-05**: Stage 4 (Feature B) — product screen docks to the other side (or shifts position); "trends / notes" feature copy and bullets fade in
+- [x] **CHOREO-03**: Stage 2 (Wow) — product screen scales to a centered, near-full-viewport reveal as the user enters the second scroll zone
+- [x] **CHOREO-04**: Stage 3 (Feature A) — product screen docks to one side; "every signal" feature copy and bullets fade in alongside
+- [x] **CHOREO-05**: Stage 4 (Feature B) — product screen docks to the other side (or shifts position); "trends / notes" feature copy and bullets fade in
 - [x] **CHOREO-06**: All scroll-driven visual values use `useTransform` directly into `style` — no `useState` is driven from `useMotionValueEvent` for visual properties
 - [x] **CHOREO-07**: Tall outer container uses `lvh` units, inner sticky container uses `svh` units (iOS Safari address-bar safety)
 - [x] **CHOREO-08**: Existing scroll-linked hero video continues to scrub during Stage 1 only; `currentTime` updates are gated/paused once Stage 2 fully covers it (GPU pressure fix)
@@ -147,9 +147,9 @@ Explicitly excluded. Documented to prevent scope creep.
 | STATIC-04 | Phase 1 | Pending |
 | CHOREO-01 | Phase 2 | Complete |
 | CHOREO-02 | Phase 2 | Complete |
-| CHOREO-03 | Phase 3 | Pending |
-| CHOREO-04 | Phase 3 | Pending |
-| CHOREO-05 | Phase 3 | Pending |
+| CHOREO-03 | Phase 3 | Complete |
+| CHOREO-04 | Phase 3 | Complete |
+| CHOREO-05 | Phase 3 | Complete |
 | CHOREO-06 | Phase 2 | Complete |
 | CHOREO-07 | Phase 2 | Complete |
 | CHOREO-08 | Phase 2 | Complete |

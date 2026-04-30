@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 3 context gathered
-last_updated: "2026-04-30T05:35:29.442Z"
+last_updated: "2026-04-30T05:40:14.884Z"
 last_activity: 2026-04-30
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 15
-  completed_plans: 11
-  percent: 73
+  completed_plans: 12
+  percent: 80
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-28)
 ## Current Position
 
 Phase: 3 (Product Screen — The Single Shared Element) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-04-30
 
-Progress: [███████░░░] 73%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Progress: [███████░░░] 73%
 
 *Updated after each plan completion.*
 | Phase 03-product-screen-the-single-shared-element P01 | 4min | 3 tasks | 16 files |
+| Phase 03-product-screen-the-single-shared-element P03 | 5min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -73,6 +74,7 @@ Recent decisions affecting current work:
 - Phase 2 CHOREO-02 / CHOREO-08 scope shift (2026-04-29 user direction during production-preview smoke): the hero video switches from scroll-linked `currentTime` scrubbing to a continuously-playing `autoPlay loop`. Same storytelling intent (background motion in the paper world during stage 1) with a simpler primitive and tempo decoupled from scroll speed. CHOREO-08's pause-when-covered GPU-relief intent is preserved — the gate now calls `video.pause()` above `byId('wow').window[1]` and `video.play()` below. REQUIREMENTS.md CHOREO-02 / CHOREO-08 literal text ("scroll-linked", "currentTime updates are gated") is now stale relative to shipped behavior; deferred-cleanup item. The shipped contract is: autoplay-loop + threshold-paused. PaperBackdrop's `loadedmetadata` effect + `videoDurationRef` were removed (duration no longer needed). paper-backdrop.test.tsx was updated to assert autoplay/loop attrs + play()/pause() calls + a regression-guard that `currentTime` is never written.
 - [Phase ?]: Type-erasure helper (HeadShape) added to head test for typecheck compat — TanStack head() signature trips TS2554/TS2339 on .head?.() with 0 args
 - [Phase ?]: AVIF effort=4 for variant generator — q=60 effort=4 hits 26KB at 1280w (5x smaller than PNG)
+- [Phase ?]: Plan 03-03: STAGES retuned to D-02 monotonic non-overlapping windows; SCREEN_TARGETS runtime const replaces Phase 1 ScreenTargetsMap type alias.
 
 ### Pending Todos
 
@@ -94,6 +96,6 @@ Items acknowledged and carried forward:
 
 ## Session Continuity
 
-Last session: 2026-04-30T05:35:21.831Z
+Last session: 2026-04-30T05:40:09.544Z
 Stopped at: Phase 3 context gathered
 Resume file: None
