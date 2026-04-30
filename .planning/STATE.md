@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 3 context gathered
-last_updated: "2026-04-30T05:40:14.884Z"
+last_updated: "2026-04-30T05:56:01.306Z"
 last_activity: 2026-04-30
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 15
-  completed_plans: 12
-  percent: 80
+  completed_plans: 13
+  percent: 87
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-28)
 ## Current Position
 
 Phase: 3 (Product Screen — The Single Shared Element) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-04-30
 
-Progress: [████████░░] 80%
+Progress: [█████████░] 87%
 
 ## Performance Metrics
 
@@ -55,6 +55,7 @@ Progress: [████████░░] 80%
 *Updated after each plan completion.*
 | Phase 03-product-screen-the-single-shared-element P01 | 4min | 3 tasks | 16 files |
 | Phase 03-product-screen-the-single-shared-element P03 | 5min | 2 tasks | 2 files |
+| Phase 03 P02 | 10min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -75,6 +76,9 @@ Recent decisions affecting current work:
 - [Phase ?]: Type-erasure helper (HeadShape) added to head test for typecheck compat — TanStack head() signature trips TS2554/TS2339 on .head?.() with 0 args
 - [Phase ?]: AVIF effort=4 for variant generator — q=60 effort=4 hits 26KB at 1280w (5x smaller than PNG)
 - [Phase ?]: Plan 03-03: STAGES retuned to D-02 monotonic non-overlapping windows; SCREEN_TARGETS runtime const replaces Phase 1 ScreenTargetsMap type alias.
+- [Phase ?]: D-14: Per-segment eases applied via { ease: EasingFunction[] } — imported function refs (easeOut, easeInOut, cubicBezier) used in place of plan's string-literal forms
+- [Phase ?]: D-16 Option A: FA-FB scale dip implemented as 9th mid-stop at progress=0.815, value=0.45 (named consts FA_TO_FB_SCALE_DIP_PROGRESS / FA_TO_FB_SCALE_DIP_VALUE)
+- [Phase ?]: MIGRATE-03 walker compatibility: keyframe arrays inlined as ArrayExpressions of MemberExpressions at useTransform call sites; data-driven STAGES.flatMap form preserved verbatim in docstring
 
 ### Pending Todos
 
@@ -96,6 +100,6 @@ Items acknowledged and carried forward:
 
 ## Session Continuity
 
-Last session: 2026-04-30T05:40:09.544Z
+Last session: 2026-04-30T05:55:55.744Z
 Stopped at: Phase 3 context gathered
 Resume file: None

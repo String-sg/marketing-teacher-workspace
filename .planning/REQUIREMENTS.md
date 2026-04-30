@@ -53,10 +53,10 @@
 
 ### Visual System
 
-- [ ] **VISUAL-01**: Tonal contrast between paper-sketch world and photorealistic UI is preserved — UI screen is not flattened to match paper aesthetic
-- [ ] **VISUAL-02**: Browser-frame screenshot of the Student Insights view (or a refreshed variant) is the canonical product-UI asset
+- [x] **VISUAL-01**: Tonal contrast between paper-sketch world and photorealistic UI is preserved — UI screen is not flattened to match paper aesthetic
+- [x] **VISUAL-02**: Browser-frame screenshot of the Student Insights view (or a refreshed variant) is the canonical product-UI asset
 - [x] **VISUAL-03**: Product-UI image is delivered with responsive `srcset` + WebP/AVIF; LCP candidate is preloaded with `<link rel="preload" fetchpriority="high">`
-- [ ] **VISUAL-04**: 25%, 50%, 75% midstates of every stage transition are intentionally designed (no broken-looking scrub points)
+- [x] **VISUAL-04**: 25%, 50%, 75% midstates of every stage transition are intentionally designed (no broken-looking scrub points)
 
 ### SEO / Meta
 
@@ -78,7 +78,7 @@
 - [ ] **A11Y-02**: Keyboard tab order matches reading order; every stage's interactive elements (CTA, links) reachable in sequence
 - [ ] **A11Y-03**: Skip-link to main content present and visible on focus
 - [ ] **A11Y-04**: Semantic landmarks (`<header>`, `<main>`, `<footer>`) and one `<h1>` only; per-stage headings use `<h2>`/`<h3>` consistently
-- [ ] **A11Y-05**: Product-UI screenshot has descriptive `alt` text
+- [x] **A11Y-05**: Product-UI screenshot has descriptive `alt` text
 - [ ] **A11Y-06**: axe-core reports 0 violations on the deployed page
 - [ ] **A11Y-07**: No hover-only interactions; focus rings visible on all interactive elements
 
@@ -166,10 +166,10 @@ Explicitly excluded. Documented to prevent scope creep.
 | CONTENT-06 | Phase 4 | Pending |
 | CONTENT-07 | Phase 1 | Pending |
 | CONTENT-08 | Phase 4 | Pending |
-| VISUAL-01 | Phase 3 | Pending |
-| VISUAL-02 | Phase 3 | Pending |
+| VISUAL-01 | Phase 3 | Complete |
+| VISUAL-02 | Phase 3 | Complete |
 | VISUAL-03 | Phase 3 | Complete |
-| VISUAL-04 | Phase 3 | Pending |
+| VISUAL-04 | Phase 3 | Complete |
 | SEO-01 | Phase 4 | Pending |
 | SEO-02 | Phase 4 | Pending |
 | SEO-03 | Phase 4 | Pending |
@@ -182,7 +182,7 @@ Explicitly excluded. Documented to prevent scope creep.
 | A11Y-02 | Phase 6 | Pending |
 | A11Y-03 | Phase 1 | Pending |
 | A11Y-04 | Phase 1 | Pending |
-| A11Y-05 | Phase 3 | Pending |
+| A11Y-05 | Phase 3 | Complete |
 | A11Y-06 | Phase 6 | Pending |
 | A11Y-07 | Phase 1 | Pending |
 | SHIP-01 | Phase 5 | Pending |
