@@ -67,7 +67,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Tonal contrast between the paper-sketch world and the photorealistic UI is preserved at every stage (the screen is not flattened to match the paper aesthetic), and the canonical browser-frame screenshot of the Student Insights view is the asset rendered.
   4. The product-UI image ships with responsive `srcset` plus WebP/AVIF variants and is preloaded as the LCP candidate via `<link rel="preload" as="image" fetchpriority="high">`; the network panel shows the right variant for the viewport.
   5. The product-screen `<img>` carries descriptive alt text ("Teacher Workspace student view showing attendance, behavior notes, and family messages") that is reachable to screen readers in both choreography and static-fallback render paths.
-**Plans**: TBD
+**Plans**: 5 plans
+  - [ ] 03-01-PLAN.md — Wave 0: sharp devDep + gen-hero-images.mjs + 12 variants + OQ-04 falsification (NEW index.head.test.tsx)
+  - [ ] 03-02-PLAN.md — Wave 1a: ProductScreen 4-stage data-driven morph + per-segment ease + scale dip + <picture> + D-13 alt text
+  - [ ] 03-03-PLAN.md — Wave 1b: stages.ts retune (D-02 STAGES) + runtime SCREEN_TARGETS const + tests
+  - [ ] 03-04-PLAN.md — Wave 1c: routes/index.tsx head() preload + h-[400lvh] retune + PaperBackdrop intra-stage const cascade
+  - [ ] 03-05-PLAN.md — Wave 2: full suite green-up + D-17 visual-review checkpoint + VISUAL-03 LCP smoke + final commit
 **UI hint**: yes
 **Research flag**: yes — multi-stop `useTransform` stitching across four stage targets, the clip-path shape transition, and the responsive-image strategy for LCP all benefit from a `/gsd-research-phase` pass before planning.
 
@@ -127,7 +132,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. Foundation — Types, Static Fallback, SSR Contract | 0/5 | Not started | - |
 | 2. Orchestrator Shell + Backdrop Migration | 5/5 | Complete    | 2026-04-29 |
-| 3. Product Screen — The Single Shared Element | 0/TBD | Not started | - |
+| 3. Product Screen — The Single Shared Element | 0/5 | Not started | - |
 | 4. Stage Copy, Bullet Reveals, Trust Signals, Meta | 0/TBD | Not started | - |
 | 5. Wire-In, Delete `paper-hero.tsx`, Ship to Production | 0/TBD | Not started | - |
 | 6. Performance, A11y Audit, Real-Device, Sign-Off | 0/TBD | Not started | - |
