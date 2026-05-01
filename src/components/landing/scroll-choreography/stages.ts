@@ -26,8 +26,8 @@ export const STAGES = [
     id: "hero",
     window: [0, 0.12] as const,
     scale: 0.068,
-    x: "+0vw",
-    y: "+23vh",
+    x: "+0.09vw",
+    y: "+22.9vh",
     opacity: 1,
   },
   {
