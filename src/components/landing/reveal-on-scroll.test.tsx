@@ -1,14 +1,15 @@
 import { describe, expect, it, vi } from "vitest"
 import { render, screen } from "@testing-library/react"
+import type { useInView as RealUseInView } from "motion/react"
 
 // Per-test mocks of motion/react are configured via vi.hoisted() so each
 // test can flip useInView / useReducedMotion independently while keeping
 // the rest of the module (motion.div, cubicBezier) intact.
-type InViewOptions = {
-  once?: boolean
-  margin?: string
-  amount?: number | string
-}
+//
+// The InViewOptions type is derived from motion/react's real `useInView`
+// signature so the mock cannot drift if motion ever extends or renames an
+// option (e.g., adds `root` or `initial`, narrows `amount`).
+type InViewOptions = NonNullable<Parameters<typeof RealUseInView>[1]>
 const mocks = vi.hoisted(() => ({
   useInView: vi.fn(
     (_ref: unknown, _options?: InViewOptions): boolean => false
