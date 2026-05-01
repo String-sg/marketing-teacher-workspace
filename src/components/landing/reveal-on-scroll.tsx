@@ -69,11 +69,15 @@ export function RevealOnScroll({
           ? { opacity: 1, y: 0 }
           : { opacity: 0, y: DEFAULT_Y }
       }
-      transition={{
-        duration: DEFAULT_DURATION,
-        ease: EASE,
-        delay: delay / 1000,
-      }}
+      transition={
+        reduced
+          ? { duration: 0 }
+          : {
+              duration: DEFAULT_DURATION,
+              ease: EASE,
+              delay: delay / 1000,
+            }
+      }
     >
       {children}
     </MotionTag>
