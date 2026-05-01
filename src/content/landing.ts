@@ -1,33 +1,16 @@
 import type { StageCopyContent } from "@/components/landing/scroll-choreography/types"
 
-export type NavItem = {
-  readonly label: string
-  readonly href: string
-}
-
-/** Single source of truth for the live app destination (FOUND-06).
- *  Every external CTA in components MUST resolve through this constant. */
 export const TEACHER_WORKSPACE_APP_URL =
   "https://teacherworkspace-alpha.vercel.app/students"
 
-export const navItems: readonly NavItem[] = [
+export const navItems = [
   { label: "Features", href: "#features" },
 ] as const
 
-/**
- * Site-wide CTA copy shared by the nav and hero primary CTA. Single
- * source of truth so the call-to-action label stays in lockstep across
- * the page.
- */
 export const siteCtaCopy = {
   primary: "Get started",
 } as const
 
-/**
- * Per-stage copy keyed by StageId. Discriminated union enforces correct
- * shape per stage at compile time (e.g., docked MUST have exactly 3
- * bullets — adding a fourth is a TypeScript error).
- */
 export const stages: readonly StageCopyContent[] = [
   {
     id: "hero",
@@ -67,10 +50,6 @@ export const stages: readonly StageCopyContent[] = [
   },
 ] as const
 
-/**
- * Section 3 — In schools today. Replaces the prior single-card proof
- * strip with three source-cited mini-cases.
- */
 export const schoolsTodayCopy = {
   kicker: "IN SCHOOLS TODAY",
   heading: "Real schools. Real time saved.",
@@ -98,9 +77,6 @@ export const schoolsTodayCopy = {
   ],
 } as const
 
-/**
- * Section 4 — Built for the way schools work. Three open-paper columns.
- */
 export const audienceCopy = {
   kicker: "BUILT FOR THE WAY SCHOOLS WORK",
   heading: "Built for the way schools work.",
@@ -120,21 +96,11 @@ export const audienceCopy = {
   ],
 } as const
 
-/**
- * Final CTA copy — a closing card with kicker + headline only. The
- * primary conversion path lives at the top (nav + hero "Get started"),
- * so the bottom card is a visual full-stop, not a second action.
- */
 export const finalCtaCopy = {
   kicker: "Free for individual teachers",
   headline: "Know every student before tomorrow's bell.",
 } as const
 
-/**
- * Footer copy. The earlier mailto support email was replaced by a
- * go.gov.sg feedback URL — `feedbackUrl` is the canonical link target;
- * `feedbackLabel` is the human-readable footer label.
- */
 export const footerCopy = {
   copyright: "© Teacher Workspace",
   feedbackUrl: "https://go.gov.sg/teacherworkspace-feedback",

@@ -2,15 +2,6 @@ import { schoolsTodayCopy } from "@/content/landing"
 
 import { RevealOnScroll } from "./reveal-on-scroll"
 
-/**
- * Section 3 — In schools today.
- *
- * Replaces the prior single-card proof strip. Three source-cited cases
- * surface in three paper-cards on a 1/3 grid (collapsing to one column
- * on mobile). Each card carries a number stamp, bold title, italic
- * source attribution, and body — keeping the kicker / heading / italic
- * sub centered above the grid for the introduction.
- */
 export function SchoolsToday() {
   return (
     <section

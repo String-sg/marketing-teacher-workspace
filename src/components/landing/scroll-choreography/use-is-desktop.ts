@@ -3,30 +3,10 @@ import { useHydrated } from "@tanstack/react-router"
 
 const DESKTOP_MQ = "(min-width: 1024px)"
 
-/**
- * Optimistic-desktop SSR hook.
- *
- * Mechanism:
- * - `useHydrated()` from @tanstack/react-router is implemented as
- *   `useSyncExternalStore(subscribe, () => true, () => false)`. Its server
- *   snapshot is `false`, its client snapshot is `true`. During hydration React
- *   uses the server snapshot first to keep markup in sync, then transitions
- *   the value to `true`.
- * - During SSR and the hydrating first client render `useHydrated()` is
- *   therefore `false`; the outer ternary short-circuits to the literal `true`
- *   so server and client render the same desktop layout (no "did not match"
- *   warning).
- * - Once `useHydrated()` flips to `true`, the `useState` value (driven by the
- *   effect's `matchMedia(DESKTOP_MQ)` read + change subscription) becomes
- *   authoritative.
- *
- * Pairs with the `.scroll-choreography-only { display: none }` CSS backstop
- * Plan 05 lands in styles.css so mobile users never see a one-frame flash
- * of the desktop choreography subtree.
- *
- * Verified via Context7 /websites/tanstack_start docs:
- * `useHydrated` is exported from `@tanstack/react-router`.
- */
+// Optimistic-desktop SSR hook. Returns `true` during SSR and the hydrating
+// first client render to keep server/client markup in sync; matchMedia takes
+// over once `useHydrated()` flips. Pairs with the `.scroll-choreography-only`
+// CSS gate that hides the subtree on mobile.
 export function useIsDesktop(): boolean {
   const hydrated = useHydrated()
   const [isDesktop, setIsDesktop] = useState(true)

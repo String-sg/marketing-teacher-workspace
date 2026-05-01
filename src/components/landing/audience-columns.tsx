@@ -2,16 +2,6 @@ import { audienceCopy } from "@/content/landing"
 
 import { RevealOnScroll } from "./reveal-on-scroll"
 
-/**
- * Section 4 — Built for the way schools work.
- *
- * Three audience columns (Form Teachers / Year Heads & SDT / School
- * Leaders). Open-paper layout — no cards — with a top-rule divider per
- * column. Sits between the cards of "In schools today" and the centered
- * paper-card of the final CTA so the page rhythm reads:
- *
- *   cards (Section 3) → open paper (Section 4) → card (Section 5).
- */
 export function AudienceColumns() {
   return (
     <section

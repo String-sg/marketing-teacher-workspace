@@ -1,10 +1,5 @@
 import { footerCopy } from "@/content/landing"
 
-/**
- * Minimal footer: copyright + trust line + feedback link. The feedback
- * link replaced the prior mailto support address with the canonical
- * go.gov.sg short URL — see CONTENT-07 in the rewrite spec.
- */
 export function SiteFooter() {
   return (
     <footer className="border-t border-[color:var(--paper-rule)]/55 px-5 py-10 sm:px-8 lg:py-14">

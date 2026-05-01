@@ -1,26 +1,5 @@
 import type { StageDef, StageId } from "./types"
 
-/**
- * The three choreography stages. Each carries:
- *   - window: the [start, end] scroll-progress range where this stage
- *     holds at its peak transform.
- *   - scale / x / y / opacity: the product-screen's peak-of-stage rect.
- *     ProductScreen's useTransform reads these directly (one fewer layer
- *     of indirection than the previous ScreenTarget preset map).
- *
- * Windows are monotonic non-overlapping: the morph between adjacent
- * stages happens in the gap (prev.window[1] → next.window[0]). The
- * useTransform keyframe array is built by
- * STAGES.flatMap(s => [s.window[0], s.window[1]]) (6 stops, value at
- * window[0] === value at window[1] = the hold).
- *
- *   hero:   tiny over the laptop in the cartoon illustration
- *   wow:    centered full-viewport reveal
- *   docked: parked on the right side at half scale
- *
- * Cascade: PaperBackdrop's VIDEO_GATE_THRESHOLD = byId("wow").window[1]
- * auto-tracks the wow exit point.
- */
 export const STAGES = [
   {
     id: "hero",
@@ -48,8 +27,6 @@ export const STAGES = [
   },
 ] as const satisfies readonly StageDef[]
 
-/** Throws on unknown id — see CONTEXT.md note that strict-types philosophy
- *  prefers a thrown error over `find(...)!` non-null assertions everywhere. */
 export function byId(id: StageId): StageDef {
   const stage = STAGES.find((s) => s.id === id)
   if (!stage) throw new Error(`Unknown stage id: ${id}`)

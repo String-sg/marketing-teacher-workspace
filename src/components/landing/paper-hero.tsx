@@ -30,24 +30,13 @@ export function PaperHero() {
   const videoDurationRef = useRef(0)
   const prefersReducedMotion = useReducedMotion()
   const isDesktop = useIsDesktop()
-  // Mobile users get the static fallback layout (per CLAUDE.md "Mobile: Static
-  // fallback only" + static-choreography-fallback.tsx docstring). Reduced-motion
-  // users likewise get the static branch. Mirrors the orchestrator-mode contract
-  // documented for Phase 2: `mode === "static"` when mobile OR reduced-motion.
   const reduced = prefersReducedMotion === true || !isDesktop
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end end"],
   })
 
-  // PHASE-2-DEBT: this useState→opacity pattern (lines below: setStageOpacity,
-  // setScreenOpacity, setCopyOpacity driven by useMotionValueEvent) and the
-  // magic-number useTransform keyframes (lines below: [0, 0.6, 1], [1, 2.4, 5.2],
-  // [0, 0.55, 0.85, 1], etc.) are explicit Phase 2 work. Do NOT refactor here.
-  // See:
-  //   - .planning/REQUIREMENTS.md MIGRATE-02 (useState fix), MIGRATE-03 (named STAGES)
-  //   - .planning/REQUIREMENTS.md PERF-04, CHOREO-06
-  //   - .planning/phases/01-foundation-types-static-fallback-ssr-contract/01-CONTEXT.md D-14
+  // Phase 2 cleanup target — do not refactor in isolation.
   const stageScale = useTransform(scrollYProgress, [0, 0.6, 1], [1, 2.4, 5.2])
   const screenScale = useTransform(
     scrollYProgress,
@@ -78,11 +67,8 @@ export function PaperHero() {
     }
   })
 
-  // Re-runs when `reduced` flips so a no-reduce-motion → reduce-motion → back
-  // toggle (or a viewport resize past the desktop breakpoint) re-attaches the
-  // loadedmetadata listener against the freshly-mounted <video>. With an empty
-  // dep array the duration captured at first mount stays at 0 in that path
-  // and the scroll-driven scrubber in useMotionValueEvent silently no-ops.
+  // Depend on `reduced` so a flip remounts the <video> and re-attaches the
+  // loadedmetadata listener; otherwise the scroll-driven scrubber no-ops.
   useEffect(() => {
     if (reduced) return
     const video = videoRef.current

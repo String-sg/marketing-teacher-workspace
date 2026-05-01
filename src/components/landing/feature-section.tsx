@@ -17,11 +17,6 @@ export type FeatureSectionContent = {
 
 type FeatureSectionProps = {
   readonly id?: string
-  /**
-   * Reverses the 2-column layout so the screenshot sits on the left and
-   * the copy on the right — used to give Section 2 (Student Insights)
-   * visual rhythm against Section 1 (Holistic Profile).
-   */
   readonly reverse?: boolean
 } & (
   | { readonly stage: "docked"; readonly content?: never }
