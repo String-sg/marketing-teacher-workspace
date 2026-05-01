@@ -33,24 +33,28 @@ describe("RevealOnScroll", () => {
     mocks.useInView.mockReturnValue(false)
 
     const { container } = render(
-      <RevealOnScroll>
+      <RevealOnScroll delay={120}>
         <p>hello</p>
       </RevealOnScroll>
     )
 
     expect(screen.getByText("hello")).not.toBeNull()
 
-    // The wrapper is the first child of the render container. Under reduced
-    // motion the inline style must read opacity 1 with no Y translation.
+    // Confirm the reduced-motion branch was actually taken. Without this the
+    // negative-only style assertions below would trivially pass even if the
+    // branch were deleted (an empty inline `style` matches no nonzero values).
+    expect(mocks.useReducedMotion).toHaveBeenCalled()
+
+    // Wrapper is the first child. Assert opacity is "" (motion did not write
+    // it because target == initial-skip == final) or explicitly "1" — both
+    // observable proofs that we are *not* sitting at opacity 0.
     const wrapper = container.firstElementChild as HTMLElement
     expect(wrapper).not.toBeNull()
-    const style = wrapper.getAttribute("style") ?? ""
-
-    // opacity is 1 (or unset because animate target == initial-skip == final)
-    expect(/opacity:\s*0(?!\.)/i.test(style)).toBe(false)
-    // No nonzero Y translation lingering on the wrapper
-    expect(/translateY\((?!0)/i.test(style)).toBe(false)
-    expect(/translate3d\(0px,\s*(?!0px)/i.test(style)).toBe(false)
+    expect(wrapper.style.opacity === "" || wrapper.style.opacity === "1").toBe(
+      true
+    )
+    // No Y translation lingering on the wrapper (positive observable).
+    expect(wrapper.style.transform).not.toMatch(/translate(3d|Y)\(/)
   })
 
   it("calls useInView with once: true and the documented margin", () => {
