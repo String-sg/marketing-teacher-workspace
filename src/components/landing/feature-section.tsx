@@ -106,7 +106,7 @@ export function FeatureSection(props: FeatureSectionProps) {
           </Button>
         </div>
 
-        <div className={["relative", props.reverse ? "lg:order-1" : ""].join(" ")}>
+        <div className={["relative hidden lg:block", props.reverse ? "lg:order-1" : ""].join(" ")}>
           <div className="paper-card relative overflow-hidden rounded-[20px] border border-black/10 bg-white shadow-[0_30px_120px_-40px_rgb(15_23_42/0.45)]">
             <div className="flex items-center gap-2 border-b border-black/5 bg-[#f7f7f5] px-4 py-2.5">
               <span className="size-3 rounded-full bg-[#ff5f57]" />
