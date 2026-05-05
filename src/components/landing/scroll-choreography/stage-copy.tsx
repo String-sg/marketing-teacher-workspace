@@ -16,6 +16,7 @@
  * otherwise hijacks scroll-linked opacity (see paper-backdrop.tsx).
  */
 import { motion, useTransform } from "motion/react"
+import { useState } from "react"
 
 import { useScrollChoreography } from "./context"
 import { useFlowStages } from "./dev-flow-context"
@@ -35,6 +36,7 @@ export function StageCopy({ stage }: StageCopyProps) {
     throw new Error(`StageCopy: unknown stage "${stage}"`)
   }
   const { heading, bullets, cta } = entry.copy
+  const [active, setActive] = useState(0)
 
   const fadeInStart = byFlowId("wow")!.window[1]
   const holdStart = byFlowId("docked")!.window[0]
@@ -58,15 +60,18 @@ export function StageCopy({ stage }: StageCopyProps) {
 
         <div className="mt-8 border-t border-[color:var(--paper-rule)]">
           {bullets.map((bullet, idx) => (
-            <article
-              className="flex gap-4 border-b border-[color:var(--paper-rule)] py-6"
+            <button
+              aria-expanded={idx === active}
+              className="flex w-full gap-4 border-b border-[color:var(--paper-rule)] py-6 text-left transition-colors hover:bg-[color:var(--paper-ink)]/[0.02] focus-visible:outline-none focus-visible:bg-[color:var(--paper-ink)]/[0.03]"
               key={bullet.title}
+              onClick={() => setActive(idx)}
+              type="button"
             >
               <span
                 aria-hidden
                 className={[
-                  "mt-[10px] size-2 shrink-0 rounded-full",
-                  idx === 0
+                  "mt-[10px] size-2 shrink-0 rounded-full transition-colors",
+                  idx === active
                     ? "bg-primary"
                     : "border border-[color:var(--paper-ink)]/25",
                 ].join(" ")}
@@ -75,13 +80,13 @@ export function StageCopy({ stage }: StageCopyProps) {
                 <p className="text-[17px] leading-[26px] font-semibold tracking-[-0.005em] text-[color:var(--paper-ink)]">
                   {bullet.title}
                 </p>
-                {idx === 0 ? (
+                {idx === active ? (
                   <p className="mt-2 text-[15px] leading-[24px] text-[color:var(--paper-muted)]">
                     {bullet.body}
                   </p>
                 ) : null}
               </div>
-            </article>
+            </button>
           ))}
         </div>
 

@@ -21,6 +21,6 @@ describe("SiteFooter", () => {
 
   it("renders the brand wordmark", () => {
     render(<SiteFooter />)
-    expect(screen.getByText(footerCopy.brand)).not.toBeNull()
+    expect(screen.getByLabelText(footerCopy.brand)).not.toBeNull()
   })
 })

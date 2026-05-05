@@ -43,7 +43,7 @@ export function AudienceColumns() {
                   <p className="mt-4 max-w-[280px] text-center text-base leading-[26px] text-[color:var(--paper-muted)]">
                     {column.body}
                   </p>
-                  <div className="mt-auto w-full max-w-[349px] pb-0">
+                  <div className="mt-auto h-[210px] w-full max-w-[349px]">
                     <Peek />
                   </div>
                 </article>
@@ -58,7 +58,7 @@ export function AudienceColumns() {
 
 function PeekKicker({ children }: { children: React.ReactNode }) {
   return (
-    <p className="font-mono text-[10px] leading-3 font-medium tracking-[0.22em] text-[color:var(--paper-muted)] uppercase">
+    <p className="font-mono text-[11px] leading-4 font-medium text-[color:var(--paper-muted)]">
       {children}
     </p>
   )
@@ -104,7 +104,7 @@ function FormTeachersPeek() {
             className="flex items-center gap-3"
             key={row.initials}
           >
-            <span className="w-6 shrink-0 font-mono text-[10px] tracking-[0.18em] text-[color:var(--paper-muted)] uppercase">
+            <span className="w-6 shrink-0 font-mono text-[11px] text-[color:var(--paper-muted)]">
               {row.class}
             </span>
             <span

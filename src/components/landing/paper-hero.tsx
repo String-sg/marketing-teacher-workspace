@@ -39,6 +39,10 @@ export function PaperHero() {
               src="/hero/hill-1280.jpg"
             />
           </picture>
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-0 h-[42%] bg-gradient-to-b from-[rgb(15_23_42/0.32)] via-[rgb(15_23_42/0.12)] to-transparent"
+          />
           <img
             alt=""
             aria-hidden
@@ -59,7 +63,7 @@ export function PaperHero() {
           </div>
           <div className="mx-auto mt-12 flex w-fit flex-col items-center px-4 text-center sm:mt-16">
             <h1
-              className="font-heading text-[clamp(2rem,5vw,3.5rem)] leading-[1.05] font-semibold tracking-tight text-balance text-white drop-shadow-[0_2px_10px_rgb(15_23_42_/_0.22)]"
+              className="font-heading text-[clamp(2rem,5vw,3.5rem)] leading-[1.05] font-medium tracking-tight text-balance text-white drop-shadow-[0_1px_2px_rgb(15_23_42_/_0.55)] [text-shadow:_0_2px_18px_rgb(15_23_42_/_0.45)]"
               id="hero-title-static"
             >
               {hero.headline}

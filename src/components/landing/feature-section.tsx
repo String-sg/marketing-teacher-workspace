@@ -1,3 +1,5 @@
+import { useState } from "react"
+
 import type {
   BulletItem,
   CtaLink,
@@ -33,6 +35,7 @@ export function FeatureSection(props: FeatureSectionProps) {
   const content = resolveContent(props)
   const sectionId =
     props.id ?? (props.stage === "docked" ? "features" : undefined)
+  const [active, setActive] = useState(0)
 
   return (
     <section
@@ -59,15 +62,18 @@ export function FeatureSection(props: FeatureSectionProps) {
 
           <div className="mt-8 border-t border-[color:var(--paper-rule)]">
             {content.bullets.map((bullet, idx) => (
-              <article
-                className="flex gap-4 border-b border-[color:var(--paper-rule)] py-6"
+              <button
+                aria-expanded={idx === active}
+                className="flex w-full gap-4 border-b border-[color:var(--paper-rule)] py-6 text-left transition-colors hover:bg-[color:var(--paper-ink)]/[0.02] focus-visible:outline-none focus-visible:bg-[color:var(--paper-ink)]/[0.03]"
                 key={bullet.title}
+                onClick={() => setActive(idx)}
+                type="button"
               >
                 <span
                   aria-hidden
                   className={[
-                    "mt-[10px] size-2 shrink-0 rounded-full",
-                    idx === 0
+                    "mt-[10px] size-2 shrink-0 rounded-full transition-colors",
+                    idx === active
                       ? "bg-primary"
                       : "border border-[color:var(--paper-ink)]/25",
                   ].join(" ")}
@@ -76,11 +82,13 @@ export function FeatureSection(props: FeatureSectionProps) {
                   <p className="text-[17px] leading-[26px] font-semibold tracking-[-0.005em] text-[color:var(--paper-ink)]">
                     {bullet.title}
                   </p>
-                  <p className="mt-2 text-[15px] leading-[24px] text-[color:var(--paper-muted)]">
-                    {bullet.body}
-                  </p>
+                  {idx === active ? (
+                    <p className="mt-2 text-[15px] leading-[24px] text-[color:var(--paper-muted)]">
+                      {bullet.body}
+                    </p>
+                  ) : null}
                 </div>
-              </article>
+              </button>
             ))}
           </div>
 

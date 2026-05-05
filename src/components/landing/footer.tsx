@@ -11,7 +11,7 @@ export function SiteFooter() {
         </p>
         <a
           aria-label={footerCopy.brand}
-          className="order-1 flex items-center gap-2.5 sm:order-2"
+          className="order-1 flex items-center gap-2.5 font-heading text-[color:var(--paper-ink)] sm:order-2"
           href="/"
         >
           <img
@@ -20,8 +20,9 @@ export function SiteFooter() {
             className="size-7 select-none"
             src="/hero/tw-icon.png"
           />
-          <span className="text-sm font-medium text-[color:var(--paper-ink)]">
-            {footerCopy.brand}
+          <span className="flex flex-col text-[13px] leading-[1.05] font-medium">
+            <span>Teacher</span>
+            <span>Workspace</span>
           </span>
         </a>
         <a

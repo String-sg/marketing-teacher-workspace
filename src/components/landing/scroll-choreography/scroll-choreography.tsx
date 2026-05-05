@@ -102,7 +102,7 @@ function ChoreographyTree({
                   style={{ opacity: copyOpacity, y: copyY }}
                 >
                   <h1
-                    className="font-heading text-[clamp(2rem,5vw,3.5rem)] leading-[1.05] font-semibold tracking-tight text-balance text-white drop-shadow-[0_2px_10px_rgb(15_23_42_/_0.22)]"
+                    className="font-heading text-[clamp(2rem,5vw,3.5rem)] leading-[1.05] font-medium tracking-tight text-balance text-white drop-shadow-[0_1px_2px_rgb(15_23_42_/_0.55)] [text-shadow:_0_2px_18px_rgb(15_23_42_/_0.45)]"
                     id="hero-title"
                   >
                     {hero.headline}
@@ -187,6 +187,14 @@ function ChoreographySection({
         } as React.CSSProperties
       }
     >
+      {/* Anchor for #features nav link — positioned where the docked stage
+          is fully visible (≈ scroll progress 0.65). The smooth-scroll on
+          html lands the user mid-docked. */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute top-[35%] left-0 block h-px w-px"
+        id="features"
+      />
       {children}
     </section>
   )

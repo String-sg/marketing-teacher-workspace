@@ -44,7 +44,7 @@ export function SchoolsToday() {
                   className="pointer-events-none absolute -top-3.5 left-1/2 inline-block h-7 w-[110px] -translate-x-1/2 border-x border-dashed border-black/10"
                   style={{ backgroundColor: TAPE_BG[memo.tape] }}
                 />
-                <p className="font-mono text-[11px] leading-[14px] font-medium tracking-[0.22em] text-[color:var(--paper-muted)] uppercase">
+                <p className="font-mono text-[12px] leading-[16px] font-medium text-[color:var(--paper-muted)]">
                   {memo.number}
                 </p>
                 <p className="mt-5 text-[22px] leading-[32px] font-medium tracking-[-0.01em] text-[color:var(--paper-ink)] italic">

@@ -78,6 +78,10 @@ export function PaperBackdrop({ children }: { children?: ReactNode }) {
             src="/hero/hill-1280.jpg"
           />
         </picture>
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-[42%] bg-gradient-to-b from-[rgb(15_23_42/0.32)] via-[rgb(15_23_42/0.12)] to-transparent"
+        />
         <img
           alt=""
           aria-hidden
