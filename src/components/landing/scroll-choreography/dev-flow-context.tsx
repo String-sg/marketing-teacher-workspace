@@ -63,6 +63,33 @@ export const PAPER_CARD_DEFAULTS: PaperCardConfig = {
 
 export type PaperCardPatch = Partial<PaperCardConfig>
 
+/**
+ * SVG sketch placement inside the aspect-locked hero frame
+ * (paper-backdrop.tsx). Positions are expressed in frame-relative units
+ * so they hold across viewport aspects:
+ *
+ *   topPct: percentage of frame HEIGHT for the sketch's top edge
+ *   widthCqi: percentage of frame WIDTH (cqi) for the sketch's width
+ *
+ * Tune live via the Flow tuner's "sketches" panel; values flow through
+ * useSketchesConfig() into paper-backdrop.tsx as inline style.
+ */
+export type SketchesConfig = {
+  readonly cardsTop: number
+  readonly cardsWidth: number
+  readonly teacherTop: number
+  readonly teacherWidth: number
+}
+
+export const SKETCHES_DEFAULTS: SketchesConfig = {
+  cardsTop: 44,
+  cardsWidth: 28,
+  teacherTop: 54,
+  teacherWidth: 22,
+}
+
+export type SketchesPatch = Partial<SketchesConfig>
+
 /** Tall outer-section height in lvh (large-viewport-heights). The sticky
  *  inner shell pins to viewport, so scrollable span = (this - 100) lvh.
  *  Default 220lvh = ~120lvh of scrollable distance, which paces the
@@ -81,10 +108,12 @@ type FlowStagesState = Record<StageId, StageDef>
 type FlowControlsContextValue = {
   readonly stages: readonly StageDef[]
   readonly paperCard: PaperCardConfig
+  readonly sketches: SketchesConfig
   readonly scrollHeightVh: number
   readonly view: TimelineView
   readonly setStage: (id: StageId, patch: StageRectPatch) => void
   readonly setPaperCard: (patch: PaperCardPatch) => void
+  readonly setSketches: (patch: SketchesPatch) => void
   readonly setScrollHeightVh: (vh: number) => void
   readonly setView: (view: TimelineView) => void
   readonly resetAll: () => void
@@ -112,6 +141,9 @@ export function DevFlowProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<FlowStagesState>(cloneStages)
   const [paperCard, setPaperCardState] = useState<PaperCardConfig>(
     PAPER_CARD_DEFAULTS
+  )
+  const [sketches, setSketchesState] = useState<SketchesConfig>(
+    SKETCHES_DEFAULTS
   )
   const [scrollHeightVh, setScrollHeightVhState] = useState<number>(
     SCROLL_HEIGHT_DEFAULT_VH
@@ -152,6 +184,10 @@ export function DevFlowProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
+  const setSketches = useCallback((patch: SketchesPatch) => {
+    setSketchesState((prev) => ({ ...prev, ...patch }))
+  }, [])
+
   const setScrollHeightVh = useCallback((vh: number) => {
     // Section must always be taller than the viewport for sticky to work,
     // so floor at 110lvh. Cap at 1000lvh just to keep the input sane.
@@ -177,6 +213,7 @@ export function DevFlowProvider({ children }: { children: ReactNode }) {
   const resetAll = useCallback(() => {
     setState(cloneStages())
     setPaperCardState(PAPER_CARD_DEFAULTS)
+    setSketchesState(SKETCHES_DEFAULTS)
     setScrollHeightVhState(SCROLL_HEIGHT_DEFAULT_VH)
     setViewState(TIMELINE_VIEW_DEFAULT)
   }, [])
@@ -187,10 +224,12 @@ export function DevFlowProvider({ children }: { children: ReactNode }) {
     () => ({
       stages,
       paperCard,
+      sketches,
       scrollHeightVh,
       view,
       setStage,
       setPaperCard,
+      setSketches,
       setScrollHeightVh,
       setView,
       resetAll,
@@ -198,10 +237,12 @@ export function DevFlowProvider({ children }: { children: ReactNode }) {
     [
       stages,
       paperCard,
+      sketches,
       scrollHeightVh,
       view,
       setStage,
       setPaperCard,
+      setSketches,
       setScrollHeightVh,
       setView,
       resetAll,
@@ -229,6 +270,13 @@ export function useFlowStages(): readonly StageDef[] {
 export function usePaperCardConfig(): PaperCardConfig {
   const ctx = useContext(FlowControlsContext)
   return ctx?.paperCard ?? PAPER_CARD_DEFAULTS
+}
+
+/** Read the SVG sketch placement (cards + teacher) inside the hero frame.
+ *  Falls back to SKETCHES_DEFAULTS outside dev. */
+export function useSketchesConfig(): SketchesConfig {
+  const ctx = useContext(FlowControlsContext)
+  return ctx?.sketches ?? SKETCHES_DEFAULTS
 }
 
 /** Read the tunable scroll-section height in lvh. Falls back to the

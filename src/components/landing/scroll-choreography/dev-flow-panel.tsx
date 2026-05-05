@@ -28,6 +28,8 @@ import type {
   FlowWindow,
   PaperCardConfig,
   PaperCardPatch,
+  SketchesConfig,
+  SketchesPatch,
   StageRectPatch,
   TimelineView,
 } from "./dev-flow-context"
@@ -94,7 +96,8 @@ type DragHint = { id: StageId; lo: number; hi: number }
 
 function serializeFlow(
   stages: readonly StageDef[],
-  paper: PaperCardConfig
+  paper: PaperCardConfig,
+  sketches: SketchesConfig
 ): string {
   const stageBlock = [
     "export const STAGES = [",
@@ -121,7 +124,15 @@ function serializeFlow(
     `  opacityFadeEnd: ${fmtNumber(paper.opacityFadeEnd)},`,
     "}",
   ]
-  return [...stageBlock, "", ...paperBlock].join("\n")
+  const sketchesBlock = [
+    "export const SKETCHES_DEFAULTS: SketchesConfig = {",
+    `  cardsTop: ${fmtNumber(sketches.cardsTop)},`,
+    `  cardsWidth: ${fmtNumber(sketches.cardsWidth)},`,
+    `  teacherTop: ${fmtNumber(sketches.teacherTop)},`,
+    `  teacherWidth: ${fmtNumber(sketches.teacherWidth)},`,
+    "}",
+  ]
+  return [...stageBlock, "", ...paperBlock, "", ...sketchesBlock].join("\n")
 }
 
 async function copyText(text: string): Promise<boolean> {
@@ -155,7 +166,11 @@ export function DevFlowPanel() {
 
   if (!controls) return null
 
-  const configText = serializeFlow(controls.stages, controls.paperCard)
+  const configText = serializeFlow(
+    controls.stages,
+    controls.paperCard,
+    controls.sketches
+  )
 
   const handleCopy = async () => {
     const ok = await copyText(configText)
@@ -207,6 +222,10 @@ export function DevFlowPanel() {
               config={controls.paperCard}
               onChange={controls.setPaperCard}
               progress={progress}
+            />
+            <SketchesEditor
+              config={controls.sketches}
+              onChange={controls.setSketches}
             />
           </div>
 
@@ -745,21 +764,38 @@ function StageEditor({
           step={0.05}
           value={stage.opacity}
         />
-        <StringField
+        <NudgeField
           label="x"
           onChange={(v) => onChange({ x: v })}
-          placeholder="0 / +Nvw"
+          placeholder="0cqi / +Ncqi"
+          step={0.5}
           value={stage.x}
         />
-        <StringField
+        <NudgeField
           label="y"
           onChange={(v) => onChange({ y: v })}
-          placeholder="0 / +Nvh"
+          placeholder="0cqi / +Ncqi"
+          step={0.5}
           value={stage.y}
         />
       </div>
     </details>
   )
+}
+
+/** Parse a CSS length like "+6.3cqi" / "0" / "-2vw" into [number, unit]. */
+function splitCssLength(value: string): { num: number; unit: string } {
+  const match = value.trim().match(/^([+-]?\d+(?:\.\d+)?)([a-z%]*)$/i)
+  if (!match) return { num: 0, unit: "cqi" }
+  return { num: parseFloat(match[1]), unit: match[2] || "" }
+}
+
+/** Format a number + unit back into the canonical string. Sign is added
+ *  for positive values to match the existing style ("+6.3cqi"). */
+function formatCssLength(num: number, unit: string): string {
+  const trimmed = Number(num.toFixed(4)).toString()
+  const sign = num > 0 ? "+" : ""
+  return `${sign}${trimmed}${unit}`
 }
 
 /** Live-tunable controls for the paper-card (cartoon video) zoom envelope.
@@ -855,6 +891,75 @@ function PaperCardEditor({
   )
 }
 
+/** Live-tunable placement of the two SVG sketches inside the aspect-locked
+ *  hero frame. `top` is % of frame height (frame is 16:10) and `width` is
+ *  cqi (% of frame width). Both consumed by paper-backdrop.tsx as inline
+ *  style. */
+function SketchesEditor({
+  config,
+  onChange,
+}: {
+  config: SketchesConfig
+  onChange: (patch: SketchesPatch) => void
+}) {
+  return (
+    <details className="rounded border border-black/10">
+      <summary className="cursor-pointer px-2 py-1 font-medium tracking-wide select-none">
+        sketches
+        <span className="ml-2 font-mono text-[10px] text-black/45">
+          cards {fmtNumber(config.cardsTop)}% · {fmtNumber(config.cardsWidth)}
+          cqi · teacher {fmtNumber(config.teacherTop)}% ·{" "}
+          {fmtNumber(config.teacherWidth)}cqi
+        </span>
+      </summary>
+      <div className="space-y-2 px-2 pt-1 pb-2">
+        <div className="text-[10px] tracking-wider text-black/45 uppercase">
+          cards
+        </div>
+        <div className="grid grid-cols-2 gap-1.5">
+          <NumberField
+            label="top %"
+            max={100}
+            min={0}
+            onChange={(v) => onChange({ cardsTop: v })}
+            step={0.5}
+            value={config.cardsTop}
+          />
+          <NumberField
+            label="w cqi"
+            max={100}
+            min={0}
+            onChange={(v) => onChange({ cardsWidth: v })}
+            step={0.5}
+            value={config.cardsWidth}
+          />
+        </div>
+        <div className="text-[10px] tracking-wider text-black/45 uppercase">
+          teacher
+        </div>
+        <div className="grid grid-cols-2 gap-1.5">
+          <NumberField
+            label="top %"
+            max={100}
+            min={0}
+            onChange={(v) => onChange({ teacherTop: v })}
+            step={0.5}
+            value={config.teacherTop}
+          />
+          <NumberField
+            label="w cqi"
+            max={100}
+            min={0}
+            onChange={(v) => onChange({ teacherWidth: v })}
+            step={0.5}
+            value={config.teacherWidth}
+          />
+        </div>
+      </div>
+    </details>
+  )
+}
+
 function NumberField({
   label,
   value,
@@ -888,29 +993,65 @@ function NumberField({
   )
 }
 
-function StringField({
+/** CSS-length input with ▲/▼ steppers that bump the numeric prefix by
+ *  `step` and re-emit with the original unit. Lets the dev nudge a stage
+ *  up/down without retyping the value. ⇧+click → 5× step, ⌥+click →
+ *  0.1× step (fine). */
+function NudgeField({
   label,
   value,
   placeholder,
+  step,
   onChange,
 }: {
   label: string
   value: string
   placeholder?: string
+  step: number
   onChange: (v: string) => void
 }) {
+  const nudge = (direction: 1 | -1, e: React.MouseEvent) => {
+    const { num, unit } = splitCssLength(value)
+    const factor = e.shiftKey ? 5 : e.altKey ? 0.1 : 1
+    const next = num + direction * step * factor
+    onChange(formatCssLength(next, unit || "cqi"))
+  }
   return (
     <label className="flex items-center gap-1.5">
       <span className="w-12 text-black/60">{label}</span>
-      <input
-        className="w-full rounded border border-black/15 bg-white px-1.5 py-0.5 font-mono"
-        onChange={(e: ChangeEvent<HTMLInputElement>) =>
-          onChange(e.target.value)
-        }
-        placeholder={placeholder}
-        type="text"
-        value={value}
-      />
+      <span className="flex w-full items-stretch overflow-hidden rounded border border-black/15 bg-white">
+        <input
+          className="w-full bg-transparent px-1.5 py-0.5 font-mono outline-none"
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            onChange(e.target.value)
+          }
+          placeholder={placeholder}
+          type="text"
+          value={value}
+        />
+        <span className="flex flex-col border-l border-black/10">
+          <button
+            aria-label={`${label} up`}
+            className="grid h-1/2 w-5 place-items-center text-[8px] leading-none text-black/55 hover:bg-black/5 hover:text-black"
+            onClick={(e) => nudge(1, e)}
+            tabIndex={-1}
+            title="↑ (Shift = ×5, Opt = fine)"
+            type="button"
+          >
+            ▲
+          </button>
+          <button
+            aria-label={`${label} down`}
+            className="grid h-1/2 w-5 place-items-center border-t border-black/10 text-[8px] leading-none text-black/55 hover:bg-black/5 hover:text-black"
+            onClick={(e) => nudge(-1, e)}
+            tabIndex={-1}
+            title="↓ (Shift = ×5, Opt = fine)"
+            type="button"
+          >
+            ▼
+          </button>
+        </span>
+      </span>
     </label>
   )
 }

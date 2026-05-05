@@ -37,12 +37,13 @@ import { motion, useTransform } from "motion/react"
 import type { ReactNode } from "react"
 
 import { useScrollChoreography } from "./context"
-import { usePaperCardConfig } from "./dev-flow-context"
+import { usePaperCardConfig, useSketchesConfig } from "./dev-flow-context"
 import { ProductScreen } from "./product-screen"
 
 export function PaperBackdrop({ children }: { children?: ReactNode }) {
   const { scrollYProgress, paperCardScale } = useScrollChoreography()
   const paper = usePaperCardConfig()
+  const sketches = useSketchesConfig()
 
   // clamp:false disables motion 12's accelerate/WAAPI path on opacity, which
   // hijacks scroll-linked opacity into an independent native animation that
@@ -91,17 +92,27 @@ export function PaperBackdrop({ children }: { children?: ReactNode }) {
       </motion.div>
 
       <div className="absolute inset-0 grid place-items-center">
-        <div className="relative aspect-[16/10] w-full max-w-[calc(100svh*1.6)] [container-type:inline-size]">
+        <div
+          className="relative aspect-[16/10] w-full max-w-[calc(100svh*1.6)] [container-type:inline-size]"
+          style={
+            {
+              "--cards-top": `${sketches.cardsTop}%`,
+              "--cards-width": `${sketches.cardsWidth}cqi`,
+              "--teacher-top": `${sketches.teacherTop}%`,
+              "--teacher-width": `${sketches.teacherWidth}cqi`,
+            } as React.CSSProperties
+          }
+        >
           <img
             alt=""
             aria-hidden
-            className="pointer-events-none absolute top-[44%] left-1/2 w-[28cqi] -translate-x-1/2 select-none"
+            className="pointer-events-none absolute top-[var(--cards-top)] left-1/2 w-[var(--cards-width)] -translate-x-1/2 select-none"
             src="/hero/hero-cards-sketch.svg"
           />
           <img
             alt=""
             aria-hidden
-            className="pointer-events-none absolute top-[54%] left-1/2 w-[22cqi] -translate-x-1/2 select-none"
+            className="pointer-events-none absolute top-[var(--teacher-top)] left-1/2 w-[var(--teacher-width)] -translate-x-1/2 select-none"
             src="/hero/hero-teacher-sketch.svg"
           />
           <ProductScreen />
