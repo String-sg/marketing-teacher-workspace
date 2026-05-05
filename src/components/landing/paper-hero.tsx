@@ -67,7 +67,7 @@ export function PaperHero() {
           </div>
           <div className="mx-auto mt-12 flex w-fit flex-col items-center px-4 text-center sm:mt-16">
             <h1
-              className="font-heading text-[clamp(2rem,5vw,3.5rem)] leading-[1.05] font-medium tracking-tight text-balance text-white drop-shadow-[0_1px_2px_rgb(15_23_42_/_0.55)] [text-shadow:_0_2px_18px_rgb(15_23_42_/_0.45)]"
+              className="font-heading text-[clamp(2rem,5vw,3.5rem)] leading-[1.05] font-medium tracking-tight text-balance text-white"
               id="hero-title-static"
             >
               {hero.headline}

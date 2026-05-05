@@ -96,7 +96,7 @@ function FormTeachersPeek() {
   ]
 
   return (
-    <div className="rounded-t-2xl border border-black/5 bg-white/85 p-4 pb-5 shadow-[0_-6px_20px_-10px_rgb(15_23_42/0.15)] backdrop-blur-sm">
+    <div className="flex h-full flex-col rounded-t-2xl border border-black/5 bg-white/85 p-4 pb-5 shadow-[0_-6px_20px_-10px_rgb(15_23_42/0.15)] backdrop-blur-sm">
       <PeekKicker>Class · Sec 3.1</PeekKicker>
       <ul className="mt-3 flex flex-col gap-2.5">
         {rows.map((row) => (
@@ -133,7 +133,7 @@ function FormTeachersPeek() {
 function YearHeadsPeek() {
   const chips = ["FAS", "SEN", "Low att.", "Pre-LTA"]
   return (
-    <div className="rounded-t-2xl border border-black/5 bg-white/85 p-4 pb-5 shadow-[0_-6px_20px_-10px_rgb(15_23_42/0.15)] backdrop-blur-sm">
+    <div className="flex h-full flex-col rounded-t-2xl border border-black/5 bg-white/85 p-4 pb-5 shadow-[0_-6px_20px_-10px_rgb(15_23_42/0.15)] backdrop-blur-sm">
       <PeekKicker>Cohort filter</PeekKicker>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {chips.map((chip, i) => (
@@ -175,7 +175,7 @@ function SchoolLeadersPeek() {
   const bars = [9, 14, 19, 22, 25, 28, 31]
   const days = ["M", "T", "W", "T", "F", "S", "S"]
   return (
-    <div className="rounded-t-2xl border border-black/5 bg-white/85 p-4 pb-5 shadow-[0_-6px_20px_-10px_rgb(15_23_42/0.15)] backdrop-blur-sm">
+    <div className="flex h-full flex-col rounded-t-2xl border border-black/5 bg-white/85 p-4 pb-5 shadow-[0_-6px_20px_-10px_rgb(15_23_42/0.15)] backdrop-blur-sm">
       <PeekKicker>Adoption · this week</PeekKicker>
       <div className="mt-3 flex items-baseline gap-2">
         <span className="font-heading text-[36px] leading-[40px] font-semibold tracking-tight text-[color:var(--paper-ink)]">

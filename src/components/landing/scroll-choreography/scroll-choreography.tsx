@@ -101,7 +101,7 @@ function ChoreographyTree({
                   style={{ opacity: copyOpacity, y: copyY }}
                 >
                   <h1
-                    className="font-heading text-[clamp(2rem,5vw,3.5rem)] leading-[1.05] font-medium tracking-tight text-balance text-white drop-shadow-[0_1px_2px_rgb(15_23_42_/_0.55)] [text-shadow:_0_2px_18px_rgb(15_23_42_/_0.45)]"
+                    className="font-heading text-[clamp(2rem,5vw,3.5rem)] leading-[1.05] font-medium tracking-tight text-balance text-white"
                     id="hero-title"
                   >
                     {hero.headline}
