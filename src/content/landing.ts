@@ -18,8 +18,6 @@ export const stages: readonly StageCopyContent[] = [
     id: "hero",
     copy: {
       headline: "Every student's full picture, one view.",
-      subline:
-        "Attendance, grades, conduct, counselling, SEN, FAS, family in one picture. So your day starts with context, not a scavenger hunt.",
     },
   },
   {

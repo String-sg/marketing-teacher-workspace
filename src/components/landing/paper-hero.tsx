@@ -64,9 +64,6 @@ export function PaperHero() {
             >
               {hero.headline}
             </h1>
-            <p className="mt-4 max-w-[34rem] text-sm leading-[1.45] text-balance text-white/95 drop-shadow-[0_1px_4px_rgb(15_23_42_/_0.25)] sm:text-base sm:leading-[1.5]">
-              {hero.subline}
-            </p>
             <Button
               asChild
               className="mt-7 h-10 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-[0_8px_22px_-12px_rgb(36_90_219_/_0.7)] hover:bg-primary/90"

@@ -28,7 +28,6 @@ export type StageCopyContent =
       readonly id: "hero"
       readonly copy: {
         readonly headline: string
-        readonly subline: string
       }
     }
   | {
