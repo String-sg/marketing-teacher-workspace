@@ -1,7 +1,6 @@
 /**
  * Paper-card backdrop subscriber. Owns the paper-card stage frame,
- * the two cloud parallax layers, the autoplay-loop hero video, and
- * the CHOREO-08 video gate.
+ * the two cloud parallax layers, and the static hero illustration.
  *
  * Rendered ONLY in choreography mode (the orchestrator early-returns
  * <StaticChoreographyFallback /> when reduced/mobile per D-02).
@@ -13,8 +12,8 @@
  *     ScrollChoreographyContext) so the UI overlay stays locked to the
  *     cartoon laptop throughout the morph zone.
  *   - Inner backdrop motion.div (absolute inset-0) carries `opacity` +
- *     the cartoon visuals (paper-card bg color, shadow, clouds, video).
- *     This is the layer that fades during the wow plateau.
+ *     the cartoon visuals (paper-card bg color, shadow, clouds, hero
+ *     illustration). This is the layer that fades during the wow plateau.
  *   - Caller-supplied `children` render on top of the backdrop layer
  *     (z-index 10+) and are NOT affected by the opacity fade — that's
  *     where the bundled <ProductScreen> + hero copy live.
@@ -24,35 +23,23 @@
  * instance. PaperBackdrop reads it via useScrollChoreography().
  *
  * Other invariants:
- *   - CHOREO-08 / D-15 / D-16 (revised 2026-04-29): video autoplay-loops
- *     during stage 1; on crossing byId("wow").window[1] the gate calls
- *     video.pause() so no GPU/decoder work runs while the screen covers
- *     it. On scroll-back below threshold the gate calls video.play() to
- *     resume the loop.
  *   - PERF-04: transform/opacity only — no width/height/top/left
  *
  * The opacityFadeStart / opacityFadeEnd values come from
  * usePaperCardConfig() so the dev tuner can live-edit the fade window.
  */
-import { motion, useMotionValueEvent, useTransform } from "motion/react"
-import { useRef } from "react"
+import { motion, useTransform } from "motion/react"
 import type { ReactNode } from "react"
 
 import { useScrollChoreography } from "./context"
-import { useFlowStages, usePaperCardConfig } from "./dev-flow-context"
+import { usePaperCardConfig } from "./dev-flow-context"
 
 const CLOUD_LEFT_TRAVEL_PX = "-160px"
 const CLOUD_RIGHT_TRAVEL_PX = "-110px"
 
 export function PaperBackdrop({ children }: { children?: ReactNode }) {
   const { scrollYProgress, paperCardScale } = useScrollChoreography()
-  const stages = useFlowStages()
   const paper = usePaperCardConfig()
-  // Video gate fires when scrollYProgress crosses out of the wow exit edge.
-  // Resolved per-render so dev tuning of the wow window is honored live.
-  const videoGateThreshold =
-    stages.find((s) => s.id === "wow")?.window[1] ?? 0.55
-  const videoRef = useRef<HTMLVideoElement>(null)
 
   // clamp:false disables motion 12's accelerate/WAAPI path on opacity, which
   // hijacks scroll-linked opacity into an independent native animation that
@@ -76,28 +63,6 @@ export function PaperBackdrop({ children }: { children?: ReactNode }) {
     ["0px", CLOUD_RIGHT_TRAVEL_PX]
   )
 
-  // CHOREO-08 video gate (D-15 + D-16, revised 2026-04-29). The video
-  // autoplay-loops via the `loop` + `autoPlay` attributes; the gate only
-  // pauses/resumes it on threshold crossings. useMotionValueEvent is the
-  // only legitimate use after CHOREO-06's useState ban (DOM imperative,
-  // not visual). play() rejection is harmless — the autoplay attribute
-  // handles the next mount, and the failure mode is "video stays paused"
-  // which is graceful (the poster image continues to display).
-  useMotionValueEvent(scrollYProgress, "change", (p) => {
-    const video = videoRef.current
-    if (!video) return
-    if (p >= videoGateThreshold) {
-      if (!video.paused) video.pause()
-    } else if (video.paused) {
-      // Real browsers return a Promise from play(); jsdom returns undefined.
-      // Wrap defensively so the gate never throws on a non-thenable return.
-      const result = video.play()
-      if (result && typeof result.catch === "function") {
-        result.catch(() => undefined)
-      }
-    }
-  })
-
   return (
     <motion.div
       className="paper-card relative mx-auto flex w-full max-w-[110rem] flex-1 flex-col items-center overflow-hidden rounded-[20px]"
@@ -106,7 +71,7 @@ export function PaperBackdrop({ children }: { children?: ReactNode }) {
         transformOrigin: "50% 92%",
       }}
     >
-      {/* Backdrop layer — bg + clouds + video, fades with stageOpacity.
+      {/* Backdrop layer — bg + clouds + illustration, fades with stageOpacity.
           Sits behind caller-supplied children (which render at z-10+ and
           stay fully opaque so the bundled ProductScreen is unaffected
           by the cartoon fade). */}
@@ -139,17 +104,10 @@ export function PaperBackdrop({ children }: { children?: ReactNode }) {
         </motion.div>
         <div className="absolute inset-x-0 bottom-0 flex w-full justify-center">
           <div className="relative w-full max-w-[360px] px-4 sm:max-w-[400px]">
-            <video
-              aria-label="A teacher slowly working at her desk"
-              autoPlay
+            <img
+              alt="Teacher working at her desk with a laptop and lamp"
               className="hero-media block h-auto w-full select-none"
-              loop
-              muted
-              playsInline
-              poster="/hero/teacher-illustration.png"
-              preload="auto"
-              ref={videoRef}
-              src="/hero/teacher-working.mp4"
+              src="/hero/teacher-illustration.png"
             />
           </div>
         </div>

@@ -5,7 +5,7 @@ import {
   useScroll,
   useTransform,
 } from "motion/react"
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 
 import { useIsDesktop } from "@/components/landing/scroll-choreography/use-is-desktop"
 import { SiteHeader } from "@/components/landing/site-header"
@@ -26,8 +26,6 @@ export function PaperHero() {
   const hero = heroEntry.copy
 
   const sectionRef = useRef<HTMLElement>(null)
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const videoDurationRef = useRef(0)
   const prefersReducedMotion = useReducedMotion()
   const isDesktop = useIsDesktop()
   const reduced = prefersReducedMotion === true || !isDesktop
@@ -59,27 +57,7 @@ export function PaperHero() {
     setStageOpacity(p < 0.6 ? 1 : clamp01(1 - (p - 0.6) / 0.18))
     setScreenOpacity(p < 0.55 ? 0 : clamp01((p - 0.55) / 0.23))
     setCopyOpacity(p < 0.06 ? 1 : clamp01(1 - (p - 0.06) / 0.08))
-
-    const video = videoRef.current
-    const duration = videoDurationRef.current
-    if (video && duration > 0) {
-      video.currentTime = clamp01(p / 0.6) * duration
-    }
   })
-
-  // Depend on `reduced` so a flip remounts the <video> and re-attaches the
-  // loadedmetadata listener; otherwise the scroll-driven scrubber no-ops.
-  useEffect(() => {
-    if (reduced) return
-    const video = videoRef.current
-    if (!video) return
-    const handleMeta = () => {
-      videoDurationRef.current = video.duration || 0
-    }
-    if (video.readyState >= 1) handleMeta()
-    else video.addEventListener("loadedmetadata", handleMeta)
-    return () => video.removeEventListener("loadedmetadata", handleMeta)
-  }, [reduced])
 
   return (
     <section
@@ -161,24 +139,11 @@ export function PaperHero() {
 
           <div className="relative z-0 mt-auto flex w-full justify-center pb-0">
             <div className="relative w-full max-w-[360px] px-4 sm:max-w-[400px]">
-              {reduced ? (
-                <img
-                  alt="Teacher working at her desk with a laptop and lamp"
-                  className="hero-media block h-auto w-full select-none"
-                  src="/hero/teacher-illustration.png"
-                />
-              ) : (
-                <video
-                  aria-label="A teacher slowly working at her desk"
-                  className="hero-media block h-auto w-full select-none"
-                  muted
-                  playsInline
-                  poster="/hero/teacher-illustration.png"
-                  preload="auto"
-                  ref={videoRef}
-                  src="/hero/teacher-working.mp4"
-                />
-              )}
+              <img
+                alt="Teacher working at her desk with a laptop and lamp"
+                className="hero-media block h-auto w-full select-none"
+                src="/hero/teacher-illustration.png"
+              />
             </div>
           </div>
         </motion.div>
