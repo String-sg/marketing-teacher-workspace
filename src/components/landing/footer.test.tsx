@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest"
 import { render, screen } from "@testing-library/react"
 
+import { footerCopy } from "@/content/landing"
+
 import { SiteFooter } from "./footer"
 
 describe("SiteFooter", () => {
@@ -17,8 +19,8 @@ describe("SiteFooter", () => {
     expect(feedback).not.toBeUndefined()
   })
 
-  it("renders the trust line text", () => {
+  it("renders the brand wordmark", () => {
     render(<SiteFooter />)
-    expect(screen.getByText(/Built with teachers/i)).not.toBeNull()
+    expect(screen.getByText(footerCopy.brand)).not.toBeNull()
   })
 })

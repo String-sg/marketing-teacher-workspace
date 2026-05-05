@@ -5,6 +5,8 @@ export const TEACHER_WORKSPACE_APP_URL =
 
 export const navItems = [
   { label: "Features", href: "#features" },
+  { label: "Testimonials", href: "#schools" },
+  { label: "Use cases", href: "#audiences" },
 ] as const
 
 export const siteCtaCopy = {
@@ -15,9 +17,9 @@ export const stages: readonly StageCopyContent[] = [
   {
     id: "hero",
     copy: {
-      headline: "Every student's full picture. One View.",
+      headline: "Every student's full picture, one view.",
       subline:
-        "Attendance, grades, conduct, counselling, SEN, FAS, family — in one picture. So your day starts with context, not a scavenger hunt.",
+        "Attendance, grades, conduct, counselling, SEN, FAS, family in one picture. So your day starts with context, not a scavenger hunt.",
     },
   },
   {
@@ -28,13 +30,13 @@ export const stages: readonly StageCopyContent[] = [
     id: "docked",
     copy: {
       kicker: "STUDENT INSIGHTS",
-      heading: "Spot the pattern. Early.",
+      heading: "Spot the pattern.\nEarly.",
       paragraph:
-        "Find the cohort in seconds. Save it once. Know the moment it changes.",
+        "Find the cohort in seconds — the moment it changes, you'll know.",
       bullets: [
         {
           title: "Quick filters.",
-          body: "FAS, SEN, low attendance, peer isolation, pre-LTA. Name it. See it.",
+          body: "FAS, SEN, low attendance, peer isolation, pre-LTA. Name it. See it. Find the cohort in seconds — the moment it changes, you'll know.",
         },
         {
           title: "Saved groups.",
@@ -50,60 +52,79 @@ export const stages: readonly StageCopyContent[] = [
   },
 ] as const
 
+export type SchoolMemo = {
+  readonly number: string
+  readonly tape: 1 | 2 | 3
+  readonly quote: string
+  readonly body: string
+  readonly role: string
+  readonly school: string
+}
+
 export const schoolsTodayCopy = {
-  kicker: "IN SCHOOLS TODAY",
   heading: "Real schools. Real time saved.",
   subheading:
-    "Pilot schools shaped what Teacher Workspace does. Here's what changed.",
+    "Pilot schools shaped what Teacher Workspace does. Three notes from the people using it.",
   cases: [
     {
-      number: "01",
-      title: "Bursary nominations. In one filter.",
-      source: "Lianhua Primary. Year Heads.",
-      body: "What used to mean toggling between FAS, academic results, offences and Cockpit reports became one filter, one shortlist. Fewer steps. Fewer errors. Hours back.",
+      number: "Note · 01",
+      tape: 1,
+      quote:
+        "“One filter, one shortlist. The bursary list takes minutes now, not an afternoon.”",
+      body: "FAS, results, offences and Cockpit reports — all in one saved view. Fewer steps. Fewer errors. Hours back.",
+      role: "— Year Heads",
+      school: "Lianhua Primary",
     },
     {
-      number: "02",
-      title: "New Form Teachers. Day-one fluent.",
-      source: "Lianhua Primary. Form Teachers.",
-      body: "Custody, SEN, counselling and offence history — known before the first conversation. Week-one shifted from “where do I find this?” to “how do I engage this student?”",
+      number: "Note · 02",
+      tape: 2,
+      quote:
+        "“Week one stopped being a scavenger hunt. We knew the class before we walked in.”",
+      body: "Custody, SEN, counselling and offence history — known before the first conversation, not after the first incident.",
+      role: "— Form Teachers",
+      school: "Lianhua Primary",
     },
     {
-      number: "03",
-      title: "SwANs. Surfaced earlier.",
-      source: "Westwood Secondary. Year Heads.",
-      body: "A student flagged only on the FAS list — surfaced in the same view with SEN needs, peer isolation and pre-LTA signals. Days of prep, one focused session.",
+      number: "Note · 03",
+      tape: 3,
+      quote:
+        "“The student we'd missed showed up — SEN, peer isolation, pre-LTA — on the same view.”",
+      body: "A student flagged only on the FAS list — surfaced earlier with the right context. Days of prep, one focused session.",
+      role: "— Year Heads",
+      school: "Westwood Secondary",
     },
-  ],
+  ] as const satisfies readonly SchoolMemo[],
 } as const
 
 export const audienceCopy = {
-  kicker: "BUILT FOR THE WAY SCHOOLS WORK",
-  heading: "Built for the way schools work.",
+  heading: "One view that fits the way schools work.",
+  subheading:
+    "The same data. Three roles. Each sees the slice that lets them act — nothing more, nothing missing.",
   columns: [
     {
-      label: "Form Teachers.",
+      label: "Form Teachers",
       body: "Walk in fluent in your class. The context is already on the profile.",
     },
     {
-      label: "Year Heads & SDT.",
+      label: "Year Heads & SDT",
       body: "Nominations, SwAN identification, level briefings — from one place.",
     },
     {
-      label: "School Leaders.",
-      body: "Adoption in real time. The whole school in one lens. Access mirrors source systems (e.g. School Cockpit, AllEars). Nothing new exposed.",
+      label: "School Leaders",
+      body: "Adoption in real time. Whole school in one lens — access mirrors source systems.",
     },
   ],
 } as const
 
 export const finalCtaCopy = {
-  kicker: "Free for individual teachers",
   headline: "Know every student before tomorrow's bell.",
+  subtitle:
+    "Bring attendance, behaviour, notes home, and SEN context into a single view your whole school can read at a glance.",
 } as const
 
 export const footerCopy = {
-  copyright: "© Teacher Workspace",
+  copyright: "© 2026",
+  brand: "Teacher Workspace",
   feedbackUrl: "https://go.gov.sg/teacherworkspace-feedback",
   feedbackLabel: "Send feedback",
-  trustLine: "Built with teachers. For every educator.",
 } as const

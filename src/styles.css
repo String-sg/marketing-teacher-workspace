@@ -68,7 +68,7 @@
     --card-foreground: var(--mauve-12);
     --popover: var(--mauve-1);
     --popover-foreground: var(--mauve-12);
-    --primary: var(--blue-9);
+    --primary: #245adb;
     --primary-foreground: white;
     --secondary: var(--mauve-3);
     --secondary-foreground: var(--mauve-12);
@@ -95,14 +95,27 @@
     --sidebar-border: var(--mauve-6);
     --sidebar-ring: var(--blue-8);
 
-    --nav-surface: color-mix(in oklab, var(--mauve-12) 78%, transparent);
+    --nav-surface: rgb(255 255 255 / 0.8);
     --brand-orbit: var(--cyan-7);
-    --paper: var(--amber-2);
+    --paper: #f6f3eb;
     --paper-ink: #1a1a1a;
-    --paper-muted: color-mix(in oklab, var(--mauve-11) 72%, var(--grass-10));
-    --paper-rule: color-mix(in oklab, var(--mauve-7) 68%, var(--amber-6));
+    --paper-muted: #5f6f76;
+    --paper-rule: rgb(14 23 41 / 0.08);
     --paper-card: #ffffff;
+    --cta-blue: #245adb;
     --cta-ground: color-mix(in oklab, var(--mauve-12) 88%, var(--blue-12));
+
+    --memo-bg: #fdfaf2;
+    --memo-section-bg: #cfe6ff;
+    --memo-tape-1: rgb(245 198 86 / 0.55);
+    --memo-tape-2: rgb(124 196 138 / 0.45);
+    --memo-tape-3: rgb(166 192 234 / 0.65);
+
+    --audience-cream: #fde7c2;
+    --audience-mint: #c8e8d2;
+    --audience-sky: #d6e2f7;
+
+    --footer-bg: #f6f3eb;
 }
 
 .dark {
@@ -157,53 +170,31 @@
 
 @layer components {
   .paper-page {
-    background-color: #cfe6ff;
-    background-image: url("/hero/blue-paper.png");
-    background-size: 100vw auto;
-    background-position: top center;
-    background-repeat: repeat-y;
-    background-attachment: scroll;
+    background-color: var(--paper);
   }
 
   .paper-card {
-    background-color: #ffffff;
+    background-color: var(--paper-card);
   }
 
-  .hero-media {
-    filter: brightness(1.05) contrast(1.03);
-    mix-blend-mode: multiply;
+  .hero-stage-bg {
+    background-image: image-set(
+      url("/hero/hill-1280.webp") 1x,
+      url("/hero/hill-1600.webp") 1.5x
+    );
+    background-image: -webkit-image-set(
+      url("/hero/hill-1280.webp") 1x,
+      url("/hero/hill-1600.webp") 1.5x
+    );
+    background-size: cover;
+    background-position: center;
   }
 
-  .cloud-drift-left,
-  .cloud-drift-right {
-    filter: brightness(1.06) contrast(1.02);
+  .nav-pill {
+    background-color: var(--nav-surface);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
   }
-
-  .cloud-drift-left {
-    animation: cloud-drift-left 18s ease-in-out infinite;
-  }
-
-  .cloud-drift-right {
-    animation: cloud-drift-right 22s ease-in-out infinite;
-  }
-
-  @keyframes cloud-drift-left {
-    0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
-    50%  { transform: translate3d(56px, -22px, 0) rotate(1.2deg); }
-    100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-  }
-
-  @keyframes cloud-drift-right {
-    0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
-    50%  { transform: translate3d(-64px, 18px, 0) rotate(-1.4deg); }
-    100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .cloud-drift-left,
-    .cloud-drift-right { animation: none; }
-  }
-
 }
 
 @media (prefers-reduced-motion: reduce) {

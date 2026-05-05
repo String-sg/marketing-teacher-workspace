@@ -98,21 +98,21 @@ function ChoreographyTree({
                   <SiteHeader />
                 </div>
                 <motion.div
-                  className="mx-auto mt-10 flex w-fit flex-col items-center text-center sm:mt-14"
+                  className="mx-auto mt-12 flex w-fit flex-col items-center px-4 text-center sm:mt-16"
                   style={{ opacity: copyOpacity, y: copyY }}
                 >
                   <h1
-                    className="font-heading text-[clamp(1.75rem,4.4vw,4rem)] leading-[1.05] font-medium tracking-tight text-[color:var(--paper-ink)]"
+                    className="font-heading text-[clamp(2rem,5vw,3.5rem)] leading-[1.05] font-semibold tracking-tight text-balance text-white drop-shadow-[0_2px_10px_rgb(15_23_42_/_0.22)]"
                     id="hero-title"
                   >
                     {hero.headline}
                   </h1>
-                  <p className="mt-3 max-w-xl text-base leading-7 text-balance text-[color:var(--paper-muted)] sm:text-lg sm:leading-8">
+                  <p className="mt-4 max-w-[34rem] text-sm leading-[1.45] text-balance text-white/95 drop-shadow-[0_1px_4px_rgb(15_23_42_/_0.25)] sm:text-base sm:leading-[1.5]">
                     {hero.subline}
                   </p>
                   <Button
                     asChild
-                    className="mt-6 h-11 rounded-full bg-primary px-7 text-base text-primary-foreground hover:bg-primary/90 sm:mt-7"
+                    className="mt-7 h-10 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-[0_8px_22px_-12px_rgb(36_90_219_/_0.7)] hover:bg-primary/90"
                   >
                     <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
                       {siteCtaCopy.primary}

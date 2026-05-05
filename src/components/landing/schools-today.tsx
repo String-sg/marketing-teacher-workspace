@@ -2,53 +2,62 @@ import { schoolsTodayCopy } from "@/content/landing"
 
 import { RevealOnScroll } from "./reveal-on-scroll"
 
+const TAPE_BG: Record<1 | 2 | 3, string> = {
+  1: "var(--memo-tape-1)",
+  2: "var(--memo-tape-2)",
+  3: "var(--memo-tape-3)",
+}
+
+const CARD_ROTATION: Record<number, string> = {
+  0: "-1.4deg",
+  1: "0.8deg",
+  2: "-0.6deg",
+}
+
 export function SchoolsToday() {
   return (
     <section
-      className="relative px-5 py-20 sm:px-8 lg:py-24"
+      className="relative px-5 py-16 sm:px-8 lg:py-20"
       id="schools"
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-10 right-[-3rem] hidden w-[min(22vw,260px)] sm:block lg:right-[-2rem]"
-      >
-        <img
-          alt=""
-          className="cloud-drift-right block w-full opacity-70 mix-blend-multiply select-none"
-          src="/hero/cloud-halftone.png"
-        />
-      </div>
-
-      <div className="mx-auto w-[1024px] max-w-full">
+      <div className="mx-auto w-full max-w-[1412px] rounded-[28px] bg-[color:var(--memo-section-bg)] px-6 py-20 sm:rounded-[44px] sm:px-12 sm:py-24 lg:px-24 lg:py-28">
         <RevealOnScroll>
           <div className="mx-auto max-w-2xl text-center">
-            <p className="text-xs font-medium tracking-[0.18em] text-[color:var(--paper-muted)] uppercase sm:text-sm">
-              {schoolsTodayCopy.kicker}
-            </p>
-            <h2 className="mt-4 font-heading text-[clamp(1.5rem,3.6vw,3.25rem)] leading-[1.08] font-medium tracking-tight text-balance text-[color:var(--paper-ink)]">
+            <h2 className="font-heading text-[clamp(1.75rem,4vw,3.5rem)] leading-[1.08] font-medium tracking-tight text-balance text-[color:var(--paper-ink)]">
               {schoolsTodayCopy.heading}
             </h2>
-            <p className="mt-6 text-base italic leading-7 text-[color:var(--paper-muted)] sm:text-lg sm:leading-8">
+            <p className="mt-6 text-base leading-[1.7] text-balance text-[color:var(--paper-muted)] sm:text-lg">
               {schoolsTodayCopy.subheading}
             </p>
           </div>
         </RevealOnScroll>
 
-        <div className="mt-12 grid grid-cols-1 gap-6 lg:mt-16 lg:grid-cols-3">
-          {schoolsTodayCopy.cases.map((item, i) => (
-            <RevealOnScroll delay={i * 80} key={item.number}>
-              <article className="paper-card flex flex-col rounded-[20px] border border-black/5 bg-white p-6 shadow-[0_10px_60px_-30px_rgb(15_23_42/0.18)] sm:p-8">
-                <p className="font-mono text-xs tracking-[0.2em] text-[color:var(--paper-muted)] uppercase">
-                  {item.number}
+        <div className="mx-auto mt-14 grid w-full max-w-[1220px] grid-cols-1 gap-10 sm:gap-7 lg:mt-20 lg:grid-cols-3">
+          {schoolsTodayCopy.cases.map((memo, i) => (
+            <RevealOnScroll delay={i * 80} key={memo.number}>
+              <article
+                className="relative flex h-full flex-col rounded-[4px] border border-black/5 bg-[color:var(--memo-bg)] px-9 pt-14 pb-9 shadow-[0_18px_40px_-22px_rgb(15_23_42/0.30)]"
+                style={{ rotate: CARD_ROTATION[i] }}
+              >
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute -top-3.5 left-1/2 inline-block h-7 w-[110px] -translate-x-1/2 border-x border-dashed border-black/10"
+                  style={{ backgroundColor: TAPE_BG[memo.tape] }}
+                />
+                <p className="font-mono text-[11px] leading-[14px] font-medium tracking-[0.22em] text-[color:var(--paper-muted)] uppercase">
+                  {memo.number}
                 </p>
-                <h3 className="mt-4 font-heading text-xl leading-[1.2] font-medium tracking-tight text-[color:var(--paper-ink)] sm:text-2xl">
-                  {item.title}
-                </h3>
-                <p className="mt-2 text-sm italic text-[color:var(--paper-muted)]">
-                  {item.source}
+                <p className="mt-5 text-[22px] leading-[32px] font-medium tracking-[-0.01em] text-[color:var(--paper-ink)] italic">
+                  {memo.quote}
                 </p>
-                <p className="mt-4 text-base leading-7 text-[color:var(--paper-ink)]/85">
-                  {item.body}
+                <p className="mt-5 text-[15px] leading-[24px] text-[color:var(--paper-ink)]/85">
+                  {memo.body}
+                </p>
+                <p className="mt-6 text-sm leading-5 font-semibold text-[color:var(--paper-ink)]">
+                  {memo.role}
+                </p>
+                <p className="mt-0.5 text-[13px] leading-5 text-[color:var(--paper-muted)] italic">
+                  {memo.school}
                 </p>
               </article>
             </RevealOnScroll>

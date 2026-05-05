@@ -1,12 +1,12 @@
 /**
  * Stage copy track for the docked stage.
  *
- * Renders the kicker / heading / paragraph / bullets / CTA on the side of
- * the viewport opposite where <ProductScreen> docks:
- *   - docked: screen on the right → copy on the left side
+ * Renders the heading, three-item feature list, and CTA on the side of
+ * the viewport opposite where <ProductScreen> docks (docked: screen on
+ * the right → copy on the left side).
  *
- * Opacity is scroll-linked via useTransform: the copy fades in during the
- * wow→docked morph zone (so it arrives just as the screen finishes
+ * Opacity is scroll-linked via useTransform: the copy fades in during
+ * the wow→docked morph zone (so it arrives just as the screen finishes
  * docking) and holds through the rest of the timeline.
  *
  *   docked: fade in [wow.window[1] → docked.window[0]] = [0.55, 0.65]
@@ -15,13 +15,11 @@
  * clamp:false on opacity disables motion 12's WAAPI accelerate path that
  * otherwise hijacks scroll-linked opacity (see paper-backdrop.tsx).
  */
-import { ArrowUpRightIcon, CheckIcon } from "lucide-react"
 import { motion, useTransform } from "motion/react"
 
 import { useScrollChoreography } from "./context"
 import { useFlowStages } from "./dev-flow-context"
 
-import { Button } from "@/components/ui/button"
 import { stages } from "@/content/landing"
 
 type StageCopyProps = { stage: "docked" }
@@ -36,7 +34,7 @@ export function StageCopy({ stage }: StageCopyProps) {
   if (!entry || entry.id !== "docked") {
     throw new Error(`StageCopy: unknown stage "${stage}"`)
   }
-  const { kicker, heading, paragraph, bullets, cta } = entry.copy
+  const { heading, bullets, cta } = entry.copy
 
   const fadeInStart = byFlowId("wow")!.window[1]
   const holdStart = byFlowId("docked")!.window[0]
@@ -53,49 +51,47 @@ export function StageCopy({ stage }: StageCopyProps) {
       className="pointer-events-none absolute inset-0 z-30 flex items-center justify-start px-4 sm:px-10 lg:px-16"
       style={{ opacity }}
     >
-      <div className="pointer-events-auto w-full max-w-xl px-4 sm:px-6 lg:w-[44%] lg:max-w-2xl lg:px-8">
-        <p className="text-xs font-medium tracking-[0.18em] text-[color:var(--paper-muted)] uppercase sm:text-sm">
-          {kicker}
-        </p>
-        <h2 className="mt-4 font-heading text-[clamp(1.5rem,3.2vw,3rem)] leading-[1.08] font-medium tracking-tight text-balance text-[color:var(--paper-ink)]">
+      <div className="pointer-events-auto w-full max-w-xl px-4 sm:px-6 lg:w-[40%] lg:max-w-[520px] lg:px-8">
+        <h2 className="font-heading text-[clamp(2rem,3.6vw,3.5rem)] leading-[1.21] font-medium tracking-tight whitespace-pre-line text-[color:var(--paper-ink)]">
           {heading}
         </h2>
-        <p className="mt-6 text-base leading-7 text-[color:var(--paper-muted)] sm:text-lg sm:leading-8">
-          {paragraph}
-        </p>
 
-        <div className="mt-8 flex flex-col">
-          {bullets.map((bullet) => (
+        <div className="mt-8 border-t border-[color:var(--paper-rule)]">
+          {bullets.map((bullet, idx) => (
             <article
-              className="border-t border-[color:var(--paper-rule)]/55 py-5 first:border-t-0 first:pt-0"
+              className="flex gap-4 border-b border-[color:var(--paper-rule)] py-6"
               key={bullet.title}
             >
-              <div className="flex gap-4">
-                <span className="mt-1 grid size-6 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
-                  <CheckIcon aria-hidden className="size-3.5" />
-                </span>
-                <div>
-                  <p className="font-medium leading-7 text-[color:var(--paper-ink)]">
-                    {bullet.title}
-                  </p>
-                  <p className="mt-1 leading-7 text-[color:var(--paper-muted)]">
+              <span
+                aria-hidden
+                className={[
+                  "mt-[10px] size-2 shrink-0 rounded-full",
+                  idx === 0
+                    ? "bg-primary"
+                    : "border border-[color:var(--paper-ink)]/25",
+                ].join(" ")}
+              />
+              <div className="min-w-0">
+                <p className="text-[17px] leading-[26px] font-semibold tracking-[-0.005em] text-[color:var(--paper-ink)]">
+                  {bullet.title}
+                </p>
+                {idx === 0 ? (
+                  <p className="mt-2 text-[15px] leading-[24px] text-[color:var(--paper-muted)]">
                     {bullet.body}
                   </p>
-                </div>
+                ) : null}
               </div>
             </article>
           ))}
         </div>
 
-        <Button
-          asChild
-          className="mt-8 h-11 rounded-full bg-primary px-7 text-base text-primary-foreground hover:bg-primary/90"
+        <a
+          className="mt-7 inline-block text-[15px] leading-[22px] font-semibold text-[color:var(--paper-ink)] underline underline-offset-[6px] decoration-[color:var(--paper-ink)]/40 transition-colors hover:decoration-[color:var(--paper-ink)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/40"
+          href={cta.href}
+          rel="noreferrer"
         >
-          <a href={cta.href} rel="noreferrer">
-            {cta.label}
-            <ArrowUpRightIcon data-icon="inline-end" />
-          </a>
-        </Button>
+          {cta.label}
+        </a>
       </div>
     </motion.div>
   )

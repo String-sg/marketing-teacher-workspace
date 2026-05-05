@@ -1,6 +1,3 @@
-import { ArrowUpRightIcon, CheckIcon } from "lucide-react"
-
-import { Button } from "@/components/ui/button"
 import type {
   BulletItem,
   CtaLink,
@@ -23,9 +20,7 @@ type FeatureSectionProps = {
   | { readonly stage?: never; readonly content: FeatureSectionContent }
 )
 
-function resolveContent(
-  props: FeatureSectionProps
-): FeatureSectionContent {
+function resolveContent(props: FeatureSectionProps): FeatureSectionContent {
   if (props.content) return props.content
   const entry = stages.find((s) => s.id === "docked")
   if (!entry || entry.id !== "docked") {
@@ -36,7 +31,8 @@ function resolveContent(
 
 export function FeatureSection(props: FeatureSectionProps) {
   const content = resolveContent(props)
-  const sectionId = props.id ?? (props.stage === "docked" ? "features" : undefined)
+  const sectionId =
+    props.id ?? (props.stage === "docked" ? "features" : undefined)
 
   return (
     <section
@@ -57,52 +53,53 @@ export function FeatureSection(props: FeatureSectionProps) {
             props.reverse ? "lg:order-2 lg:ml-auto" : "",
           ].join(" ")}
         >
-          <p className="text-xs font-medium tracking-[0.18em] text-[color:var(--paper-muted)] uppercase sm:text-sm">
-            {content.kicker}
-          </p>
-          <h2 className="mt-4 font-heading text-[clamp(1.5rem,3.6vw,3.25rem)] leading-[1.08] font-medium tracking-tight text-balance text-[color:var(--paper-ink)]">
+          <h2 className="font-heading text-[clamp(2rem,3.6vw,3.5rem)] leading-[1.21] font-medium tracking-tight whitespace-pre-line text-[color:var(--paper-ink)]">
             {content.heading}
           </h2>
-          <p className="mt-6 text-base leading-7 text-[color:var(--paper-muted)] sm:text-lg sm:leading-8">
-            {content.paragraph}
-          </p>
 
-          <div className="mt-10 flex flex-col">
-            {content.bullets.map((bullet) => (
+          <div className="mt-8 border-t border-[color:var(--paper-rule)]">
+            {content.bullets.map((bullet, idx) => (
               <article
-                className="border-t border-[color:var(--paper-rule)]/55 py-5 first:border-t-0 first:pt-0"
+                className="flex gap-4 border-b border-[color:var(--paper-rule)] py-6"
                 key={bullet.title}
               >
-                <div className="flex gap-4">
-                  <span className="mt-1 grid size-6 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
-                    <CheckIcon aria-hidden className="size-3.5" />
-                  </span>
-                  <div>
-                    <p className="font-medium leading-7 text-[color:var(--paper-ink)]">
-                      {bullet.title}
-                    </p>
-                    <p className="mt-1 leading-7 text-[color:var(--paper-muted)]">
-                      {bullet.body}
-                    </p>
-                  </div>
+                <span
+                  aria-hidden
+                  className={[
+                    "mt-[10px] size-2 shrink-0 rounded-full",
+                    idx === 0
+                      ? "bg-primary"
+                      : "border border-[color:var(--paper-ink)]/25",
+                  ].join(" ")}
+                />
+                <div className="min-w-0">
+                  <p className="text-[17px] leading-[26px] font-semibold tracking-[-0.005em] text-[color:var(--paper-ink)]">
+                    {bullet.title}
+                  </p>
+                  <p className="mt-2 text-[15px] leading-[24px] text-[color:var(--paper-muted)]">
+                    {bullet.body}
+                  </p>
                 </div>
               </article>
             ))}
           </div>
 
-          <Button
-            asChild
-            className="mt-10 h-11 rounded-full bg-primary px-7 text-base text-primary-foreground hover:bg-primary/90"
+          <a
+            className="mt-7 inline-block text-[15px] leading-[22px] font-semibold text-[color:var(--paper-ink)] underline underline-offset-[6px] decoration-[color:var(--paper-ink)]/40 transition-colors hover:decoration-[color:var(--paper-ink)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/40"
+            href={content.cta.href}
+            rel="noreferrer"
           >
-            <a href={content.cta.href} rel="noreferrer">
-              {content.cta.label}
-              <ArrowUpRightIcon data-icon="inline-end" />
-            </a>
-          </Button>
+            {content.cta.label}
+          </a>
         </div>
 
-        <div className={["relative hidden lg:block", props.reverse ? "lg:order-1" : ""].join(" ")}>
-          <div className="paper-card relative overflow-hidden rounded-[20px] border border-black/10 bg-white shadow-[0_30px_120px_-40px_rgb(15_23_42/0.45)]">
+        <div
+          className={[
+            "relative hidden lg:block",
+            props.reverse ? "lg:order-1" : "",
+          ].join(" ")}
+        >
+          <div className="paper-card relative overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_30px_120px_-40px_rgb(15_23_42/0.45)]">
             <div className="flex items-center gap-2 border-b border-black/5 bg-[#f7f7f5] px-4 py-2.5">
               <span className="size-3 rounded-full bg-[#ff5f57]" />
               <span className="size-3 rounded-full bg-[#febc2e]" />

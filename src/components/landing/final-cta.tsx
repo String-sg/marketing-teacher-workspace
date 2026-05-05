@@ -1,4 +1,7 @@
-import { finalCtaCopy } from "@/content/landing"
+import { ArrowRightIcon } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+import { finalCtaCopy, siteCtaCopy, TEACHER_WORKSPACE_APP_URL } from "@/content/landing"
 
 import { RevealOnScroll } from "./reveal-on-scroll"
 
@@ -8,35 +11,23 @@ export function FinalCta() {
       className="relative overflow-hidden px-5 py-24 sm:px-8 lg:py-32"
       id="pricing"
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-12 left-[-3rem] w-[min(28vw,320px)] sm:-left-12"
-      >
-        <img
-          alt=""
-          className="cloud-drift-left block w-full opacity-75 mix-blend-multiply select-none"
-          src="/hero/cloud-halftone.png"
-        />
-      </div>
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -bottom-16 right-[-3rem] w-[min(26vw,300px)] sm:-right-12"
-      >
-        <img
-          alt=""
-          className="cloud-drift-right block w-full opacity-75 mix-blend-multiply select-none"
-          src="/hero/cloud-halftone.png"
-        />
-      </div>
-
       <RevealOnScroll>
-        <div className="paper-card relative mx-auto w-full max-w-5xl overflow-hidden rounded-[20px] border border-black/5 px-6 py-14 text-center shadow-[0_10px_60px_-30px_rgb(15_23_42/0.2)] sm:px-12 sm:py-20 lg:px-16 lg:py-24">
-          <p className="text-xs font-medium tracking-[0.18em] text-[color:var(--paper-muted)] uppercase sm:text-sm">
-            {finalCtaCopy.kicker}
-          </p>
-          <h2 className="mt-4 font-heading text-[clamp(1.75rem,4.4vw,4rem)] leading-[1.05] font-medium tracking-tight text-balance text-[color:var(--paper-ink)]">
+        <div className="mx-auto flex w-full max-w-[1024px] flex-col items-center gap-5 px-4 text-center sm:px-10">
+          <h2 className="font-heading text-[clamp(1.75rem,4vw,3.5rem)] leading-[1.21] font-medium tracking-[-0.025em] text-balance text-[color:#0e1729]">
             {finalCtaCopy.headline}
           </h2>
+          <p className="max-w-[34rem] text-base leading-[1.7] text-balance text-[color:var(--paper-muted)] sm:text-lg">
+            {finalCtaCopy.subtitle}
+          </p>
+          <Button
+            asChild
+            className="mt-2 h-10 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-[0_8px_22px_-12px_rgb(36_90_219_/_0.7)] hover:bg-primary/90"
+          >
+            <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
+              {siteCtaCopy.primary}
+              <ArrowRightIcon data-icon="inline-end" />
+            </a>
+          </Button>
         </div>
       </RevealOnScroll>
     </section>
