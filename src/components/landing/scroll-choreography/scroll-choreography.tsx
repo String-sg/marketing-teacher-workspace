@@ -20,7 +20,6 @@ import {
 } from "./dev-flow-context"
 import { DevFlowPanel } from "./dev-flow-panel"
 import { PaperBackdrop } from "./paper-backdrop"
-import { ProductScreen } from "./product-screen"
 import { StageCopy } from "./stage-copy"
 import { STAGES } from "./stages"
 import { StaticChoreographyFallback } from "./static-choreography-fallback"
@@ -117,7 +116,6 @@ function ChoreographyTree({
                   </Button>
                 </motion.div>
               </div>
-              <ProductScreen />
             </PaperBackdrop>
             <StageCopy stage="docked" />
           </div>

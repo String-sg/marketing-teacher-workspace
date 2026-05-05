@@ -43,18 +43,22 @@ export function PaperHero() {
             aria-hidden
             className="pointer-events-none absolute inset-x-0 top-0 h-[42%] bg-gradient-to-b from-[rgb(15_23_42/0.32)] via-[rgb(15_23_42/0.12)] to-transparent"
           />
-          <img
-            alt=""
-            aria-hidden
-            className="pointer-events-none absolute top-[44%] left-1/2 w-[clamp(220px,28vw,420px)] -translate-x-1/2 select-none"
-            src="/hero/hero-cards-sketch.svg"
-          />
-          <img
-            alt=""
-            aria-hidden
-            className="pointer-events-none absolute top-[54%] left-1/2 w-[clamp(200px,22vw,360px)] -translate-x-1/2 select-none"
-            src="/hero/hero-teacher-sketch.svg"
-          />
+          <div className="absolute inset-0 grid place-items-center">
+            <div className="relative aspect-[16/10] w-full max-w-[calc(100svh*1.6)] [container-type:inline-size]">
+              <img
+                alt=""
+                aria-hidden
+                className="pointer-events-none absolute top-[44%] left-1/2 w-[28cqi] -translate-x-1/2 select-none"
+                src="/hero/hero-cards-sketch.svg"
+              />
+              <img
+                alt=""
+                aria-hidden
+                className="pointer-events-none absolute top-[54%] left-1/2 w-[22cqi] -translate-x-1/2 select-none"
+                src="/hero/hero-teacher-sketch.svg"
+              />
+            </div>
+          </div>
         </div>
 
         <div className="relative z-10 flex w-full flex-col">

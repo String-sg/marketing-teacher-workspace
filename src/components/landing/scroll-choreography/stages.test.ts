@@ -31,8 +31,10 @@ describe("STAGES data", () => {
     expect(hero.id).toBe("hero")
     expect(hero.scale).toBeGreaterThan(0)
     expect(hero.scale).toBeLessThan(0.2)
-    expect(hero.x).toMatch(/^[+-]?[\d.]+vw$/)
-    expect(hero.y).toMatch(/^[+-]?[\d.]+vh$/)
+    // cqi anchors translates to the aspect-locked frame (paper-backdrop)
+    // so alignment holds across viewport aspects.
+    expect(hero.x).toMatch(/^[+-]?[\d.]+cqi$/)
+    expect(hero.y).toMatch(/^[+-]?[\d.]+cqi$/)
     expect(hero.opacity).toBe(1)
   })
 
@@ -63,14 +65,14 @@ describe("STAGES data", () => {
     const w = byId("wow")
     expect(w.scale).toBe(1.0)
     expect(w.opacity).toBe(1)
-    expect(w.x).toBe("0")
-    expect(w.y).toBe("0")
+    expect(w.x).toBe("0cqi")
+    expect(w.y).toBe("0cqi")
   })
 
   it("docked rect — positive-rightward sign, scale 0.5", () => {
     const d = byId("docked")
     expect(d.scale).toBe(0.5)
     expect(d.opacity).toBe(1)
-    expect(d.x).toBe("+28vw")
+    expect(d.x).toBe("+28cqi")
   })
 })
