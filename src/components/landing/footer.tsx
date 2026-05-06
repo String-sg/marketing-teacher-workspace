@@ -11,7 +11,7 @@ export function SiteFooter() {
         </p>
         <a
           aria-label={footerCopy.brand}
-          className="order-1 flex items-center gap-2.5 font-heading text-[color:var(--paper-ink)] sm:order-2"
+          className="order-1 flex items-center gap-2.5 rounded-md font-heading text-[color:var(--paper-ink)] transition-opacity duration-200 ease-out hover:opacity-80 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/40 sm:order-2"
           href="/"
         >
           <img
@@ -26,13 +26,16 @@ export function SiteFooter() {
           </span>
         </a>
         <a
-          className="order-3 inline-flex items-center gap-1.5 text-[13px] leading-[18px] text-[color:var(--paper-muted)] transition-colors hover:text-primary focus-visible:rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          className="group/feedback order-3 inline-flex items-center gap-1.5 rounded text-[13px] leading-[18px] text-[color:var(--paper-muted)] transition-colors duration-200 ease-out hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           href={footerCopy.feedbackUrl}
           rel="noreferrer"
           target="_blank"
         >
           {footerCopy.feedbackLabel}
-          <ArrowUpRightIcon aria-hidden className="size-3.5" />
+          <ArrowUpRightIcon
+            aria-hidden
+            className="size-3.5 transition-transform duration-200 ease-out group-hover/feedback:translate-x-px group-hover/feedback:-translate-y-px"
+          />
         </a>
       </div>
     </footer>

@@ -19,6 +19,12 @@ import {
   useScrollHeightVh,
 } from "./dev-flow-context"
 import { DevFlowPanel } from "./dev-flow-panel"
+import {
+  EASE_HERO_TO_WOW,
+  EASE_OUT_EXIT,
+  EASE_WOW_TO_DOCKED,
+  LINEAR,
+} from "./eases"
 import { PaperBackdrop } from "./paper-backdrop"
 import { StageCopy } from "./stage-copy"
 import { STAGES } from "./stages"
@@ -73,17 +79,20 @@ function ChoreographyTree({
   }
   const hero = heroEntry.copy
 
+  // ease-out on the active fade segment (Emil: "exits use ease-out").
+  // Paired with copyY below — same curve so they read as one motion.
   // clamp:false: prevents motion's WAAPI path from hijacking scroll-linked opacity.
   const copyOpacity = useTransform(
     scrollYProgress,
     [0, HERO_COPY_FADE_OUT_START, HERO_COPY_FADE_OUT_END, 1],
     [1, 1, 0, 0],
-    { clamp: false }
+    { ease: [LINEAR, EASE_OUT_EXIT, LINEAR], clamp: false }
   )
   const copyY = useTransform(
     scrollYProgress,
     [0, HERO_COPY_LIFT_PROGRESS, 1],
-    ["0px", HERO_COPY_LIFT_TRAVEL_PX, HERO_COPY_LIFT_TRAVEL_PX]
+    ["0px", HERO_COPY_LIFT_TRAVEL_PX, HERO_COPY_LIFT_TRAVEL_PX],
+    { ease: [EASE_OUT_EXIT, LINEAR] }
   )
 
   return (
@@ -101,14 +110,14 @@ function ChoreographyTree({
                   style={{ opacity: copyOpacity, y: copyY }}
                 >
                   <h1
-                    className="font-heading text-[clamp(2rem,5vw,3.5rem)] leading-[1.05] font-medium tracking-tight text-balance text-white"
+                    className="font-heading text-[clamp(2.25rem,5.5vw,3.75rem)] leading-[1.1] font-bold tracking-[-0.025em] text-balance text-[#0F1B33]"
                     id="hero-title"
                   >
                     {hero.headline}
                   </h1>
                   <Button
                     asChild
-                    className="mt-7 h-10 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-[0_8px_22px_-12px_rgb(36_90_219_/_0.7)] hover:bg-primary/90"
+                    className="mt-7 h-10 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-[var(--paper-shadow-cta)] transition-all duration-200 ease-out hover:-translate-y-px hover:bg-primary/90 hover:shadow-[var(--paper-shadow-cta-hover)]"
                   >
                     <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
                       {siteCtaCopy.primary}
@@ -141,18 +150,51 @@ function ChoreographyContextShell({
   const heroHoldEnd = stages.find((s) => s.id === "hero")?.window[1] ?? 0.15
   const dockedStart = stages.find((s) => s.id === "docked")?.window[0] ?? 0.3
 
-  const scaleEndAt = Math.max(dockedStart, paper.scaleMidProgress + 0.0001)
-  const paperCardScale = useTransform(
+  // Each layer reaches scaleMidValue at its own progress, then converges
+  // to scaleEndValue by scaleEndAt. scaleEndAt is the later of dockedStart
+  // and the layer's own midProgress + epsilon — guarantees monotonic
+  // keyframes when the user drags a midProgress past dockedStart.
+  //
+  // Ease shape per layer (4 segments): hold(LINEAR) →
+  // ramp1(EASE_HERO_TO_WOW) → ramp2(EASE_WOW_TO_DOCKED) → hold(LINEAR).
+  // Camera moving through the scene = on-screen movement → ease-in-out.
+  // Decelerating WOW→DOCKED ease lands the layer cleanly into the 5.2x
+  // hold instead of crashing into it. Matches the product-screen morph's
+  // segment-by-segment ease so layer scales and screen scale move on
+  // the same beat.
+  const layerEases = [LINEAR, EASE_HERO_TO_WOW, EASE_WOW_TO_DOCKED, LINEAR]
+  const bgScaleEndAt = Math.max(dockedStart, paper.bgMidProgress + 0.0001)
+  const bgScale = useTransform(
     scrollYProgress,
-    [0, heroHoldEnd, paper.scaleMidProgress, scaleEndAt, 1],
-    [1, 1, paper.scaleMidValue, paper.scaleEndValue, paper.scaleEndValue]
+    [0, heroHoldEnd, paper.bgMidProgress, bgScaleEndAt, 1],
+    [1, 1, paper.scaleMidValue, paper.scaleEndValue, paper.scaleEndValue],
+    { ease: layerEases }
+  )
+  const cardsScaleEndAt = Math.max(dockedStart, paper.cardsMidProgress + 0.0001)
+  const cardsScale = useTransform(
+    scrollYProgress,
+    [0, heroHoldEnd, paper.cardsMidProgress, cardsScaleEndAt, 1],
+    [1, 1, paper.scaleMidValue, paper.scaleEndValue, paper.scaleEndValue],
+    { ease: layerEases }
+  )
+  const teacherScaleEndAt = Math.max(
+    dockedStart,
+    paper.teacherMidProgress + 0.0001
+  )
+  const teacherScale = useTransform(
+    scrollYProgress,
+    [0, heroHoldEnd, paper.teacherMidProgress, teacherScaleEndAt, 1],
+    [1, 1, paper.scaleMidValue, paper.scaleEndValue, paper.scaleEndValue],
+    { ease: layerEases }
   )
 
   return (
     <ScrollChoreographyContext.Provider
       value={{
         scrollYProgress,
-        paperCardScale,
+        bgScale,
+        cardsScale,
+        teacherScale,
         stages: STAGES,
         reducedMotion: false,
         mode: "choreography",

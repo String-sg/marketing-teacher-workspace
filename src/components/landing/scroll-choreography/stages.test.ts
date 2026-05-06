@@ -44,7 +44,7 @@ describe("STAGES data", () => {
   })
 
   it("byId('wow').window[1] is the wow plateau end", () => {
-    expect(byId("wow").window[1]).toBeCloseTo(0.26, 2)
+    expect(byId("wow").window[1]).toBeCloseTo(0.62, 2)
   })
 
   it("STAGES windows are monotonic non-overlapping (D-02)", () => {
@@ -56,9 +56,9 @@ describe("STAGES data", () => {
   })
 
   it("STAGES window endpoints match the current schedule", () => {
-    expect(byId("hero").window).toEqual([0, 0.12])
-    expect(byId("wow").window).toEqual([0.24, 0.26])
-    expect(byId("docked").window).toEqual([0.3, 0.85])
+    expect(byId("hero").window).toEqual([0, 0.21])
+    expect(byId("wow").window).toEqual([0.57, 0.62])
+    expect(byId("docked").window).toEqual([0.63, 0.98])
   })
 
   it("wow rect — centered full-viewport reveal", () => {

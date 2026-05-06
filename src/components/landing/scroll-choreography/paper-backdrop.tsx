@@ -8,24 +8,29 @@
  * <StaticChoreographyFallback /> when reduced/mobile per D-02).
  *
  * Bundle architecture:
- *   - Outer motion.div carries `scale` + `transformOrigin` only — never
- *     fades. Shared transform parent that <ProductScreen> piggybacks on
- *     via `paperCardScale` published in ScrollChoreographyContext.
- *   - Inner backdrop motion.div (absolute inset-0) carries `opacity` +
- *     the full-bleed visuals (hill image + dark gradient overlay). This
- *     is the layer that fades during the wow plateau.
+ *   - Outer div is now structural-only (no scale). Children stay in
+ *     place rather than scaling out of view with the master zoom.
+ *   - Background motion.div (absolute inset-0): carries `bgScale` +
+ *     `opacity` (the wow-plateau fade) + the full-bleed hill image and
+ *     dark gradient overlay. Earliest layer in the stagger.
  *   - Hero stage frame (absolute, centered, aspect 16:10, container-type
- *     inline-size). Inside the frame, the SVG sketches are anchored by
- *     percentage and <ProductScreen> uses cqi-based translate values
- *     (see stages.ts). Container queries decouple the morph offsets from
- *     vw/vh so the product-screen stays on the laptop at any aspect.
- *   - Caller-supplied `children` render on top (z-index 10+) and are NOT
- *     affected by the opacity fade — that's where SiteHeader and the
- *     hero copy live.
+ *     inline-size). Inside, two scale wrappers split the illustration
+ *     into depth layers:
+ *       · Cards motion.div carries `cardsScale` and contains
+ *         hero-cards-sketch.svg (the row of wall paintings).
+ *       · Teacher motion.div carries `teacherScale` and contains
+ *         hero-teacher-sketch.svg (the teacher at desk) together with
+ *         <ProductScreen> — they zoom together as one depth plane.
+ *     All three layer wrappers share transformOrigin "50% 92%" so the
+ *     stagger converges toward the same focal point (the laptop screen).
+ *   - Caller-supplied `children` render on top (z-index 10+) and are
+ *     unaffected by any layer scale/opacity — SiteHeader and hero copy
+ *     live there.
  *
- * `paperCardScale` is computed at the orchestrator level (ChoreographyTree)
- * so both this component and <ProductScreen> consume the same MotionValue
- * instance. PaperBackdrop reads it via useScrollChoreography().
+ * `bgScale` / `cardsScale` / `teacherScale` are computed at the
+ * orchestrator level (ChoreographyTree) so the same MotionValue
+ * instances are shared with <ProductScreen> (which counter-scales
+ * against `teacherScale` since the screen now lives inside that layer).
  *
  * Other invariants:
  *   - PERF-04: transform/opacity only — no width/height/top/left
@@ -38,56 +43,60 @@ import type { ReactNode } from "react"
 
 import { useScrollChoreography } from "./context"
 import { usePaperCardConfig, useSketchesConfig } from "./dev-flow-context"
+import { EASE_OUT_EXIT, LINEAR } from "./eases"
 import { ProductScreen } from "./product-screen"
 
 export function PaperBackdrop({ children }: { children?: ReactNode }) {
-  const { scrollYProgress, paperCardScale } = useScrollChoreography()
+  const { scrollYProgress, bgScale, cardsScale, teacherScale } =
+    useScrollChoreography()
   const paper = usePaperCardConfig()
   const sketches = useSketchesConfig()
 
-  // clamp:false disables motion 12's accelerate/WAAPI path on opacity, which
-  // hijacks scroll-linked opacity into an independent native animation that
-  // ignores scrollYProgress (motion-dom use-transform.mjs:31-43). The keyframe
-  // range covers [0, 1] so disabling clamp is safe — scrollYProgress is
-  // bounded by useScroll and never extrapolates.
+  // ease-out on the active fade segment (Emil: "exits use ease-out");
+  // LINEAR on the surrounding holds. clamp:false disables motion 12's
+  // accelerate/WAAPI path on opacity, which would otherwise hijack
+  // scroll-linked opacity into an independent native animation that
+  // ignores scrollYProgress (motion-dom use-transform.mjs:31-43). The
+  // keyframe range covers [0, 1] so disabling clamp is safe — scrollYProgress
+  // is bounded by useScroll and never extrapolates.
   const stageOpacity = useTransform(
     scrollYProgress,
     [0, paper.opacityFadeStart, paper.opacityFadeEnd, 1],
     [1, 1, 0, 0],
-    { clamp: false }
+    { ease: [LINEAR, EASE_OUT_EXIT, LINEAR], clamp: false }
   )
 
   return (
-    <motion.div
-      className="paper-card relative mx-auto flex w-full max-w-[110rem] flex-1 flex-col items-center overflow-hidden rounded-[20px] shadow-[0_10px_60px_-30px_rgb(15_23_42/0.18)]"
-      style={{
-        scale: paperCardScale,
-        transformOrigin: "50% 92%",
-      }}
-    >
+    <div className="paper-card relative mx-auto flex w-full max-w-[110rem] flex-1 flex-col items-center overflow-hidden rounded-[20px] shadow-[0_10px_60px_-30px_rgb(15_23_42/0.18)]">
       <motion.div
         aria-hidden
-        className="absolute inset-0 overflow-hidden rounded-[20px]"
-        style={{ opacity: stageOpacity }}
+        className="absolute inset-0 overflow-hidden rounded-[20px] bg-gradient-to-b from-[#cfe5f7] from-0% via-[#e8f1fa] via-35% to-white to-75%"
+        style={{
+          scale: bgScale,
+          opacity: stageOpacity,
+          transformOrigin: "50% 92%",
+        }}
       >
-        <picture>
-          <source
-            type="image/webp"
-            srcSet="/hero/hill-640.webp 640w, /hero/hill-960.webp 960w, /hero/hill-1280.webp 1280w, /hero/hill-1600.webp 1600w"
-            sizes="(min-width:1280px) 1280px, 100vw"
-          />
-          <img
-            alt=""
-            aria-hidden
-            className="absolute inset-0 block h-full w-full object-cover select-none"
-            decoding="async"
-            fetchPriority="high"
-            src="/hero/hill-1280.jpg"
-          />
-        </picture>
-        <div
+        {/* Halftone cloud overlays — positioned per Paper "Hero V2 — Cloud
+            Notes" design. Mix-blend-lighten lets the white halftone cloud
+            sit on the sky gradient without a hard edge. */}
+        <img
+          alt=""
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-[42%] bg-gradient-to-b from-[rgb(15_23_42/0.32)] via-[rgb(15_23_42/0.12)] to-transparent"
+          className="pointer-events-none absolute top-[2%] left-[78%] w-[18%] mix-blend-lighten select-none"
+          src="/hero/cloud-halftone.png"
+        />
+        <img
+          alt=""
+          aria-hidden
+          className="pointer-events-none absolute top-[16%] left-[60%] w-[40%] mix-blend-lighten select-none"
+          src="/hero/cloud-halftone.png"
+        />
+        <img
+          alt=""
+          aria-hidden
+          className="pointer-events-none absolute top-[28%] -left-[8%] w-[36%] mix-blend-lighten select-none"
+          src="/hero/cloud-halftone.png"
         />
       </motion.div>
 
@@ -103,23 +112,34 @@ export function PaperBackdrop({ children }: { children?: ReactNode }) {
             } as React.CSSProperties
           }
         >
-          <img
-            alt=""
+          <motion.div
             aria-hidden
-            className="pointer-events-none absolute top-[var(--cards-top)] left-1/2 w-[var(--cards-width)] -translate-x-1/2 select-none"
-            src="/hero/hero-cards-sketch.svg"
-          />
-          <img
-            alt=""
-            aria-hidden
-            className="pointer-events-none absolute top-[var(--teacher-top)] left-1/2 w-[var(--teacher-width)] -translate-x-1/2 select-none"
-            src="/hero/hero-teacher-sketch.svg"
-          />
-          <ProductScreen />
+            className="pointer-events-none absolute inset-0"
+            style={{ scale: cardsScale, transformOrigin: "50% 92%" }}
+          >
+            <img
+              alt=""
+              aria-hidden
+              className="pointer-events-none absolute top-[var(--cards-top)] left-1/2 w-[var(--cards-width)] -translate-x-1/2 select-none"
+              src="/hero/hero-cards-sketch.svg"
+            />
+          </motion.div>
+          <motion.div
+            className="absolute inset-0"
+            style={{ scale: teacherScale, transformOrigin: "50% 92%" }}
+          >
+            <img
+              alt=""
+              aria-hidden
+              className="pointer-events-none absolute top-[var(--teacher-top)] left-1/2 w-[var(--teacher-width)] -translate-x-1/2 select-none"
+              src="/hero/hero-teacher-sketch.svg"
+            />
+            <ProductScreen />
+          </motion.div>
         </div>
       </div>
 
       {children}
-    </motion.div>
+    </div>
   )
 }

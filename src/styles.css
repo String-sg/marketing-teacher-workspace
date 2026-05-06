@@ -116,6 +116,16 @@
     --audience-sky: #d6e2f7;
 
     --footer-bg: #f6f3eb;
+
+    /* Polish tokens — kept here so component-level utilities stay tight
+       and reusable hover/shadow rhythms don't drift apart. */
+    --paper-shadow-card: 0 18px 40px -22px rgb(15 23 42 / 0.3);
+    --paper-shadow-card-hover: 0 24px 50px -22px rgb(15 23 42 / 0.35);
+    --paper-shadow-peek: 0 -6px 20px -10px rgb(15 23 42 / 0.15);
+    --paper-shadow-cta: 0 8px 22px -12px rgb(36 90 219 / 0.7);
+    --paper-shadow-cta-hover: 0 14px 30px -10px rgb(36 90 219 / 0.55);
+    --paper-hover-bg: rgb(14 23 41 / 0.04);
+    --paper-rule-strong: rgb(14 23 41 / 0.14);
 }
 
 .dark {

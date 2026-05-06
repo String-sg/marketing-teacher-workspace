@@ -93,12 +93,11 @@ const Y: PropertyAdapter = {
   format: (v) => formatCssLength(v, "cqi"),
 }
 
-export const PROPERTY_ADAPTERS: ReadonlyArray<PropertyAdapter> = [
-  SCALE,
-  OPACITY,
-  X,
-  Y,
-]
+// Stage opacity is always 1 today (every stage carries opacity:1), so the
+// per-stage OPACITY lane never moves and just adds visual noise. Keep the
+// OPACITY adapter in PROPERTY_BY_KEY for type completeness / future use,
+// but exclude it from the rendered timeline.
+export const PROPERTY_ADAPTERS: ReadonlyArray<PropertyAdapter> = [SCALE, X, Y]
 
 export const PROPERTY_BY_KEY: Record<PropertyKey, PropertyAdapter> = {
   scale: SCALE,

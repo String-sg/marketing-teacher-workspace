@@ -34,16 +34,16 @@ export function AudienceColumns() {
             return (
               <RevealOnScroll delay={i * 100} key={column.label}>
                 <article
-                  className="relative flex h-[520px] flex-col items-center overflow-clip rounded-[28px] px-8 pt-9"
+                  className="group/audience relative flex h-[520px] flex-col items-center overflow-clip rounded-[28px] px-8 pt-9 transition-transform duration-300 ease-out hover:-translate-y-1"
                   style={{ backgroundColor: CARD_BG[i] }}
                 >
-                  <h3 className="text-center font-heading text-[clamp(1.5rem,2.2vw,2rem)] leading-[1.12] font-medium tracking-[-0.015em] text-[color:var(--paper-ink)]">
+                  <h3 className="text-center font-heading text-[clamp(1.5rem,2.2vw,2rem)] leading-[1.12] font-medium tracking-tight text-[color:var(--paper-ink)]">
                     {column.label}
                   </h3>
                   <p className="mt-4 max-w-[280px] text-center text-base leading-[26px] text-[color:var(--paper-muted)]">
                     {column.body}
                   </p>
-                  <div className="mt-auto h-[210px] w-full max-w-[349px]">
+                  <div className="mt-auto h-[210px] w-full max-w-[349px] transition-transform duration-300 ease-out group-hover/audience:translate-y-[-4px]">
                     <Peek />
                   </div>
                 </article>
@@ -96,7 +96,7 @@ function FormTeachersPeek() {
   ]
 
   return (
-    <div className="flex h-full flex-col rounded-t-2xl border border-black/5 bg-white/85 p-4 pb-5 shadow-[0_-6px_20px_-10px_rgb(15_23_42/0.15)] backdrop-blur-sm">
+    <div className="flex h-full flex-col rounded-t-2xl border border-[color:var(--paper-rule)] bg-white/85 p-4 pb-5 shadow-[var(--paper-shadow-peek)] backdrop-blur-sm">
       <PeekKicker>Class · Sec 3.1</PeekKicker>
       <ul className="mt-3 flex flex-col gap-2.5">
         {rows.map((row) => (
@@ -133,7 +133,7 @@ function FormTeachersPeek() {
 function YearHeadsPeek() {
   const chips = ["FAS", "SEN", "Low att.", "Pre-LTA"]
   return (
-    <div className="flex h-full flex-col rounded-t-2xl border border-black/5 bg-white/85 p-4 pb-5 shadow-[0_-6px_20px_-10px_rgb(15_23_42/0.15)] backdrop-blur-sm">
+    <div className="flex h-full flex-col rounded-t-2xl border border-[color:var(--paper-rule)] bg-white/85 p-4 pb-5 shadow-[var(--paper-shadow-peek)] backdrop-blur-sm">
       <PeekKicker>Cohort filter</PeekKicker>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {chips.map((chip, i) => (
@@ -142,7 +142,7 @@ function YearHeadsPeek() {
               "rounded-md px-2 py-[3px] text-[11px] leading-[14px] font-semibold",
               i === 0
                 ? "bg-primary text-white"
-                : "border border-black/10 bg-white text-[color:var(--paper-ink)]/80",
+                : "border border-[color:var(--paper-rule-strong)] bg-white text-[color:var(--paper-ink)]/80",
             ].join(" ")}
             key={chip}
           >
@@ -158,7 +158,7 @@ function YearHeadsPeek() {
           students matched · saved as &ldquo;Bursary nominees&rdquo;
         </span>
       </div>
-      <div className="mt-3 flex items-center gap-2 border-t border-black/5 pt-2.5">
+      <div className="mt-3 flex items-center gap-2 border-t border-[color:var(--paper-rule)] pt-2.5">
         <span aria-hidden className="size-1.5 rounded-full bg-primary" />
         <span className="flex-1 truncate text-[12px] leading-4 text-[color:var(--paper-ink)]">
           Sec 3.1 · Chua Li Wei
@@ -175,7 +175,7 @@ function SchoolLeadersPeek() {
   const bars = [9, 14, 19, 22, 25, 28, 31]
   const days = ["M", "T", "W", "T", "F", "S", "S"]
   return (
-    <div className="flex h-full flex-col rounded-t-2xl border border-black/5 bg-white/85 p-4 pb-5 shadow-[0_-6px_20px_-10px_rgb(15_23_42/0.15)] backdrop-blur-sm">
+    <div className="flex h-full flex-col rounded-t-2xl border border-[color:var(--paper-rule)] bg-white/85 p-4 pb-5 shadow-[var(--paper-shadow-peek)] backdrop-blur-sm">
       <PeekKicker>Adoption · this week</PeekKicker>
       <div className="mt-3 flex items-baseline gap-2">
         <span className="font-heading text-[36px] leading-[40px] font-semibold tracking-tight text-[color:var(--paper-ink)]">

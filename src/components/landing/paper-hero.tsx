@@ -23,38 +23,41 @@ export function PaperHero() {
       className="relative min-h-svh overflow-hidden p-3"
     >
       <div className="paper-card relative mx-auto flex w-full max-w-[110rem] flex-1 flex-col items-center overflow-hidden rounded-[20px] shadow-[0_10px_60px_-30px_rgb(15_23_42/0.18)]">
-        <div aria-hidden className="absolute inset-0 overflow-hidden rounded-[20px]">
-          <picture>
-            <source
-              type="image/webp"
-              srcSet="/hero/hill-640.webp 640w, /hero/hill-960.webp 960w, /hero/hill-1280.webp 1280w, /hero/hill-1600.webp 1600w"
-              sizes="(min-width:1280px) 1280px, 100vw"
-            />
-            <img
-              alt=""
-              aria-hidden
-              className="absolute inset-0 block h-full w-full object-cover select-none"
-              decoding="async"
-              fetchPriority="high"
-              src="/hero/hill-1280.jpg"
-            />
-          </picture>
-          <div
+        <div
+          aria-hidden
+          className="absolute inset-0 overflow-hidden rounded-[20px] bg-gradient-to-b from-[#cfe5f7] from-0% via-[#e8f1fa] via-35% to-white to-75%"
+        >
+          {/* Halftone cloud overlays — match Paper "Hero V2 — Cloud Notes". */}
+          <img
+            alt=""
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-0 h-[42%] bg-gradient-to-b from-[rgb(15_23_42/0.32)] via-[rgb(15_23_42/0.12)] to-transparent"
+            className="pointer-events-none absolute top-[2%] left-[78%] w-[18%] mix-blend-lighten select-none"
+            src="/hero/cloud-halftone.png"
+          />
+          <img
+            alt=""
+            aria-hidden
+            className="pointer-events-none absolute top-[16%] left-[60%] w-[40%] mix-blend-lighten select-none"
+            src="/hero/cloud-halftone.png"
+          />
+          <img
+            alt=""
+            aria-hidden
+            className="pointer-events-none absolute top-[28%] -left-[8%] w-[36%] mix-blend-lighten select-none"
+            src="/hero/cloud-halftone.png"
           />
           <div className="absolute inset-0 grid place-items-center">
             <div className="relative aspect-[16/10] w-full max-w-[calc(100svh*1.6)] [container-type:inline-size]">
               <img
                 alt=""
                 aria-hidden
-                className="pointer-events-none absolute top-[44%] left-1/2 w-[28cqi] -translate-x-1/2 select-none"
+                className="pointer-events-none absolute top-[52%] left-1/2 w-[28cqi] -translate-x-1/2 select-none"
                 src="/hero/hero-cards-sketch.svg"
               />
               <img
                 alt=""
                 aria-hidden
-                className="pointer-events-none absolute top-[54%] left-1/2 w-[22cqi] -translate-x-1/2 select-none"
+                className="pointer-events-none absolute top-[62%] left-1/2 w-[22cqi] -translate-x-1/2 select-none"
                 src="/hero/hero-teacher-sketch.svg"
               />
             </div>
@@ -67,14 +70,14 @@ export function PaperHero() {
           </div>
           <div className="mx-auto mt-12 flex w-fit flex-col items-center px-4 text-center sm:mt-16">
             <h1
-              className="font-heading text-[clamp(2rem,5vw,3.5rem)] leading-[1.05] font-medium tracking-tight text-balance text-white"
+              className="font-heading text-[clamp(2.25rem,5.5vw,3.75rem)] leading-[1.1] font-bold tracking-[-0.025em] text-balance text-[#0F1B33]"
               id="hero-title-static"
             >
               {hero.headline}
             </h1>
             <Button
               asChild
-              className="mt-7 h-10 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-[0_8px_22px_-12px_rgb(36_90_219_/_0.7)] hover:bg-primary/90"
+              className="mt-7 h-10 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-[var(--paper-shadow-cta)] transition-all duration-200 ease-out hover:-translate-y-px hover:bg-primary/90 hover:shadow-[var(--paper-shadow-cta-hover)]"
             >
               <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
                 {siteCtaCopy.primary}

@@ -1,7 +1,7 @@
 import type { StageCopyContent } from "@/components/landing/scroll-choreography/types"
 
 export const TEACHER_WORKSPACE_APP_URL =
-  "https://teacherworkspace-alpha.vercel.app/students"
+  "https://app.teacher.digital.moe.gov.sg"
 
 export const navItems = [
   { label: "Features", href: "#features" },

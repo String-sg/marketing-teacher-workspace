@@ -1,15 +1,12 @@
 // Product-UI shared element — 3-stage scroll-driven morph.
-import { cubicBezier, easeOut } from "motion"
+import { easeOut } from "motion"
 import { motion, useTransform } from "motion/react"
 
 import { useScrollChoreography } from "./context"
 import { useFlowStages } from "./dev-flow-context"
+import { EASE_HERO_TO_WOW, EASE_WOW_TO_DOCKED, LINEAR } from "./eases"
 
 import { TEACHER_WORKSPACE_APP_URL } from "@/content/landing"
-
-const EASE_HERO_TO_WOW = cubicBezier(0.32, 0, 0.67, 1)
-const EASE_WOW_TO_DOCKED = cubicBezier(0.4, 0, 0.2, 1)
-const LINEAR = (t: number) => t
 
 const SCALE_EASES = [
   LINEAR, // hero hold
@@ -35,10 +32,13 @@ const OPACITY_EASES = [
   LINEAR, // docked hold
 ]
 
-// Vertical distance from paper-card center to its transform-origin (50%, 92%),
-// in vh. As paper-card scales by Sp, its content center drifts by 42*(Sp - 1)vh.
-// Must stay in lock-step with PaperBackdrop's transformOrigin.
-const PAPER_CARD_ORIGIN_Y_OFFSET_VH = 42
+// Vertical distance from teacher-layer center to its transform-origin (50%, 92%),
+// expressed in cqi (frame-width-relative). The frame is locked 16:10, so 42%
+// of frame_height = 42 * (10/16) = 26.25 cqi. Using cqi instead of vh keeps
+// the compensation viewport-stable: the SVG illustration is laid out in
+// cqi/% of frame, and the product screen rides the same ruler. Must stay
+// in lock-step with PaperBackdrop's teacher-layer transformOrigin.
+const TEACHER_LAYER_ORIGIN_Y_OFFSET_CQI = 26.25
 
 function parseCssLength(value: string): number {
   const match = value.match(/^([+-]?\d+(?:\.\d+)?)/)
@@ -57,20 +57,20 @@ function divideCssLength(value: string, scale: number): string {
   return `${rounded}${unit}`
 }
 
-// ty = 42*(1 - 1/Sp) + yRect/Sp — compensates child translate for both
-// paper-card scale Sp and its off-center transform-origin (50%, 92%).
-// At Sp = 1 reduces to yRect (no-op).
+// ty = 26.25*(1 - 1/St) + yCqi/St — compensates child translate for both
+// teacher-layer scale St and its off-center transform-origin (50%, 92%).
+// At St = 1 reduces to yCqi (no-op). All y values in STAGES are cqi.
 function compensateYTranslate(yStr: string, scale: number): string {
   if (scale === 0 || !Number.isFinite(scale)) return yStr
-  const yVh = parseCssLength(yStr)
-  const tyVh =
-    PAPER_CARD_ORIGIN_Y_OFFSET_VH * (1 - 1 / scale) + yVh / scale
-  const rounded = Math.round(tyVh * 10000) / 10000
-  return `${rounded}vh`
+  const yCqi = parseCssLength(yStr)
+  const tyCqi =
+    TEACHER_LAYER_ORIGIN_Y_OFFSET_CQI * (1 - 1 / scale) + yCqi / scale
+  const rounded = Math.round(tyCqi * 10000) / 10000
+  return `${rounded}cqi`
 }
 
 export function ProductScreen() {
-  const { scrollYProgress, paperCardScale } = useScrollChoreography()
+  const { scrollYProgress, teacherScale } = useScrollChoreography()
   const STAGES = useFlowStages()
 
   const scale = useTransform(
@@ -162,14 +162,14 @@ export function ProductScreen() {
   // multi-input overload doesn't accept mixed [string, number] tuples.
   const compensatedScale = useTransform(scrollYProgress, () => {
     const s = scale.get()
-    const ps = paperCardScale.get()
-    return ps === 0 ? s : s / ps
+    const ts = teacherScale.get()
+    return ts === 0 ? s : s / ts
   })
   const compensatedX = useTransform(scrollYProgress, () =>
-    divideCssLength(x.get(), paperCardScale.get())
+    divideCssLength(x.get(), teacherScale.get())
   )
   const compensatedY = useTransform(scrollYProgress, () =>
-    compensateYTranslate(y.get(), paperCardScale.get())
+    compensateYTranslate(y.get(), teacherScale.get())
   )
 
   return (

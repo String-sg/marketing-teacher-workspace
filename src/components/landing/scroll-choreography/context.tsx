@@ -5,11 +5,15 @@ import { STAGES } from "./stages"
 import type { ScrollChoreographyContextValue } from "./types"
 
 const stubScrollYProgress = motionValue(0)
-const stubPaperCardScale = motionValue(1)
+const stubBgScale = motionValue(1)
+const stubCardsScale = motionValue(1)
+const stubTeacherScale = motionValue(1)
 
 const defaultContextValue: ScrollChoreographyContextValue = {
   scrollYProgress: stubScrollYProgress,
-  paperCardScale: stubPaperCardScale,
+  bgScale: stubBgScale,
+  cardsScale: stubCardsScale,
+  teacherScale: stubTeacherScale,
   stages: STAGES,
   reducedMotion: false,
   mode: "static",

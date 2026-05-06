@@ -62,7 +62,7 @@ export function StageCopy({ stage }: StageCopyProps) {
           {bullets.map((bullet, idx) => (
             <button
               aria-expanded={idx === active}
-              className="flex w-full gap-4 border-b border-[color:var(--paper-rule)] py-6 text-left transition-colors hover:bg-[color:var(--paper-ink)]/[0.02] focus-visible:outline-none focus-visible:bg-[color:var(--paper-ink)]/[0.03]"
+              className="flex w-full gap-4 border-b border-[color:var(--paper-rule)] py-6 text-left transition-colors duration-200 ease-out hover:bg-[color:var(--paper-hover-bg)] focus-visible:bg-[color:var(--paper-hover-bg)] focus-visible:outline-none"
               key={bullet.title}
               onClick={() => setActive(idx)}
               type="button"
@@ -70,7 +70,7 @@ export function StageCopy({ stage }: StageCopyProps) {
               <span
                 aria-hidden
                 className={[
-                  "mt-[10px] size-2 shrink-0 rounded-full transition-colors",
+                  "mt-[10px] size-2 shrink-0 rounded-full transition-colors duration-200 ease-out",
                   idx === active
                     ? "bg-primary"
                     : "border border-[color:var(--paper-ink)]/25",
@@ -91,7 +91,7 @@ export function StageCopy({ stage }: StageCopyProps) {
         </div>
 
         <a
-          className="mt-7 inline-block text-[15px] leading-[22px] font-semibold text-[color:var(--paper-ink)] underline underline-offset-[6px] decoration-[color:var(--paper-ink)]/40 transition-colors hover:decoration-[color:var(--paper-ink)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/40"
+          className="mt-7 inline-block rounded-sm text-[15px] leading-[22px] font-semibold text-[color:var(--paper-ink)] underline underline-offset-[6px] decoration-[color:var(--paper-ink)]/40 transition-colors duration-200 ease-out hover:decoration-[color:var(--paper-ink)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/40"
           href={cta.href}
           rel="noreferrer"
         >

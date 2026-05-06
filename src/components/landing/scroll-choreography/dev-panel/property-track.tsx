@@ -1,17 +1,22 @@
 /**
- * Generic property track row. Renders one horizontal lane with three
- * segment bars (one per stage) at the height that maps to that stage's
- * value, plus diagonal connectors across the gaps to visualize the
- * morph. Each segment has two grab dots at its window edges.
+ * Per-stage property lane — one row in the unified timeline.
  *
- * Drag semantics:
- *   - bar body: horizontal moves both edges (preserves stage width),
- *     vertical drag updates value
- *   - left/right dot: horizontal moves that edge, vertical updates value
- *   - ⇧ axis-locks to dominant axis after a 4px deadzone
- *   - ⌥ disables quantize (raw)
+ * Visual: a non-interactive "hold rail" bar spans each stage's window at
+ * the value's vertical position; a single draggable dot sits at the
+ * stage's window center. Diagonal connectors between consecutive stage
+ * dots visualise the implied morph in the gaps. A live-value label sits
+ * at the right edge and updates with the scroll scrub.
+ *
+ * Drag semantics (simplified vs prior bar-segment model):
+ *   - Vertical drag on the dot → edits the stage's value via adapter.write
+ *   - Horizontal drag is ignored (window editing lives on the stage strip)
+ *   - ⇧ fine step · ⌥ raw / unsnapped
+ *
+ * Window editing was previously available on the bar body and edge dots
+ * — that gesture is now consolidated to the stage strip at the top of
+ * the panel, so each lane has exactly one thing to drag.
  */
-import { useMemo, useRef } from "react"
+import { useMemo, useRef, useState } from "react"
 
 import { useDragHandler } from "./drag"
 import { KeyframeDot } from "./keyframe-dot"
@@ -19,23 +24,32 @@ import {
   laneTToValue,
   pickStep,
   snapValue,
+  splitCssLength,
   valueToLaneT,
 } from "./property-adapters"
 import { isSelected, useSelection } from "./selection-context"
-import {
-  MIN_WIDTH,
-  clamp01,
-  pToVisual,
-  quantize,
-  viewSpan,
-} from "./timeline-math"
+import { pToVisual, viewSpan } from "./timeline-math"
 import type { PropertyAdapter } from "./property-adapters"
 import type { StageDef, StageId } from "../types"
-import type { FlowWindow, StageRectPatch, TimelineView  } from "../dev-flow-context"
+import type { StageRectPatch, TimelineView } from "../dev-flow-context"
 import type {
   KeyboardEvent as ReactKeyboardEvent,
   PointerEvent as ReactPointerEvent,
 } from "react"
+
+function parseAdapterInput(
+  adapter: PropertyAdapter,
+  raw: string
+): number | null {
+  const trimmed = raw.trim()
+  if (!trimmed) return null
+  if (adapter.key === "x" || adapter.key === "y") {
+    const { num } = splitCssLength(trimmed)
+    return Number.isFinite(num) ? num : null
+  }
+  const n = parseFloat(trimmed)
+  return Number.isFinite(n) ? n : null
+}
 
 const STAGE_BAND_BG: Record<StageId, string> = {
   hero: "rgba(163, 212, 255, 0.15)",
@@ -43,23 +57,35 @@ const STAGE_BAND_BG: Record<StageId, string> = {
   docked: "rgba(155, 224, 168, 0.15)",
 }
 
+const LANE_HEIGHT = 28
+
 type DragInitial = {
   readonly stageId: StageId
-  readonly mode: "body" | "start" | "end"
-  readonly window: FlowWindow
   readonly value: number
-  readonly rect: DOMRect
-  readonly axis: "free" | "x" | "y"
 }
 
-const DEAD_ZONE = 4
-
-function applyEdgeMin(next: FlowWindow): FlowWindow {
-  const lo = clamp01(next[0])
-  const hi = clamp01(next[1])
-  if (hi - lo >= MIN_WIDTH) return [lo, hi]
-  if (lo + MIN_WIDTH <= 1) return [lo, lo + MIN_WIDTH]
-  return [hi - MIN_WIDTH, hi]
+/** Linearly interpolate the property's value at scroll progress p, using
+ *  stage windows as keyframes (held during each window, linear in gaps). */
+function liveValueAt(
+  adapter: PropertyAdapter,
+  stages: ReadonlyArray<StageDef>,
+  p: number
+): number {
+  for (const s of stages) {
+    if (p >= s.window[0] && p <= s.window[1]) return adapter.read(s)
+  }
+  for (let i = 0; i < stages.length - 1; i++) {
+    const a = stages[i]
+    const b = stages[i + 1]
+    if (p > a.window[1] && p < b.window[0]) {
+      const t = (p - a.window[1]) / (b.window[0] - a.window[1])
+      const va = adapter.read(a)
+      const vb = adapter.read(b)
+      return va + t * (vb - va)
+    }
+  }
+  if (p < stages[0].window[0]) return adapter.read(stages[0])
+  return adapter.read(stages[stages.length - 1])
 }
 
 export function PropertyTrack({
@@ -67,11 +93,13 @@ export function PropertyTrack({
   stages,
   view,
   setStage,
+  progress,
 }: {
   adapter: PropertyAdapter
   stages: ReadonlyArray<StageDef>
   view: TimelineView
   setStage: (id: StageId, patch: StageRectPatch) => void
+  progress: number
 }) {
   const trackRef = useRef<HTMLDivElement>(null)
   const { selection, setSelection } = useSelection()
@@ -80,116 +108,45 @@ export function PropertyTrack({
 
   const beginDrag = useDragHandler<DragInitial>({
     onMove(state) {
-      const init = state.initial
-      let axis = init.axis
-      // Resolve axis lock after deadzone if shift was held at start.
-      if (axis !== "free" && Math.abs(state.dx) + Math.abs(state.dy) < DEAD_ZONE) {
-        return
-      }
-      if (init.axis === "free" && state.mods.shift) {
-        axis = Math.abs(state.dx) > Math.abs(state.dy) ? "x" : "y"
-      }
-      // Horizontal: progress delta proportional to track width.
-      if (axis !== "y") {
-        const dpRaw = (state.dx / init.rect.width) * span
-        const dp = quantize(dpRaw, state.mods.shift, state.mods.alt)
-        let next: FlowWindow
-        if (init.mode === "start") {
-          next = applyEdgeMin([init.window[0] + dp, init.window[1]])
-        } else if (init.mode === "end") {
-          next = applyEdgeMin([init.window[0], init.window[1] + dp])
-        } else {
-          const width = init.window[1] - init.window[0]
-          const lo = clamp01(init.window[0] + dp)
-          const loClamp = Math.min(lo, 1 - width)
-          const safeLo = Math.max(0, loClamp)
-          next = [safeLo, safeLo + width]
-        }
-        setStage(init.stageId, { window: next })
-      }
-      // Vertical: invert dy because top of lane = max value.
-      if (axis !== "x") {
-        const laneHeight = LANE_HEIGHT
-        const dt = -state.dy / laneHeight
-        const startT = valueToLaneT(adapter, init.value)
-        const nextT = Math.max(0, Math.min(1, startT + dt))
-        const raw = laneTToValue(adapter, nextT)
-        const step = pickStep(adapter, state.mods.shift, state.mods.alt)
-        const snapped = snapValue(raw, step)
-        const stage = stages.find((s) => s.id === init.stageId)
-        if (stage) {
-          setStage(init.stageId, adapter.write(stage, snapped))
-        }
-      }
+      // Vertical-only drag: ignore horizontal motion entirely.
+      const dt = -state.dy / LANE_HEIGHT
+      const startT = valueToLaneT(adapter, state.initial.value)
+      const nextT = Math.max(0, Math.min(1, startT + dt))
+      const raw = laneTToValue(adapter, nextT)
+      const step = pickStep(adapter, state.mods.shift, state.mods.alt)
+      const snapped = snapValue(raw, step)
+      const stage = stages.find((s) => s.id === state.initial.stageId)
+      if (stage) setStage(state.initial.stageId, adapter.write(stage, snapped))
     },
   })
 
-  const handleEdgeDown = (
+  const handleDotDown = (
     e: ReactPointerEvent<HTMLSpanElement>,
-    stage: StageDef,
-    mode: "start" | "end" | "body"
+    stage: StageDef
   ) => {
-    const track = trackRef.current
-    if (!track) return
-    setSelection({ stageId: stage.id, property: adapter.key, edge: mode === "body" ? "body" : mode })
+    setSelection({
+      stageId: stage.id,
+      property: adapter.key,
+      edge: "body",
+    })
     beginDrag(e, {
-      initial: {
-        stageId: stage.id,
-        mode,
-        window: stage.window,
-        value: adapter.read(stage),
-        rect: track.getBoundingClientRect(),
-        axis: e.shiftKey ? "free" : "free",
-      },
+      initial: { stageId: stage.id, value: adapter.read(stage) },
     })
   }
 
-  const onKeyDown = (
-    e: ReactKeyboardEvent<HTMLSpanElement>,
-    stage: StageDef,
-    mode: "start" | "end" | "body"
-  ) => {
-    const horiz = e.key === "ArrowLeft" || e.key === "ArrowRight"
-    const vert = e.key === "ArrowUp" || e.key === "ArrowDown"
-    if (!horiz && !vert) {
-      if (e.key === "Escape") {
-        setSelection(null)
-      }
+  const onKeyDown = (e: ReactKeyboardEvent<HTMLSpanElement>, stage: StageDef) => {
+    if (e.key === "Escape") {
+      setSelection(null)
       return
     }
+    const vert = e.key === "ArrowUp" || e.key === "ArrowDown"
+    if (!vert) return
     e.preventDefault()
-    if (horiz) {
-      const sign = e.key === "ArrowRight" ? 1 : -1
-      const dp = (e.shiftKey ? 0.001 : 0.01) * sign
-      const w = stage.window
-      let next: FlowWindow
-      if (mode === "body" || (mode === "start" && !e.altKey) || (mode === "end" && !e.altKey)) {
-        if (mode === "body") {
-          const width = w[1] - w[0]
-          const lo = clamp01(w[0] + dp)
-          const loClamp = Math.min(lo, 1 - width)
-          const safe = Math.max(0, loClamp)
-          next = [safe, safe + width]
-        } else if (mode === "start") {
-          next = applyEdgeMin([w[0] + dp, w[1]])
-        } else {
-          next = applyEdgeMin([w[0], w[1] + dp])
-        }
-      } else {
-        // Alt + arrow: limit motion to a single edge.
-        next =
-          mode === "end"
-            ? applyEdgeMin([w[0], w[1] + dp])
-            : applyEdgeMin([w[0] + dp, w[1]])
-      }
-      setStage(stage.id, { window: next })
-    } else {
-      const sign = e.key === "ArrowUp" ? 1 : -1
-      const factor = e.altKey ? 5 : 1
-      const step = (e.shiftKey ? adapter.fineStep : adapter.coarseStep) * factor * sign
-      const next = adapter.read(stage) + step
-      setStage(stage.id, adapter.write(stage, next))
-    }
+    const sign = e.key === "ArrowUp" ? 1 : -1
+    const factor = e.altKey ? 5 : 1
+    const baseStep = e.shiftKey ? adapter.fineStep : adapter.coarseStep
+    const next = adapter.read(stage) + baseStep * factor * sign
+    setStage(stage.id, adapter.write(stage, next))
   }
 
   const segments = useMemo(
@@ -200,13 +157,19 @@ export function PropertyTrack({
         const top = (1 - t) * 100
         const offTop = v > adapter.range[1]
         const offBottom = v < adapter.range[0]
-        return { stage, value: v, topPct: top, offTop, offBottom }
+        const center = (stage.window[0] + stage.window[1]) / 2
+        return { stage, value: v, topPct: top, offTop, offBottom, center }
       }),
     [stages, adapter]
   )
 
+  const live = liveValueAt(adapter, stages, progress)
+  const activeStage =
+    stages.find((s) => progress >= s.window[0] && progress <= s.window[1]) ??
+    null
+
   return (
-    <div className="grid grid-cols-[60px_1fr] items-stretch gap-2">
+    <div className="grid grid-cols-[44px_1fr_64px] items-stretch gap-2">
       <div className="flex items-center text-[10px] tracking-wider text-black/55 uppercase">
         <span
           aria-hidden
@@ -220,7 +183,7 @@ export function PropertyTrack({
         ref={trackRef}
         style={{ height: LANE_HEIGHT }}
       >
-        {/* Stage band tints */}
+        {/* Stage band tints (visual only, not interactive) */}
         {stages.map((stage) => (
           <div
             key={stage.id}
@@ -233,7 +196,7 @@ export function PropertyTrack({
             }}
           />
         ))}
-        {/* 1.0 guide for scale */}
+        {/* Reference guide: 1.0 for scale, 0 baseline for x/y */}
         {adapter.key === "scale" ? (
           <div
             aria-hidden
@@ -241,7 +204,6 @@ export function PropertyTrack({
             style={{ top: `${(1 - valueToLaneT(adapter, 1)) * 100}%` }}
           />
         ) : null}
-        {/* 0 baseline for x/y */}
         {(adapter.key === "x" || adapter.key === "y") ? (
           <div
             aria-hidden
@@ -249,7 +211,28 @@ export function PropertyTrack({
             style={{ top: `${(1 - valueToLaneT(adapter, 0)) * 100}%` }}
           />
         ) : null}
-        {/* Diagonal connectors between segments */}
+        {/* Hold rails: non-interactive bars showing this value's range */}
+        {segments.map(({ stage, topPct, offTop, offBottom }) => {
+          const safeTop = offTop ? 0 : offBottom ? 100 : topPct
+          return (
+            <div
+              key={`rail-${stage.id}`}
+              aria-hidden
+              className="pointer-events-none absolute"
+              style={{
+                left: `${pToVisual(stage.window[0], view)}%`,
+                width: `${((stage.window[1] - stage.window[0]) / span) * 100}%`,
+                top: `${safeTop}%`,
+                transform: "translateY(-50%)",
+                height: 3,
+                borderRadius: 9999,
+                backgroundColor: adapter.color,
+                opacity: offTop || offBottom ? 0.35 : 0.7,
+              }}
+            />
+          )
+        })}
+        {/* Diagonal morph connectors between consecutive stages */}
         {segments.slice(0, -1).map((seg, i) => {
           const next = segments[i + 1]
           const x1 = pToVisual(seg.stage.window[1], view)
@@ -259,7 +242,7 @@ export function PropertyTrack({
           const y1 = seg.topPct
           const y2 = next.topPct
           const dy = y2 - y1
-          const lengthPct = Math.sqrt(dx * dx + (dy * dy) / 2) // visual approx
+          const lengthPct = Math.sqrt(dx * dx + (dy * dy) / 2)
           const angle = Math.atan2(dy, dx) * (180 / Math.PI)
           return (
             <div
@@ -271,88 +254,135 @@ export function PropertyTrack({
                 top: `${y1}%`,
                 width: `${lengthPct}%`,
                 height: 1,
-                background: `linear-gradient(90deg, ${adapter.color}66, ${adapter.color}66)`,
+                background: adapter.color,
+                opacity: 0.5,
                 transform: `rotate(${angle}deg)`,
               }}
             />
           )
         })}
-        {/* Segment bars + dots */}
-        {segments.map(({ stage, value, topPct, offTop, offBottom }) => {
-          const left = `${pToVisual(stage.window[0], view)}%`
-          const width = `${((stage.window[1] - stage.window[0]) / span) * 100}%`
+        {/* Draggable dots — one per stage, at the stage center */}
+        {segments.map(({ stage, value, topPct, offTop, offBottom, center }) => {
           const sel = isSelected(selection, stage.id, adapter.key)
-          const pinTop = offTop
-          const pinBottom = offBottom
-          const safeTop = pinTop ? 0 : pinBottom ? 100 : topPct
+          const safeTop = offTop ? 0 : offBottom ? 100 : topPct
           return (
-            <div
+            <KeyframeDot
               key={stage.id}
-              className="absolute"
+              color={adapter.color}
+              selected={sel}
+              title={`${stage.id} · ${adapter.label}: ${adapter.format(value)}`}
+              cursor="ns-resize"
+              onPointerDown={(e) => handleDotDown(e, stage)}
+              onKeyDown={(e) => onKeyDown(e, stage)}
               style={{
-                left,
-                width,
+                left: `${pToVisual(center, view)}%`,
                 top: `${safeTop}%`,
-                transform: "translateY(-50%)",
-                height: 0,
               }}
-            >
-              {/* Segment bar (clickable, draggable body) */}
-              <span
-                role="button"
-                tabIndex={0}
-                title={`${stage.id} · ${adapter.label}: ${adapter.format(value)}`}
-                onPointerDown={(e) => handleEdgeDown(e, stage, "body")}
-                onKeyDown={(e) => onKeyDown(e, stage, "body")}
-                className={`absolute -translate-y-1/2 cursor-grab rounded-full active:cursor-grabbing ${
-                  sel && selection?.edge === "body" ? "outline outline-2 outline-offset-1 outline-black/60" : ""
-                }`}
-                style={{
-                  left: 0,
-                  right: 0,
-                  height: 4,
-                  backgroundColor: adapter.color,
-                  opacity: pinTop || pinBottom ? 0.4 : 0.9,
-                }}
-              />
-              {/* Left edge dot */}
-              <KeyframeDot
-                color={adapter.color}
-                selected={sel && selection?.edge === "start"}
-                title={`${stage.id} start · ${adapter.format(value)}`}
-                cursor="ew-resize"
-                onPointerDown={(e) => handleEdgeDown(e, stage, "start")}
-                style={{ left: 0, top: 0 }}
-              />
-              {/* Right edge dot */}
-              <KeyframeDot
-                color={adapter.color}
-                selected={sel && selection?.edge === "end"}
-                title={`${stage.id} end · ${adapter.format(value)}`}
-                cursor="ew-resize"
-                onPointerDown={(e) => handleEdgeDown(e, stage, "end")}
-                style={{ left: "100%", top: 0 }}
-              />
-              {/* Off-range badge */}
-              {(pinTop || pinBottom) ? (
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute font-mono text-[9px] text-black/70"
-                  style={{
-                    left: "50%",
-                    top: pinTop ? 6 : -14,
-                    transform: "translateX(-50%)",
-                  }}
-                >
-                  {adapter.format(value)}
-                </span>
-              ) : null}
-            </div>
+            />
           )
         })}
+        {/* Off-range badges */}
+        {segments.map(({ stage, value, offTop, offBottom, center }) => {
+          if (!offTop && !offBottom) return null
+          return (
+            <span
+              key={`off-${stage.id}`}
+              aria-hidden
+              className="pointer-events-none absolute font-mono text-[9px] text-black/70"
+              style={{
+                left: `${pToVisual(center, view)}%`,
+                top: offTop ? 4 : "calc(100% - 12px)",
+                transform: "translateX(-50%)",
+              }}
+            >
+              {adapter.format(value)}
+            </span>
+          )
+        })}
+        {/* Playhead */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute top-0 h-full w-px bg-black/30"
+          style={{ left: `${pToVisual(progress, view)}%` }}
+        />
       </div>
+      <LiveValueInput
+        adapter={adapter}
+        live={live}
+        activeStage={activeStage}
+        onCommit={(value) => {
+          if (activeStage)
+            setStage(activeStage.id, adapter.write(activeStage, value))
+        }}
+      />
     </div>
   )
 }
 
-const LANE_HEIGHT = 36
+function LiveValueInput({
+  adapter,
+  live,
+  activeStage,
+  onCommit,
+}: {
+  adapter: PropertyAdapter
+  live: number
+  activeStage: StageDef | null
+  onCommit: (value: number) => void
+}) {
+  const [draft, setDraft] = useState<string | null>(null)
+  const editing = draft !== null
+  const editable = activeStage !== null
+  const display = editing ? (draft ?? "") : adapter.format(live)
+
+  const commit = () => {
+    if (draft !== null && editable) {
+      const parsed = parseAdapterInput(adapter, draft)
+      if (parsed !== null) onCommit(parsed)
+    }
+    setDraft(null)
+  }
+
+  return (
+    <input
+      aria-label={
+        editable
+          ? `${adapter.label} for ${activeStage.id} stage`
+          : `${adapter.label} (interpolating)`
+      }
+      className={[
+        "w-full bg-transparent pr-1 text-right font-mono text-[10px] tabular-nums outline-none",
+        editable
+          ? "cursor-text text-black/75 focus:text-black"
+          : "cursor-not-allowed text-black/40",
+      ].join(" ")}
+      readOnly={!editable}
+      title={
+        editable
+          ? `Edit ${adapter.label} for ${activeStage.id} (Enter to commit, Esc to cancel)`
+          : "Read-only — scroll into a stage's hold window to edit"
+      }
+      type="text"
+      value={display}
+      onChange={(e) => setDraft(e.target.value)}
+      onFocus={(e) => {
+        if (!editable) return
+        setDraft(adapter.format(live))
+        // defer so React commits the new value before selecting
+        const target = e.currentTarget
+        requestAnimationFrame(() => target.select())
+      }}
+      onBlur={commit}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          e.preventDefault()
+          e.currentTarget.blur()
+        } else if (e.key === "Escape") {
+          e.preventDefault()
+          setDraft(null)
+          e.currentTarget.blur()
+        }
+      }}
+    />
+  )
+}

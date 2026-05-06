@@ -13,7 +13,7 @@ export function FinalCta() {
     >
       <RevealOnScroll>
         <div className="mx-auto flex w-full max-w-[1024px] flex-col items-center gap-5 px-4 text-center sm:px-10">
-          <h2 className="font-heading text-[clamp(1.75rem,4vw,3.5rem)] leading-[1.21] font-medium tracking-[-0.025em] text-balance text-[color:#0e1729]">
+          <h2 className="font-heading text-[clamp(1.75rem,4vw,3.5rem)] leading-[1.12] font-medium tracking-tight text-balance text-[color:var(--paper-ink)]">
             {finalCtaCopy.headline}
           </h2>
           <p className="max-w-[34rem] text-base leading-[1.7] text-balance text-[color:var(--paper-muted)] sm:text-lg">
@@ -21,11 +21,15 @@ export function FinalCta() {
           </p>
           <Button
             asChild
-            className="mt-2 h-10 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-[0_8px_22px_-12px_rgb(36_90_219_/_0.7)] hover:bg-primary/90"
+            className="group/cta mt-2 h-10 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-[var(--paper-shadow-cta)] transition-all duration-200 ease-out hover:-translate-y-px hover:bg-primary/90 hover:shadow-[var(--paper-shadow-cta-hover)]"
           >
             <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
               {siteCtaCopy.primary}
-              <ArrowRightIcon data-icon="inline-end" />
+              <ArrowRightIcon
+                aria-hidden
+                className="transition-transform duration-200 ease-out group-hover/cta:translate-x-0.5"
+                data-icon="inline-end"
+              />
             </a>
           </Button>
         </div>

@@ -16,7 +16,7 @@ import { useScrollChoreography } from "../context"
 import { useFlowControls } from "../dev-flow-context"
 import { KeyframeInspector } from "./keyframe-inspector"
 import { LayoutGroup } from "./layout-group"
-import { PaperGroup } from "./paper-group"
+import { LayerScaleLane, OpacityLane } from "./paper-group"
 import { PanelHeader } from "./panel-header"
 import { PROPERTY_ADAPTERS } from "./property-adapters"
 import { PropertyTrack } from "./property-track"
@@ -121,7 +121,9 @@ function PanelShell({
               progress={progress}
             />
 
-            <div className="space-y-1.5 rounded border border-black/10 bg-white/30 p-2">
+            {/* Unified timeline — per-stage property lanes + paper-card layer
+                lanes share the same time axis and visual rhythm. */}
+            <div className="space-y-1 rounded border border-black/10 bg-white/30 p-2">
               {PROPERTY_ADAPTERS.map((adapter) => (
                 <PropertyTrack
                   key={adapter.key}
@@ -129,17 +131,28 @@ function PanelShell({
                   stages={controls.stages}
                   view={controls.view}
                   setStage={controls.setStage}
+                  progress={progress}
                 />
               ))}
+              <div className="h-px bg-black/5" />
+              {(["bg", "cards", "teacher"] as const).map((layer) => (
+                <LayerScaleLane
+                  key={layer}
+                  layer={layer}
+                  paper={controls.paperCard}
+                  setPaperCard={controls.setPaperCard}
+                  heroHoldEnd={heroHoldEnd}
+                  view={controls.view}
+                  progress={progress}
+                />
+              ))}
+              <OpacityLane
+                paper={controls.paperCard}
+                setPaperCard={controls.setPaperCard}
+                view={controls.view}
+                progress={progress}
+              />
             </div>
-
-            <PaperGroup
-              paper={controls.paperCard}
-              setPaperCard={controls.setPaperCard}
-              heroHoldEnd={heroHoldEnd}
-              view={controls.view}
-              progress={progress}
-            />
 
             <input
               aria-label="Scroll progress"

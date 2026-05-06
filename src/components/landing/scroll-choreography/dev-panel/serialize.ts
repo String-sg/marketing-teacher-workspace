@@ -31,7 +31,9 @@ export function serializeFlow(
   ]
   const paperBlock = [
     "export const PAPER_CARD_DEFAULTS: PaperCardConfig = {",
-    `  scaleMidProgress: ${fmtNumber(paper.scaleMidProgress)},`,
+    `  bgMidProgress: ${fmtNumber(paper.bgMidProgress)},`,
+    `  cardsMidProgress: ${fmtNumber(paper.cardsMidProgress)},`,
+    `  teacherMidProgress: ${fmtNumber(paper.teacherMidProgress)},`,
     `  scaleMidValue: ${fmtNumber(paper.scaleMidValue)},`,
     `  scaleEndValue: ${fmtNumber(paper.scaleEndValue)},`,
     `  opacityFadeStart: ${fmtNumber(paper.opacityFadeStart)},`,

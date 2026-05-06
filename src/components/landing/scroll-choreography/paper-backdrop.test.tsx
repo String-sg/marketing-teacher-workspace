@@ -21,7 +21,9 @@ function renderWithMockProgress(progress = 0) {
   const mv = motionValue(progress)
   const value: ScrollChoreographyContextValue = {
     scrollYProgress: mv,
-    paperCardScale: motionValue(1),
+    bgScale: motionValue(1),
+    cardsScale: motionValue(1),
+    teacherScale: motionValue(1),
     stages: STAGES,
     reducedMotion: false,
     mode: "choreography",
@@ -35,14 +37,24 @@ function renderWithMockProgress(progress = 0) {
 }
 
 describe("PaperBackdrop render shape", () => {
-  it("renders the lush-hill backdrop image inside a <picture> with webp source", () => {
+  it("renders the sky-gradient backdrop on the bgScale layer", () => {
     const { container } = renderWithMockProgress(0)
-    const picture = container.querySelector("picture")
-    expect(picture).not.toBeNull()
-    const webp = picture?.querySelector('source[type="image/webp"]')
-    expect(webp?.getAttribute("srcSet")).toContain("/hero/hill-")
-    const fallback = picture?.querySelector("img")
-    expect(fallback?.getAttribute("src")).toBe("/hero/hill-1280.jpg")
+    // Sky gradient lives on the same motion.div that carries bgScale —
+    // identifiable as the wrapper of the cards-sketch's parent path. The
+    // outer rounded layer carries Tailwind's bg-gradient-to-b utility plus
+    // arbitrary-value sky stops.
+    const root = container.querySelector(".paper-card") as HTMLElement | null
+    const bgLayer = root?.firstElementChild as HTMLElement | null
+    expect(bgLayer).not.toBeNull()
+    const cls = bgLayer?.className ?? ""
+    expect(cls).toMatch(/bg-gradient-to-b/)
+    expect(cls).toMatch(/from-/)
+    expect(cls).toMatch(/to-/)
+    // Hill picture must be gone — sky gradient replaces the photographic
+    // backdrop entirely. Scope to the bg layer; ProductScreen has its own
+    // <picture> deeper in the tree.
+    expect(bgLayer?.querySelector("picture")).toBeNull()
+    expect(bgLayer?.querySelector("img[src*='hill']")).toBeNull()
   })
 
   it("renders both hand-drawn sketch overlays (cards + teacher)", () => {
@@ -59,15 +71,28 @@ describe("PaperBackdrop render shape", () => {
 })
 
 describe("PaperBackdrop motion-value-driven shape (CHOREO-06 / MIGRATE-02)", () => {
-  it("renders the paper-card root with motion-value-driven inline style", () => {
+  it("renders motion-value-driven inline styles on the per-layer scale wrappers", () => {
     const { container } = renderWithMockProgress(byId("wow").window[1])
     const root = container.querySelector(".paper-card") as HTMLElement | null
     expect(root).not.toBeNull()
-    // Asserts the post-mount element carries inline style (transform / opacity)
-    // rather than a useState-derived className. The falsifiable budget gate
-    // lives in choreography-rerender-budget.test.tsx — this is the smoke
-    // assertion that the element is a motion.* node bound via style props.
-    const inline = root?.getAttribute("style") ?? ""
-    expect(inline.length).toBeGreaterThan(0)
+
+    // After the layer-zoom refactor, scale lives on three inner motion.divs
+    // (bg / cards / teacher) instead of the outer paper-card. Each sketch
+    // sits inside a motion.div whose parent therefore carries inline style.
+    // Asserts the post-mount element tree binds visual props via style props
+    // rather than useState-derived classes — the equivalent of the previous
+    // outer-element assertion. The falsifiable budget gate lives in
+    // choreography-rerender-budget.test.tsx.
+    const cards = root?.querySelector("img[src='/hero/hero-cards-sketch.svg']")
+    const cardsLayer = cards?.parentElement as HTMLElement | null
+    const cardsStyle = cardsLayer?.getAttribute("style") ?? ""
+    expect(cardsStyle.length).toBeGreaterThan(0)
+
+    const teacher = root?.querySelector(
+      "img[src='/hero/hero-teacher-sketch.svg']"
+    )
+    const teacherLayer = teacher?.parentElement as HTMLElement | null
+    const teacherStyle = teacherLayer?.getAttribute("style") ?? ""
+    expect(teacherStyle.length).toBeGreaterThan(0)
   })
 })

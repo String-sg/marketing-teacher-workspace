@@ -10,10 +10,10 @@ export function SiteHeader() {
     <header className="relative z-30 w-full">
       <nav
         aria-label="Primary navigation"
-        className="nav-pill mx-auto flex w-full max-w-[940px] items-center justify-between gap-6 rounded-full border border-slate-300/70 px-3 py-2 sm:gap-12 sm:px-6"
+        className="nav-pill mx-auto flex w-full max-w-[940px] items-center justify-between gap-6 rounded-full border border-[#CBD5E1] px-3 py-2.5 sm:gap-12 sm:px-6"
       >
         <a
-          className="flex items-center gap-2.5 font-heading text-[color:var(--paper-ink)]"
+          className="flex items-center gap-2.5 rounded-full font-heading text-[color:var(--paper-ink)] transition-opacity duration-200 hover:opacity-80 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/40"
           href="/"
         >
           <img
@@ -28,10 +28,10 @@ export function SiteHeader() {
           </span>
         </a>
 
-        <div className="hidden items-center gap-8 text-sm font-medium text-[color:var(--paper-ink)] md:flex">
+        <div className="hidden items-center gap-8 text-sm font-semibold text-[color:var(--paper-ink)] md:flex">
           {navItems.map((item) => (
             <a
-              className="transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/40"
+              className="rounded-sm transition-colors duration-200 ease-out hover:text-primary focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/40"
               href={item.href}
               key={item.label}
             >
@@ -42,7 +42,7 @@ export function SiteHeader() {
 
         <Button
           asChild
-          className="h-10 rounded-full border-primary/30 bg-transparent px-5 text-primary hover:bg-primary/5"
+          className="h-10 rounded-full border-primary bg-transparent px-5 text-sm font-semibold text-primary transition-all duration-200 ease-out hover:bg-primary/[0.06]"
           variant="outline"
         >
           <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">

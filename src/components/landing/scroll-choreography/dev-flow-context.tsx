@@ -33,20 +33,27 @@ export type StageRectPatch = Partial<{
 }>
 
 /**
- * Paper-card (cartoon video) zoom envelope. Drives the scale + opacity
- * curves on PaperBackdrop's outer motion.div. The curves are:
+ * Paper-card (cartoon video) zoom envelope. Drives three per-layer scale
+ * curves applied as inner wrappers in PaperBackdrop, plus the background
+ * opacity fade. Each layer (background, cards, teacher) has its own
+ * `*MidProgress` so the user can stagger when each depth layer reaches
+ * the shared mid-scale, producing a cinematic camera-into-the-scene
+ * effect. All three layers converge to the same `scaleEndValue` so the
+ * illustration recomposes coherently at the docked stage.
  *
- *   scale: [0, heroHoldEnd, scaleMidProgress, 1]
- *       -> [1, 1,           scaleMidValue,    scaleEndValue]
- *   opacity: [0, opacityFadeStart, opacityFadeEnd, 1]
- *         -> [1, 1,                0,              0]
+ *   scale<layer>: [0, heroHoldEnd, <layer>MidProgress, scaleEndAt, 1]
+ *              -> [1, 1,           scaleMidValue,      scaleEndValue, scaleEndValue]
+ *   opacity:     [0, opacityFadeStart, opacityFadeEnd, 1]
+ *              -> [1, 1,                0,              0]
  *
- * heroHoldEnd auto-tracks STAGES[hero].window[1] so the card stays at
+ * heroHoldEnd auto-tracks STAGES[hero].window[1] so every layer stays at
  * scale 1 throughout the hero hold and only starts zooming once the
  * UI begins its hero→wow morph.
  */
 export type PaperCardConfig = {
-  readonly scaleMidProgress: number
+  readonly bgMidProgress: number
+  readonly cardsMidProgress: number
+  readonly teacherMidProgress: number
   readonly scaleMidValue: number
   readonly scaleEndValue: number
   readonly opacityFadeStart: number
@@ -54,11 +61,13 @@ export type PaperCardConfig = {
 }
 
 export const PAPER_CARD_DEFAULTS: PaperCardConfig = {
-  scaleMidProgress: 0.19,
-  scaleMidValue: 2.4,
-  scaleEndValue: 5.2,
-  opacityFadeStart: 0.19,
-  opacityFadeEnd: 0.27,
+  bgMidProgress: 0.3,
+  cardsMidProgress: 0.43,
+  teacherMidProgress: 0.63,
+  scaleMidValue: 4.1,
+  scaleEndValue: 19.1,
+  opacityFadeStart: 0.37,
+  opacityFadeEnd: 0.63,
 }
 
 export type PaperCardPatch = Partial<PaperCardConfig>
@@ -82,9 +91,9 @@ export type SketchesConfig = {
 }
 
 export const SKETCHES_DEFAULTS: SketchesConfig = {
-  cardsTop: 44,
+  cardsTop: 52,
   cardsWidth: 28,
-  teacherTop: 54,
+  teacherTop: 62,
   teacherWidth: 22,
 }
 
@@ -177,7 +186,9 @@ export function DevFlowProvider({ children }: { children: ReactNode }) {
       // tuning so we don't second-guess the dev).
       return {
         ...next,
-        scaleMidProgress: clamp01(next.scaleMidProgress),
+        bgMidProgress: clamp01(next.bgMidProgress),
+        cardsMidProgress: clamp01(next.cardsMidProgress),
+        teacherMidProgress: clamp01(next.teacherMidProgress),
         opacityFadeStart: clamp01(next.opacityFadeStart),
         opacityFadeEnd: clamp01(next.opacityFadeEnd),
       }

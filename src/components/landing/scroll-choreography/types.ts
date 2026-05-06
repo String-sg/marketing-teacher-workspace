@@ -49,7 +49,9 @@ export type ScrollChoreographyMode = "choreography" | "static"
 
 export type ScrollChoreographyContextValue = {
   readonly scrollYProgress: MotionValue<number>
-  readonly paperCardScale: MotionValue<number>
+  readonly bgScale: MotionValue<number>
+  readonly cardsScale: MotionValue<number>
+  readonly teacherScale: MotionValue<number>
   readonly stages: readonly StageDef[]
   readonly reducedMotion: boolean
   readonly mode: ScrollChoreographyMode
