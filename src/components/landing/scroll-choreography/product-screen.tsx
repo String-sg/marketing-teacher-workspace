@@ -22,6 +22,7 @@ import { motion, useTransform } from "motion/react"
 import { useScrollChoreography } from "./context"
 import { useFlowStages, usePaperCardConfig } from "./dev-flow-context"
 import { EASE_WOW_TO_DOCKED, LINEAR, SCALE_EASES } from "./eases"
+import { StudentInsightsApp } from "./student-insights-app/app"
 
 import { TEACHER_WORKSPACE_APP_URL } from "@/content/landing"
 
@@ -169,13 +170,22 @@ export function ProductScreen() {
     compensateYTranslate(y.get(), teacherScale.get(), paper.paperOriginY)
   )
 
+  // Pointer-events stay off during morphs so clicks don't land on a
+  // scaling/translating frame. Enable once the wow plateau begins so
+  // visitors can drive the embedded Student Insights demo at full size
+  // and through the docked hold.
+  const pointerEvents = useTransform(scrollYProgress, (v) =>
+    v >= WOW.window[0] ? "auto" : "none"
+  )
+
   return (
     <motion.div
-      aria-hidden
-      className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center px-4 sm:px-10 lg:px-16"
-      style={{ opacity, x: compensatedX, y: compensatedY }}
+      data-testid="product-screen-outer"
+      className="absolute inset-0 z-20 flex items-center justify-center px-4 sm:px-10 lg:px-16"
+      style={{ opacity, x: compensatedX, y: compensatedY, pointerEvents }}
     >
       <motion.div
+        data-testid="product-screen-frame"
         className="relative w-full max-w-[1280px] overflow-hidden rounded-2xl border border-black/10 bg-white"
         style={{ scale: compensatedScale }}
       >
@@ -187,27 +197,9 @@ export function ProductScreen() {
             {TEACHER_WORKSPACE_APP_URL.replace("https://", "")}
           </span>
         </div>
-        <picture>
-          <source
-            srcSet="/hero/profiles-screen-640.avif 640w, /hero/profiles-screen-960.avif 960w, /hero/profiles-screen-1280.avif 1280w, /hero/profiles-screen-1600.avif 1600w"
-            sizes="(min-width:1280px) 1280px, 100vw"
-            type="image/avif"
-          />
-          <source
-            srcSet="/hero/profiles-screen-640.webp 640w, /hero/profiles-screen-960.webp 960w, /hero/profiles-screen-1280.webp 1280w, /hero/profiles-screen-1600.webp 1600w"
-            sizes="(min-width:1280px) 1280px, 100vw"
-            type="image/webp"
-          />
-          <img
-            src="/hero/profiles-screen-1280.png"
-            srcSet="/hero/profiles-screen-640.png 640w, /hero/profiles-screen-960.png 960w, /hero/profiles-screen-1280.png 1280w, /hero/profiles-screen-1600.png 1600w"
-            sizes="(min-width:1280px) 1280px, 100vw"
-            alt="Teacher Workspace student view showing attendance, behavior notes, and family messages"
-            loading="eager"
-            decoding="async"
-            className="block h-auto w-full select-none"
-          />
-        </picture>
+        <div className="aspect-[16/10] w-full">
+          <StudentInsightsApp />
+        </div>
       </motion.div>
     </motion.div>
   )
