@@ -3,8 +3,8 @@ import { audienceCopy } from "@/content/landing"
 import { RevealOnScroll } from "./reveal-on-scroll"
 
 const CARD_BG = [
-  "var(--audience-cream)",
-  "var(--audience-mint)",
+  "var(--audience-sky)",
+  "var(--audience-sky)",
   "var(--audience-sky)",
 ] as const
 
