@@ -1,3 +1,5 @@
+import { motion } from "motion/react"
+import type { MotionValue } from "motion/react"
 import { useEffect, useMemo, useState } from "react"
 
 import { EMPTY_FILTER } from "./components/filter-popover"
@@ -19,8 +21,12 @@ const SAVED_GROUP_STUDENT_ID = "s3-01"
 
 export function StudentInsightsApp({
   activeTab = 0,
+  sidebarWidth,
+  sidebarOpacity,
 }: {
   activeTab?: 0 | 1 | 2
+  sidebarWidth?: MotionValue<number>
+  sidebarOpacity?: MotionValue<number>
 } = {}) {
   const [route, setRoute] = useState<AppRoute>("students")
   const [classId, setClassId] = useState<string>(DEFAULT_CLASS_ID)
@@ -68,15 +74,22 @@ export function StudentInsightsApp({
   }
 
   return (
-    <div className="grid h-full grid-cols-[180px_1fr] bg-[#fafafa] text-[color:var(--paper-ink)]">
-      <Sidebar
-        active={route}
-        onChange={(id) => {
-          setRoute(id)
-          setSelectedStudentId(null)
-        }}
-      />
-      <div className="grid min-h-0 grid-rows-[auto_1fr]">
+    <div className="flex h-full min-h-0 bg-[#fafafa] text-[color:var(--paper-ink)]">
+      <motion.aside
+        className="h-full shrink-0 overflow-hidden"
+        style={{ width: sidebarWidth ?? 180, opacity: sidebarOpacity ?? 1 }}
+      >
+        <div className="h-full w-[180px]">
+          <Sidebar
+            active={route}
+            onChange={(id) => {
+              setRoute(id)
+              setSelectedStudentId(null)
+            }}
+          />
+        </div>
+      </motion.aside>
+      <div className="grid min-w-0 flex-1 grid-rows-[auto_1fr]">
         <TopBar heading={heading} />
         <main className="min-h-0 overflow-hidden">
           {route === "students" ? (

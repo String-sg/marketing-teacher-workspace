@@ -180,6 +180,25 @@ export function ProductScreen() {
     v >= WOW.window[0] ? "auto" : "none"
   )
 
+  // Wow→docked transition: collapse sidebar + zoom inner content.
+  // Holds 1.0/1/180 through wow plateau, transitions over [wow.end,
+  // docked.start], then holds at the docked values.
+  const innerScale = useTransform(
+    scrollYProgress,
+    [WOW.window[1], DOCKED.window[0]],
+    [1, 1.35]
+  )
+  const sidebarWidth = useTransform(
+    scrollYProgress,
+    [WOW.window[1], DOCKED.window[0]],
+    [180, 0]
+  )
+  const sidebarOpacity = useTransform(
+    scrollYProgress,
+    [WOW.window[1], DOCKED.window[0]],
+    [1, 0]
+  )
+
   return (
     <motion.div
       data-testid="product-screen-outer"
@@ -199,8 +218,17 @@ export function ProductScreen() {
             {TEACHER_WORKSPACE_APP_URL.replace("https://", "")}
           </span>
         </div>
-        <div className="aspect-[16/10] w-full">
-          <StudentInsightsApp activeTab={activeTab} />
+        <div className="aspect-[16/10] w-full overflow-hidden">
+          <motion.div
+            className="h-full w-full origin-top-left"
+            style={{ scale: innerScale }}
+          >
+            <StudentInsightsApp
+              activeTab={activeTab}
+              sidebarWidth={sidebarWidth}
+              sidebarOpacity={sidebarOpacity}
+            />
+          </motion.div>
         </div>
       </motion.div>
     </motion.div>
