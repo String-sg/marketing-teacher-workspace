@@ -16,7 +16,7 @@ export const STAGES = [
     window: [0, 0.21] as const,
     scale: 0.05,
     x: "0cqi",
-    y: "+6.5cqi",
+    y: "+11.2cqi",
     opacity: 1,
   },
   {

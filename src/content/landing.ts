@@ -11,6 +11,7 @@ export const navItems = [
 
 export const siteCtaCopy = {
   primary: "Get started",
+  access: "Only accessible on MOE-issued devices (SSoE)",
 } as const
 
 export const stages: readonly StageCopyContent[] = [

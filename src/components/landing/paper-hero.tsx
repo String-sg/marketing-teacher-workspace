@@ -83,6 +83,9 @@ export function PaperHero() {
                 {siteCtaCopy.primary}
               </a>
             </Button>
+            <p className="mt-3 text-xs text-[color:var(--paper-muted)]">
+              {siteCtaCopy.access}
+            </p>
           </div>
           <div className="h-[42vh] sm:h-[48vh]" aria-hidden />
         </div>

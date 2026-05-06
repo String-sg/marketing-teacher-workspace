@@ -123,6 +123,9 @@ function ChoreographyTree({
                       {siteCtaCopy.primary}
                     </a>
                   </Button>
+                  <p className="mt-3 text-xs text-[color:var(--paper-muted)]">
+                    {siteCtaCopy.access}
+                  </p>
                 </motion.div>
               </div>
             </PaperBackdrop>
