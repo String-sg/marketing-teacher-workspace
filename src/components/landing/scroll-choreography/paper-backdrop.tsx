@@ -86,43 +86,48 @@ export function PaperBackdrop({ children }: { children?: ReactNode }) {
             element catching the eye. Choreography path is reduced-motion
             gated upstream (see ScrollChoreography), so no extra check
             here. */}
+        {/* Two-keyframe loops with repeatType "reverse" — Motion ping-pongs
+            A↔B forever with no seam at the boundary. Speed: durations are
+            tuned so a ~50px cloud shift takes 4-7s, which reads as gentle
+            but unmistakably "drifting". Phase desync comes from different
+            durations + opposite starting directions. */}
         <motion.img
           alt=""
           aria-hidden
-          animate={{ x: ["-2%", "2%", "-2%"] }}
+          animate={{ x: ["-8%", "8%"] }}
           className="pointer-events-none absolute top-[2%] left-[78%] w-[18%] mix-blend-lighten select-none"
           src="/hero/cloud-halftone.png"
           transition={{
-            duration: 22,
+            duration: 9,
             ease: "easeInOut",
             repeat: Infinity,
-            repeatType: "loop",
+            repeatType: "reverse",
           }}
         />
         <motion.img
           alt=""
           aria-hidden
-          animate={{ x: ["1.5%", "-1.5%", "1.5%"] }}
+          animate={{ x: ["5%", "-5%"] }}
           className="pointer-events-none absolute top-[16%] left-[60%] w-[40%] mix-blend-lighten select-none"
           src="/hero/cloud-halftone.png"
           transition={{
-            duration: 32,
+            duration: 13,
             ease: "easeInOut",
             repeat: Infinity,
-            repeatType: "loop",
+            repeatType: "reverse",
           }}
         />
         <motion.img
           alt=""
           aria-hidden
-          animate={{ x: ["-1.2%", "1.2%", "-1.2%"] }}
+          animate={{ x: ["-12%", "12%"] }}
           className="pointer-events-none absolute top-[28%] -left-[8%] w-[36%] mix-blend-lighten select-none"
           src="/hero/cloud-halftone.png"
           transition={{
-            duration: 40,
+            duration: 11,
             ease: "easeInOut",
             repeat: Infinity,
-            repeatType: "loop",
+            repeatType: "reverse",
           }}
         />
       </motion.div>

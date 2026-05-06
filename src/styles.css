@@ -207,6 +207,24 @@
   }
 }
 
+/* Ambient cloud drift — used by the static-fallback hero. Paired with
+   `animation-direction: alternate` so the browser ping-pongs A↔B forever
+   with no seam. Translate-only keeps it on the GPU; ease-in-out gives the
+   gentle accel/decel of wind-blown drift. The global prefers-reduced-motion
+   reset below neutralizes these. */
+@keyframes cloud-drift-a {
+  from { transform: translate3d(-8%, 0, 0); }
+  to   { transform: translate3d(8%, 0, 0); }
+}
+@keyframes cloud-drift-b {
+  from { transform: translate3d(5%, 0, 0); }
+  to   { transform: translate3d(-5%, 0, 0); }
+}
+@keyframes cloud-drift-c {
+  from { transform: translate3d(-12%, 0, 0); }
+  to   { transform: translate3d(12%, 0, 0); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

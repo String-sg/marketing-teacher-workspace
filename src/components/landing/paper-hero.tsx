@@ -27,24 +27,40 @@ export function PaperHero() {
           aria-hidden
           className="absolute inset-0 overflow-hidden rounded-[28px] bg-gradient-to-b from-[#cfe5f7] from-0% via-[#e8f1fa] via-35% to-white to-75% sm:rounded-[44px]"
         >
-          {/* Halftone cloud overlays — match Paper "Hero V2 — Cloud Notes". */}
+          {/* Halftone cloud overlays — match Paper "Hero V2 — Cloud Notes".
+              Gentle left/right drift via CSS keyframes; each cloud uses a
+              different period and phase so the sky never pulses in unison.
+              prefers-reduced-motion is honored by the global reset in
+              styles.css. */}
           <img
             alt=""
             aria-hidden
-            className="pointer-events-none absolute top-[2%] left-[78%] w-[18%] mix-blend-lighten select-none"
+            className="pointer-events-none absolute top-[2%] left-[78%] w-[18%] mix-blend-lighten select-none [will-change:transform]"
             src="/hero/cloud-halftone.png"
+            style={{
+              animation:
+                "cloud-drift-a 9s cubic-bezier(0.455, 0.03, 0.515, 0.955) 0s infinite alternate",
+            }}
           />
           <img
             alt=""
             aria-hidden
-            className="pointer-events-none absolute top-[16%] left-[60%] w-[40%] mix-blend-lighten select-none"
+            className="pointer-events-none absolute top-[16%] left-[60%] w-[40%] mix-blend-lighten select-none [will-change:transform]"
             src="/hero/cloud-halftone.png"
+            style={{
+              animation:
+                "cloud-drift-b 13s cubic-bezier(0.455, 0.03, 0.515, 0.955) -3s infinite alternate",
+            }}
           />
           <img
             alt=""
             aria-hidden
-            className="pointer-events-none absolute top-[28%] -left-[8%] w-[36%] mix-blend-lighten select-none"
+            className="pointer-events-none absolute top-[28%] -left-[8%] w-[36%] mix-blend-lighten select-none [will-change:transform]"
             src="/hero/cloud-halftone.png"
+            style={{
+              animation:
+                "cloud-drift-c 11s cubic-bezier(0.455, 0.03, 0.515, 0.955) -5s infinite alternate",
+            }}
           />
           <div className="absolute inset-0 grid place-items-center">
             <div className="relative aspect-[16/10] w-full max-w-[calc(100svh*1.6)] [container-type:inline-size]">
