@@ -58,7 +58,7 @@ export function AudienceColumns() {
 
 function PeekKicker({ children }: { children: React.ReactNode }) {
   return (
-    <p className="font-mono text-[11px] leading-4 font-medium text-[color:var(--paper-muted)]">
+    <p className="text-[10px] font-semibold tracking-wider text-black/55 uppercase">
       {children}
     </p>
   )
@@ -67,59 +67,51 @@ function PeekKicker({ children }: { children: React.ReactNode }) {
 function FormTeachersPeek() {
   const rows = [
     {
-      class: "3.1",
-      initials: "CL",
-      avatarBg: "var(--audience-cream)",
+      idx: "1",
       name: "Chua Li Wei",
+      classCode: "3A",
       tag: "FAS",
-      tagBg: "rgb(36 90 219 / 0.1)",
-      tagInk: "var(--cta-blue)",
+      tagClass: "bg-rose-50 text-rose-600",
     },
     {
-      class: "3.2",
-      initials: "RT",
-      avatarBg: "var(--audience-sky)",
+      idx: "2",
       name: "Rahman Tan",
-      tag: "SEN",
-      tagBg: "rgb(124 196 138 / 0.2)",
-      tagInk: "#1f6b34",
+      classCode: "3B",
+      tag: "TCI",
+      tagClass: "bg-emerald-50 text-emerald-700",
     },
     {
-      class: "3.4",
-      initials: "SP",
-      avatarBg: "var(--audience-mint)",
+      idx: "3",
       name: "Siti Putri",
-      tag: "Counsel",
-      tagBg: "rgb(245 198 86 / 0.30)",
-      tagInk: "#7a5b18",
+      classCode: "3D",
+      tag: "LSM",
+      tagClass: "bg-sky-50 text-sky-700",
     },
   ]
 
   return (
-    <div className="flex h-full flex-col rounded-t-2xl border border-[color:var(--paper-rule)] bg-white/85 p-4 pb-5 shadow-[var(--paper-shadow-peek)] backdrop-blur-sm">
+    <div className="flex h-full flex-col rounded-t-2xl border border-black/10 bg-white p-4 pb-5 shadow-[var(--paper-shadow-peek)]">
       <PeekKicker>Class · Sec 3.1</PeekKicker>
-      <ul className="mt-3 flex flex-col gap-2.5">
-        {rows.map((row) => (
+      <ul className="mt-3 flex flex-col">
+        {rows.map((row, i) => (
           <li
-            className="flex items-center gap-3"
-            key={row.initials}
+            className={[
+              "flex items-center gap-3 py-2",
+              i < rows.length - 1 ? "border-b border-black/5" : "",
+            ].join(" ")}
+            key={row.idx}
           >
-            <span className="w-6 shrink-0 font-mono text-[11px] text-[color:var(--paper-muted)]">
-              {row.class}
+            <span className="w-3 shrink-0 text-[11px] text-black/45">
+              {row.idx}
             </span>
-            <span
-              aria-hidden
-              className="grid size-7 shrink-0 place-items-center rounded-full text-[10px] font-semibold tracking-wide text-[color:var(--paper-ink)]/80"
-              style={{ backgroundColor: row.avatarBg }}
-            >
-              {row.initials}
-            </span>
-            <span className="flex-1 truncate text-[13px] leading-5 text-[color:var(--paper-ink)]">
+            <span className="flex-1 truncate text-[12px] font-medium text-[color:var(--paper-ink)]">
               {row.name}
             </span>
+            <span className="shrink-0 text-[12px] text-[color:var(--paper-ink)]/70">
+              {row.classCode}
+            </span>
             <span
-              className="shrink-0 rounded-md px-2 py-[3px] text-[11px] leading-[14px] font-semibold"
-              style={{ backgroundColor: row.tagBg, color: row.tagInk }}
+              className={`shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-medium ${row.tagClass}`}
             >
               {row.tag}
             </span>
@@ -133,16 +125,16 @@ function FormTeachersPeek() {
 function YearHeadsPeek() {
   const chips = ["FAS", "SEN", "Low att.", "Pre-LTA"]
   return (
-    <div className="flex h-full flex-col rounded-t-2xl border border-[color:var(--paper-rule)] bg-white/85 p-4 pb-5 shadow-[var(--paper-shadow-peek)] backdrop-blur-sm">
+    <div className="flex h-full flex-col rounded-t-2xl border border-black/10 bg-white p-4 pb-5 shadow-[var(--paper-shadow-peek)]">
       <PeekKicker>Cohort filter</PeekKicker>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {chips.map((chip, i) => (
           <span
             className={[
-              "rounded-md px-2 py-[3px] text-[11px] leading-[14px] font-semibold",
+              "inline-flex h-6 items-center rounded-full px-2.5 text-[11px] font-medium",
               i === 0
-                ? "bg-primary text-white"
-                : "border border-[color:var(--paper-rule-strong)] bg-white text-[color:var(--paper-ink)]/80",
+                ? "bg-[color:var(--cta-blue)] text-white"
+                : "border border-black/10 bg-white text-[color:var(--paper-ink)]",
             ].join(" ")}
             key={chip}
           >
@@ -151,19 +143,22 @@ function YearHeadsPeek() {
         ))}
       </div>
       <div className="mt-4 flex items-baseline gap-2">
-        <span className="font-heading text-[28px] leading-[32px] font-semibold text-[color:var(--paper-ink)]">
+        <span className="text-2xl leading-none font-semibold tracking-tight text-[color:var(--paper-ink)]">
           17
         </span>
-        <span className="text-[13px] leading-[18px] text-[color:var(--paper-muted)]">
+        <span className="text-[12px] leading-4 text-black/55">
           students matched · saved as &ldquo;Bursary nominees&rdquo;
         </span>
       </div>
-      <div className="mt-3 flex items-center gap-2 border-t border-[color:var(--paper-rule)] pt-2.5">
-        <span aria-hidden className="size-1.5 rounded-full bg-primary" />
+      <div className="mt-3 flex items-center gap-2 border-t border-black/10 pt-2.5">
+        <span
+          aria-hidden
+          className="size-1.5 rounded-full bg-[color:var(--cta-blue)]"
+        />
         <span className="flex-1 truncate text-[12px] leading-4 text-[color:var(--paper-ink)]">
           Sec 3.1 · Chua Li Wei
         </span>
-        <span className="rounded-md bg-primary/10 px-1.5 py-[2px] text-[10px] leading-3 font-semibold text-primary">
+        <span className="rounded-md bg-rose-50 px-1.5 py-0.5 text-[10px] font-medium text-rose-600">
           FAS
         </span>
       </div>
@@ -172,41 +167,51 @@ function YearHeadsPeek() {
 }
 
 function SchoolLeadersPeek() {
-  const bars = [9, 14, 19, 22, 25, 28, 31]
-  const days = ["M", "T", "W", "T", "F", "S", "S"]
+  const cohorts = [
+    { label: "Sec 1", students: 312, flagged: 24 },
+    { label: "Sec 2", students: 305, flagged: 18 },
+    { label: "Sec 3", students: 298, flagged: 31 },
+    { label: "Sec 4", students: 296, flagged: 22 },
+  ]
+  const max = Math.max(...cohorts.map((c) => c.flagged))
   return (
-    <div className="flex h-full flex-col rounded-t-2xl border border-[color:var(--paper-rule)] bg-white/85 p-4 pb-5 shadow-[var(--paper-shadow-peek)] backdrop-blur-sm">
-      <PeekKicker>Adoption · this week</PeekKicker>
-      <div className="mt-3 flex items-baseline gap-2">
-        <span className="font-heading text-[36px] leading-[40px] font-semibold tracking-tight text-[color:var(--paper-ink)]">
-          86%
-        </span>
-        <span className="rounded-md bg-primary/10 px-1.5 py-[2px] text-[11px] leading-[14px] font-semibold text-primary">
-          ↑ 12 pp
+    <div className="flex h-full flex-col rounded-t-2xl border border-black/10 bg-white p-4 pb-5 shadow-[var(--paper-shadow-peek)]">
+      <div className="flex items-center justify-between">
+        <PeekKicker>Whole school · 4 cohorts</PeekKicker>
+        <span className="text-[10px] font-medium text-emerald-600">
+          <span aria-hidden>↗</span> Improving
         </span>
       </div>
-      <p className="mt-1 text-[13px] leading-5 text-[color:var(--paper-muted)]">
-        teachers active in last 7 days
+      <div className="mt-2 flex items-baseline gap-2">
+        <span className="text-[32px] leading-none font-semibold tracking-tight text-[color:var(--paper-ink)]">
+          1,211
+        </span>
+        <span className="rounded-md bg-[color:var(--cta-blue)]/10 px-1.5 py-0.5 text-[10px] font-semibold text-[color:var(--cta-blue)]">
+          95 flagged
+        </span>
+      </div>
+      <p className="mt-1 text-[11px] leading-4 text-black/55">
+        students across Sec 1–4
       </p>
       <div
         aria-hidden
         className="mt-4 flex h-12 items-end gap-1.5"
       >
-        {bars.map((h, i) => (
+        {cohorts.map((c) => (
           <span
-            className="flex-1 rounded-t-sm bg-primary/85"
-            key={i}
-            style={{ height: `${h * 1.4}px` }}
+            className="flex-1 rounded-t-sm bg-[color:var(--cta-blue)]"
+            key={c.label}
+            style={{ height: `${(c.flagged / max) * 48}px` }}
           />
         ))}
       </div>
       <div className="mt-1.5 flex gap-1.5">
-        {days.map((d, i) => (
+        {cohorts.map((c) => (
           <span
-            className="flex-1 text-center text-[10px] leading-3 text-[color:var(--paper-muted)]"
-            key={i}
+            className="flex-1 text-center text-[10px] leading-3 text-black/55"
+            key={c.label}
           >
-            {d}
+            {c.label}
           </span>
         ))}
       </div>
