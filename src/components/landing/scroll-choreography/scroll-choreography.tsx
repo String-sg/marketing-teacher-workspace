@@ -20,6 +20,7 @@ import {
 import { DevFlowPanel } from "./dev-flow-panel"
 import { EASE_OUT_EXIT, LINEAR, SCALE_EASES } from "./eases"
 import { PaperBackdrop } from "./paper-backdrop"
+import { ProductTabProvider } from "./product-tab-context"
 import { StageCopy } from "./stage-copy"
 import { STAGES } from "./stages"
 import { StaticChoreographyFallback } from "./static-choreography-fallback"
@@ -93,38 +94,40 @@ function ChoreographyTree({
     <DevFlowProvider>
       <ChoreographyContextShell scrollYProgress={scrollYProgress}>
         <ChoreographySection sectionRef={sectionRef}>
-          <div className="sticky top-0 flex h-svh items-stretch overflow-hidden px-5 py-3 sm:px-8">
-            <PaperBackdrop>
-              <div className="relative z-10 flex w-full flex-col">
-                <div className="px-4 pt-4 sm:px-6 sm:pt-6">
-                  <SiteHeader />
+          <ProductTabProvider>
+            <div className="sticky top-0 flex h-svh items-stretch overflow-hidden px-5 py-3 sm:px-8">
+              <PaperBackdrop>
+                <div className="relative z-10 flex w-full flex-col">
+                  <div className="px-4 pt-4 sm:px-6 sm:pt-6">
+                    <SiteHeader />
+                  </div>
+                  <motion.div
+                    className="mx-auto mt-12 flex w-fit flex-col items-center px-4 text-center sm:mt-16"
+                    style={{ opacity: copyOpacity, y: copyY }}
+                  >
+                    <h1
+                      className="font-heading text-[clamp(2.25rem,5.5vw,3.75rem)] leading-[1.1] font-medium tracking-[-0.025em] text-balance text-[#0F1B33]"
+                      id="hero-title"
+                    >
+                      {hero.headline}
+                    </h1>
+                    <p className="mt-5 text-[14px] text-[color:var(--paper-muted)]">
+                      {siteCtaCopy.access}
+                    </p>
+                    <Button
+                      asChild
+                      className="mt-5 h-10 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-[var(--paper-shadow-cta)] transition-all duration-200 ease-out hover:-translate-y-px hover:bg-primary/90 hover:shadow-[var(--paper-shadow-cta-hover)]"
+                    >
+                      <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
+                        {siteCtaCopy.primary}
+                      </a>
+                    </Button>
+                  </motion.div>
                 </div>
-                <motion.div
-                  className="mx-auto mt-12 flex w-fit flex-col items-center px-4 text-center sm:mt-16"
-                  style={{ opacity: copyOpacity, y: copyY }}
-                >
-                  <h1
-                    className="font-heading text-[clamp(2.25rem,5.5vw,3.75rem)] leading-[1.1] font-medium tracking-[-0.025em] text-balance text-[#0F1B33]"
-                    id="hero-title"
-                  >
-                    {hero.headline}
-                  </h1>
-                  <p className="mt-5 text-[14px] text-[color:var(--paper-muted)]">
-                    {siteCtaCopy.access}
-                  </p>
-                  <Button
-                    asChild
-                    className="mt-5 h-10 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-[var(--paper-shadow-cta)] transition-all duration-200 ease-out hover:-translate-y-px hover:bg-primary/90 hover:shadow-[var(--paper-shadow-cta-hover)]"
-                  >
-                    <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
-                      {siteCtaCopy.primary}
-                    </a>
-                  </Button>
-                </motion.div>
-              </div>
-            </PaperBackdrop>
-            <StageCopy stage="docked" />
-          </div>
+              </PaperBackdrop>
+              <StageCopy stage="docked" />
+            </div>
+          </ProductTabProvider>
         </ChoreographySection>
         <SchoolsToday />
         <AudienceColumns />

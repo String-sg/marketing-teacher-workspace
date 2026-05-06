@@ -24,12 +24,16 @@ export function StudentInsightsView({
   filter,
   onChangeFilter,
   onSelectStudent,
+  filterOpen,
+  onFilterOpenChange,
 }: {
   classId: string
   onChangeClass: (id: string) => void
   filter: FilterState
   onChangeFilter: (next: FilterState) => void
   onSelectStudent: (id: string) => void
+  filterOpen?: boolean
+  onFilterOpenChange?: (open: boolean) => void
 }) {
   const cls = getClassById(classId)
   const visibleStudents = useMemo(() => {
@@ -38,6 +42,11 @@ export function StudentInsightsView({
       if (
         filter.lateComingMin !== null &&
         student.lateComingPct <= filter.lateComingMin
+      )
+        return false
+      if (
+        filter.attentionTag &&
+        !student.attentionTags.includes(filter.attentionTag)
       )
         return false
       return true
@@ -93,7 +102,24 @@ export function StudentInsightsView({
               className="h-7 w-[180px] rounded-full border border-black/10 bg-white pr-2 pl-7 text-[11px] text-[color:var(--paper-ink)] placeholder:text-black/40 focus-visible:border-[color:var(--cta-blue)] outline-none"
             />
           </div>
-          <FilterPopover value={filter} onChange={onChangeFilter} />
+          <FilterPopover
+            value={filter}
+            onChange={onChangeFilter}
+            open={filterOpen}
+            onOpenChange={onFilterOpenChange}
+          />
+          {filter.attentionTag ? (
+            <button
+              type="button"
+              onClick={() =>
+                onChangeFilter({ ...filter, attentionTag: null })
+              }
+              className="inline-flex h-7 items-center gap-1.5 rounded-full border border-[color:var(--cta-blue)]/30 bg-[color:var(--cta-blue)]/10 px-2.5 text-[11px] font-medium text-[color:var(--cta-blue)] hover:bg-[color:var(--cta-blue)]/15"
+            >
+              Saved: {filter.attentionTag}
+              <span aria-hidden>✕</span>
+            </button>
+          ) : null}
           {filter.cca || filter.lateComingMin !== null ? (
             <button
               type="button"

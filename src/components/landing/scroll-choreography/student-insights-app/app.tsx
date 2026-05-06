@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 import { EMPTY_FILTER } from "./components/filter-popover"
 import { DEFAULT_CLASS_ID, getClassById } from "./data"
@@ -13,15 +13,38 @@ import type { AppRoute } from "./types"
 const HEADINGS: Record<AppRoute, string> = {
   home: "Home",
   students: "Student Insights",
-  posts: "Posts",
-  reports: "Reports",
 }
 
-export function StudentInsightsApp() {
+const SAVED_GROUP_STUDENT_ID = "s3-01"
+
+export function StudentInsightsApp({
+  activeTab = 0,
+}: {
+  activeTab?: 0 | 1 | 2
+} = {}) {
   const [route, setRoute] = useState<AppRoute>("students")
   const [classId, setClassId] = useState<string>(DEFAULT_CLASS_ID)
   const [filter, setFilter] = useState<FilterState>(EMPTY_FILTER)
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null)
+  const [filterOpen, setFilterOpen] = useState(false)
+
+  useEffect(() => {
+    if (activeTab === 0) {
+      setRoute("students")
+      setSelectedStudentId(null)
+      setFilter(EMPTY_FILTER)
+      setFilterOpen(true)
+    } else if (activeTab === 1) {
+      setRoute("students")
+      setSelectedStudentId(null)
+      setFilter({ ...EMPTY_FILTER, attentionTag: "FAS" })
+      setFilterOpen(false)
+    } else {
+      setRoute("students")
+      setSelectedStudentId(SAVED_GROUP_STUDENT_ID)
+      setFilterOpen(false)
+    }
+  }, [activeTab])
 
   const cls = getClassById(classId)
   const selectedStudent = useMemo(
@@ -74,6 +97,8 @@ export function StudentInsightsApp() {
                 filter={filter}
                 onChangeFilter={setFilter}
                 onSelectStudent={setSelectedStudentId}
+                filterOpen={filterOpen}
+                onFilterOpenChange={setFilterOpen}
               />
             )
           ) : (

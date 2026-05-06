@@ -2,26 +2,38 @@ import { useState } from "react"
 
 import { CCA_OPTIONS } from "../data"
 import { Popover } from "./popover"
+import type { AttentionTag } from "../data"
 
 export type FilterState = {
   cca: string | null
   lateComingMin: number | null
+  attentionTag: AttentionTag | null
 }
 
-export const EMPTY_FILTER: FilterState = { cca: null, lateComingMin: null }
+export const EMPTY_FILTER: FilterState = {
+  cca: null,
+  lateComingMin: null,
+  attentionTag: null,
+}
 
 export function FilterPopover({
   value,
   onChange,
+  open,
+  onOpenChange,
 }: {
   value: FilterState
   onChange: (next: FilterState) => void
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }) {
   return (
     <Popover
       align="start"
       panelClassName="w-[420px]"
       role="dialog"
+      open={open}
+      onOpenChange={onOpenChange}
       trigger={({ isOpen, toggle }) => (
         <button
           type="button"
@@ -188,5 +200,6 @@ function filterCount(value: FilterState) {
   let n = 0
   if (value.cca) n += 1
   if (value.lateComingMin !== null) n += 1
+  if (value.attentionTag) n += 1
   return n
 }

@@ -7,11 +7,6 @@ const NAV_ITEMS: Array<{ id: AppRoute; label: string; icon: () => React.ReactEle
   { id: "students", label: "Student Insights", icon: PeopleIcon },
 ]
 
-const COMMS_ITEMS: Array<{ id: AppRoute; label: string; icon: () => React.ReactElement; badge?: string }> = [
-  { id: "posts", label: "Posts", icon: MailIcon, badge: "Release 2" },
-  { id: "reports", label: "Reports", icon: FileIcon, badge: "Experiment" },
-]
-
 export function Sidebar({
   active,
   onChange,
@@ -22,14 +17,9 @@ export function Sidebar({
   return (
     <aside className="flex h-full flex-col border-r border-black/[0.06] bg-white">
       <div className="flex items-center justify-between gap-2 px-3 py-2.5">
-        <div className="flex items-center gap-1.5">
-          <span className="text-[13px] font-semibold tracking-tight text-[color:var(--paper-ink)]">
-            Teacher Workspace
-          </span>
-          <span className="rounded-md bg-blue-50 px-1.5 py-0.5 text-[9px] font-semibold tracking-wider text-[color:var(--cta-blue)] uppercase">
-            Beta
-          </span>
-        </div>
+        <span className="text-[13px] font-semibold tracking-tight text-[color:var(--paper-ink)]">
+          Teacher Workspace
+        </span>
         <button
           type="button"
           aria-label="Collapse sidebar"
@@ -52,25 +42,6 @@ export function Sidebar({
             </li>
           ))}
         </ul>
-
-        <div>
-          <div className="px-2 pt-1.5 pb-1 text-[9px] font-semibold tracking-wider text-black/45 uppercase">
-            Communications
-          </div>
-          <ul className="flex flex-col gap-0.5">
-            {COMMS_ITEMS.map((item) => (
-              <li key={item.id}>
-                <NavButton
-                  active={item.id === active}
-                  onClick={() => onChange(item.id)}
-                  icon={<item.icon />}
-                  label={item.label}
-                  badge={item.badge}
-                />
-              </li>
-            ))}
-          </ul>
-        </div>
       </nav>
 
       <div className="flex flex-col gap-0.5 border-t border-black/[0.06] px-2 py-2">
@@ -158,30 +129,6 @@ function PeopleIcon() {
         fill="none"
         strokeLinecap="round"
       />
-    </svg>
-  )
-}
-
-function MailIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden>
-      <rect x="2" y="4" width="12" height="9" rx="1" stroke="currentColor" strokeWidth="1.3" fill="none" />
-      <path d="M2.5 5l5.5 4 5.5-4" stroke="currentColor" strokeWidth="1.3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
-function FileIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden>
-      <path
-        d="M4 2h5l3 3v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        fill="none"
-        strokeLinejoin="round"
-      />
-      <path d="M9 2v3h3" stroke="currentColor" strokeWidth="1.3" fill="none" />
     </svg>
   )
 }

@@ -19,13 +19,6 @@ export function TopBar({ heading }: { heading: string }) {
         >
           Sign in
         </button>
-        <span aria-hidden className="h-4 w-px bg-black/15" />
-        <button
-          type="button"
-          className="inline-flex h-7 items-center gap-1.5 rounded-full border border-black/15 px-3 text-[11px] font-medium text-[color:var(--paper-ink)] hover:bg-black/[0.03]"
-        >
-          <ChatIcon /> Assistant
-        </button>
       </div>
     </div>
   )
@@ -45,16 +38,3 @@ function BellIcon() {
   )
 }
 
-function ChatIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 16 16" aria-hidden>
-      <path
-        d="M3 4.5C3 3.7 3.7 3 4.5 3h7c.8 0 1.5.7 1.5 1.5v5c0 .8-.7 1.5-1.5 1.5H7.5L5 13.2V11h-.5C3.7 11 3 10.3 3 9.5v-5z"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        fill="none"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}

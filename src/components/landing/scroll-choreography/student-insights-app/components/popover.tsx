@@ -9,6 +9,8 @@ type PopoverProps = {
   align?: "start" | "end"
   panelClassName?: string
   role?: "dialog" | "listbox"
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
 export function Popover({
@@ -17,21 +19,30 @@ export function Popover({
   align = "start",
   panelClassName,
   role = "dialog",
+  open,
+  onOpenChange,
 }: PopoverProps) {
-  const [isOpen, setIsOpen] = useState(false)
+  const isControlled = open !== undefined
+  const [internalOpen, setInternalOpen] = useState(false)
+  const isOpen = isControlled ? open : internalOpen
+  const setIsOpen = (next: boolean) => {
+    if (!isControlled) setInternalOpen(next)
+    onOpenChange?.(next)
+  }
+  const setIsOpenRef = useRef(setIsOpen)
+  setIsOpenRef.current = setIsOpen
   const wrapperRef = useRef<HTMLDivElement>(null)
   const panelId = useId()
 
   useEffect(() => {
     if (!isOpen) return
+    const close = () => setIsOpenRef.current(false)
     const onClick = (event: MouseEvent) => {
       if (!wrapperRef.current) return
-      if (!wrapperRef.current.contains(event.target as Node)) {
-        setIsOpen(false)
-      }
+      if (!wrapperRef.current.contains(event.target as Node)) close()
     }
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsOpen(false)
+      if (event.key === "Escape") close()
     }
     document.addEventListener("mousedown", onClick)
     document.addEventListener("keydown", onKey)
@@ -43,7 +54,7 @@ export function Popover({
 
   return (
     <div ref={wrapperRef} className="relative inline-flex">
-      {trigger({ isOpen, toggle: () => setIsOpen((v) => !v) })}
+      {trigger({ isOpen, toggle: () => setIsOpen(!isOpen) })}
       {isOpen ? (
         <div
           id={panelId}

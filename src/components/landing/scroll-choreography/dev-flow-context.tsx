@@ -56,8 +56,8 @@ export type PaperCardConfig = {
 }
 
 export const PAPER_CARD_DEFAULTS: PaperCardConfig = {
-  opacityFadeStart: 0.37,
-  opacityFadeEnd: 0.63,
+  opacityFadeStart: 0.32,
+  opacityFadeEnd: 0.38,
   paperOriginY: 68,
 }
 

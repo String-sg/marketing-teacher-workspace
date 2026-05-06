@@ -16,10 +16,11 @@
  * otherwise hijacks scroll-linked opacity (see paper-backdrop.tsx).
  */
 import { motion, useTransform } from "motion/react"
-import { useState } from "react"
 
 import { useScrollChoreography } from "./context"
 import { useFlowStages } from "./dev-flow-context"
+import { useProductTab } from "./product-tab-context"
+import type { ProductTabIndex } from "./product-tab-context"
 
 import { stages } from "@/content/landing"
 
@@ -36,7 +37,7 @@ export function StageCopy({ stage }: StageCopyProps) {
     throw new Error(`StageCopy: unknown stage "${stage}"`)
   }
   const { heading, bullets, cta } = entry.copy
-  const [active, setActive] = useState(0)
+  const { activeTab, setActiveTab } = useProductTab()
 
   const fadeInStart = byFlowId("wow")!.window[1]
   const holdStart = byFlowId("docked")!.window[0]
@@ -61,17 +62,17 @@ export function StageCopy({ stage }: StageCopyProps) {
         <div className="mt-8 border-t border-[color:var(--paper-rule)]">
           {bullets.map((bullet, idx) => (
             <button
-              aria-expanded={idx === active}
+              aria-expanded={idx === activeTab}
               className="flex w-full gap-4 border-b border-[color:var(--paper-rule)] py-6 text-left transition-colors duration-200 ease-out hover:bg-[color:var(--paper-hover-bg)] focus-visible:bg-[color:var(--paper-hover-bg)] focus-visible:outline-none"
               key={bullet.title}
-              onClick={() => setActive(idx)}
+              onClick={() => setActiveTab(idx as ProductTabIndex)}
               type="button"
             >
               <span
                 aria-hidden
                 className={[
                   "mt-[10px] size-2 shrink-0 rounded-full transition-colors duration-200 ease-out",
-                  idx === active
+                  idx === activeTab
                     ? "bg-primary"
                     : "border border-[color:var(--paper-ink)]/25",
                 ].join(" ")}
@@ -80,7 +81,7 @@ export function StageCopy({ stage }: StageCopyProps) {
                 <p className="text-[17px] leading-[26px] font-semibold tracking-[-0.005em] text-[color:var(--paper-ink)]">
                   {bullet.title}
                 </p>
-                {idx === active ? (
+                {idx === activeTab ? (
                   <p className="mt-2 text-[15px] leading-[24px] text-[color:var(--paper-muted)]">
                     {bullet.body}
                   </p>

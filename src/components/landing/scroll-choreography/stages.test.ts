@@ -58,7 +58,7 @@ describe("STAGES data", () => {
   it("STAGES window endpoints match the current schedule", () => {
     expect(byId("hero").window).toEqual([0, 0.21])
     expect(byId("wow").window).toEqual([0.57, 0.62])
-    expect(byId("docked").window).toEqual([0.63, 0.98])
+    expect(byId("docked").window).toEqual([0.7, 0.98])
   })
 
   it("wow rect — centered full-viewport reveal", () => {

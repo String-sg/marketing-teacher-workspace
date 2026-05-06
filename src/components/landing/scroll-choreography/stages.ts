@@ -29,7 +29,7 @@ export const STAGES = [
   },
   {
     id: "docked",
-    window: [0.63, 0.98] as const,
+    window: [0.7, 0.98] as const,
     scale: 0.5,
     x: "+28cqi",
     y: "0cqi",

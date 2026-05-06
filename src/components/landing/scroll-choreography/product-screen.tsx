@@ -22,6 +22,7 @@ import { motion, useTransform } from "motion/react"
 import { useScrollChoreography } from "./context"
 import { useFlowStages, usePaperCardConfig } from "./dev-flow-context"
 import { EASE_WOW_TO_DOCKED, LINEAR, SCALE_EASES } from "./eases"
+import { useProductTab } from "./product-tab-context"
 import { StudentInsightsApp } from "./student-insights-app/app"
 
 import { TEACHER_WORKSPACE_APP_URL } from "@/content/landing"
@@ -83,6 +84,7 @@ function compensateYTranslate(
 
 export function ProductScreen() {
   const { scrollYProgress, teacherScale } = useScrollChoreography()
+  const { activeTab } = useProductTab()
   const STAGES = useFlowStages()
   const paper = usePaperCardConfig()
   const HERO = STAGES[0]
@@ -198,7 +200,7 @@ export function ProductScreen() {
           </span>
         </div>
         <div className="aspect-[16/10] w-full">
-          <StudentInsightsApp />
+          <StudentInsightsApp activeTab={activeTab} />
         </div>
       </motion.div>
     </motion.div>
