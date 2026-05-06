@@ -179,7 +179,7 @@ export function ProductScreen() {
       style={{ opacity, x: compensatedX, y: compensatedY }}
     >
       <motion.div
-        className="relative w-full max-w-[1280px] overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_30px_120px_-40px_rgb(15_23_42/0.45)]"
+        className="relative w-full max-w-[1280px] overflow-hidden rounded-2xl border border-black/10 bg-white"
         style={{ scale: compensatedScale }}
       >
         <div className="flex items-center gap-2 border-b border-black/5 bg-[#f7f7f5] px-4 py-2.5">

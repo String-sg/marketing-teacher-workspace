@@ -79,24 +79,49 @@ export function PaperBackdrop({ children }: { children?: ReactNode }) {
       >
         {/* Halftone cloud overlays — positioned per Paper "Hero V2 — Cloud
             Notes" design. Mix-blend-lighten lets the white halftone cloud
-            sit on the sky gradient without a hard edge. */}
-        <img
+            sit on the sky gradient without a hard edge. Each cloud drifts
+            on its own period so the sky feels alive without any one
+            element catching the eye. Choreography path is reduced-motion
+            gated upstream (see ScrollChoreography), so no extra check
+            here. */}
+        <motion.img
           alt=""
           aria-hidden
+          animate={{ x: ["-1%", "1.5%", "-1%"], y: ["0%", "-0.6%", "0%"] }}
           className="pointer-events-none absolute top-[2%] left-[78%] w-[18%] mix-blend-lighten select-none"
           src="/hero/cloud-halftone.png"
+          transition={{
+            duration: 22,
+            ease: "easeInOut",
+            repeat: Infinity,
+            repeatType: "loop",
+          }}
         />
-        <img
+        <motion.img
           alt=""
           aria-hidden
+          animate={{ x: ["1%", "-1.2%", "1%"], y: ["-0.4%", "0.4%", "-0.4%"] }}
           className="pointer-events-none absolute top-[16%] left-[60%] w-[40%] mix-blend-lighten select-none"
           src="/hero/cloud-halftone.png"
+          transition={{
+            duration: 32,
+            ease: "easeInOut",
+            repeat: Infinity,
+            repeatType: "loop",
+          }}
         />
-        <img
+        <motion.img
           alt=""
           aria-hidden
+          animate={{ x: ["-0.8%", "1%", "-0.8%"], y: ["0.3%", "-0.5%", "0.3%"] }}
           className="pointer-events-none absolute top-[28%] -left-[8%] w-[36%] mix-blend-lighten select-none"
           src="/hero/cloud-halftone.png"
+          transition={{
+            duration: 40,
+            ease: "easeInOut",
+            repeat: Infinity,
+            repeatType: "loop",
+          }}
         />
       </motion.div>
 

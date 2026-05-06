@@ -115,17 +115,17 @@ function ChoreographyTree({
                   >
                     {hero.headline}
                   </h1>
+                  <p className="mt-5 text-[14px] text-[color:var(--paper-muted)]">
+                    {siteCtaCopy.access}
+                  </p>
                   <Button
                     asChild
-                    className="mt-7 h-10 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-[var(--paper-shadow-cta)] transition-all duration-200 ease-out hover:-translate-y-px hover:bg-primary/90 hover:shadow-[var(--paper-shadow-cta-hover)]"
+                    className="mt-5 h-10 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-[var(--paper-shadow-cta)] transition-all duration-200 ease-out hover:-translate-y-px hover:bg-primary/90 hover:shadow-[var(--paper-shadow-cta-hover)]"
                   >
                     <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
                       {siteCtaCopy.primary}
                     </a>
                   </Button>
-                  <p className="mt-3 text-xs text-[color:var(--paper-muted)]">
-                    {siteCtaCopy.access}
-                  </p>
                 </motion.div>
               </div>
             </PaperBackdrop>
