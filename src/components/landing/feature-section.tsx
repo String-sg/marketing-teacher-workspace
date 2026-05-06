@@ -39,7 +39,7 @@ export function FeatureSection(props: FeatureSectionProps) {
 
   return (
     <section
-      className="relative px-5 py-24 sm:px-8 lg:py-32"
+      className="relative px-5 py-14 sm:px-8 sm:py-24 lg:py-32"
       id={sectionId}
     >
       <div

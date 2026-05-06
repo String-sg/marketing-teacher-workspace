@@ -8,7 +8,7 @@ import { RevealOnScroll } from "./reveal-on-scroll"
 export function FinalCta() {
   return (
     <section
-      className="relative overflow-hidden px-5 py-24 sm:px-8 lg:py-32"
+      className="relative overflow-hidden px-5 py-14 sm:px-8 sm:py-24 lg:py-32"
       id="pricing"
     >
       <RevealOnScroll>

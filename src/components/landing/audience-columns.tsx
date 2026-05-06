@@ -13,7 +13,7 @@ const PEEKS = [FormTeachersPeek, YearHeadsPeek, SchoolLeadersPeek] as const
 export function AudienceColumns() {
   return (
     <section
-      className="relative px-5 py-20 sm:px-8 lg:py-28"
+      className="relative px-5 py-14 sm:px-8 sm:py-20 lg:py-28"
       id="audiences"
     >
       <div className="mx-auto w-full max-w-[1248px]">

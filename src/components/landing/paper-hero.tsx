@@ -20,7 +20,7 @@ export function PaperHero() {
   return (
     <section
       aria-labelledby="hero-title-static"
-      className="relative min-h-svh overflow-hidden px-5 py-3 sm:px-8"
+      className="relative overflow-hidden px-5 py-3 sm:min-h-svh sm:px-8"
     >
       <div className="paper-card relative mx-auto flex w-full max-w-[1412px] flex-1 flex-col items-center overflow-hidden rounded-[28px] shadow-[0_10px_60px_-30px_rgb(15_23_42/0.18)] sm:rounded-[44px]">
         <div
@@ -62,7 +62,7 @@ export function PaperHero() {
                 "cloud-drift-c 11s cubic-bezier(0.455, 0.03, 0.515, 0.955) -5s infinite alternate",
             }}
           />
-          <div className="absolute inset-0 grid place-items-center">
+          <div className="absolute inset-0 flex items-end justify-center sm:items-center">
             <div className="relative aspect-[16/10] w-full max-w-[calc(100svh*1.6)] [container-type:inline-size]">
               <img
                 alt=""
@@ -84,7 +84,7 @@ export function PaperHero() {
           <div className="px-4 pt-4 sm:px-6 sm:pt-6">
             <SiteHeader />
           </div>
-          <div className="mx-auto mt-12 flex w-fit flex-col items-center px-4 text-center sm:mt-16">
+          <div className="mx-auto mt-8 flex w-fit flex-col items-center px-4 text-center sm:mt-16">
             <h1
               className="font-heading text-[clamp(2.25rem,5.5vw,3.75rem)] leading-[1.1] font-medium tracking-[-0.025em] text-balance text-[#0F1B33]"
               id="hero-title-static"
@@ -103,7 +103,7 @@ export function PaperHero() {
               </a>
             </Button>
           </div>
-          <div className="h-[42vh] sm:h-[48vh]" aria-hidden />
+          <div className="h-[26vh] sm:h-[48vh]" aria-hidden />
         </div>
       </div>
     </section>
