@@ -69,7 +69,7 @@ export function PaperBackdrop({ children }: { children?: ReactNode }) {
   )
 
   return (
-    <div className="paper-card relative mx-auto flex w-full max-w-[1412px] flex-1 flex-col items-center overflow-hidden rounded-[28px] shadow-[0_10px_60px_-30px_rgb(15_23_42/0.18)] sm:rounded-[44px]">
+    <div className="paper-card relative mx-auto flex w-full max-w-[1412px] flex-1 flex-col items-center overflow-hidden rounded-[28px] sm:rounded-[44px]">
       <motion.div
         aria-hidden
         className="absolute inset-0 overflow-hidden rounded-[28px] bg-gradient-to-b from-[#cfe5f7] from-0% via-[#e8f1fa] via-35% to-white to-75% sm:rounded-[44px]"
