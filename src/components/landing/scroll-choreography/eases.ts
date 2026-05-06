@@ -34,3 +34,22 @@ export const EASE_WOW_TO_DOCKED = cubicBezier(0.4, 0, 0.2, 1)
  * of ease-out-expo.
  */
 export const EASE_OUT_EXIT = cubicBezier(0.165, 0.84, 0.44, 1)
+
+/**
+ * Per-segment scale easing for the 3-stage product-screen morph (and the
+ * locked teacher/cards/bg scenery layers that derive from it). Five
+ * segments line up with [hero.start, hero.end, wow.start, wow.end,
+ * docked.start, docked.end] keyframes:
+ *   1. hero hold (LINEAR)
+ *   2. hero→wow ramp (ease-in-out — camera into scene)
+ *   3. wow hold (LINEAR)
+ *   4. wow→docked ramp (decelerate so layers settle into the docked plateau)
+ *   5. docked hold (LINEAR)
+ */
+export const SCALE_EASES = [
+  LINEAR,
+  EASE_HERO_TO_WOW,
+  LINEAR,
+  EASE_WOW_TO_DOCKED,
+  LINEAR,
+]

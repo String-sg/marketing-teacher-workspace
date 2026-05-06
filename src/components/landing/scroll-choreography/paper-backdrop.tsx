@@ -21,8 +21,10 @@
  *       · Teacher motion.div carries `teacherScale` and contains
  *         hero-teacher-sketch.svg (the teacher at desk) together with
  *         <ProductScreen> — they zoom together as one depth plane.
- *     All three layer wrappers share transformOrigin "50% 92%" so the
- *     stagger converges toward the same focal point (the laptop screen).
+ *     The cards + teacher layers share transformOrigin `50% ${paperOriginY}%`
+ *     (default 68%, tunable via the dev panel) so the layered scenery
+ *     scales around the laptop in the SVG and the screen-on-laptop stays
+ *     in viewport at every teacher scale.
  *   - Caller-supplied `children` render on top (z-index 10+) and are
  *     unaffected by any layer scale/opacity — SiteHeader and hero copy
  *     live there.
@@ -67,10 +69,10 @@ export function PaperBackdrop({ children }: { children?: ReactNode }) {
   )
 
   return (
-    <div className="paper-card relative mx-auto flex w-full max-w-[110rem] flex-1 flex-col items-center overflow-hidden rounded-[20px] shadow-[0_10px_60px_-30px_rgb(15_23_42/0.18)]">
+    <div className="paper-card relative mx-auto flex w-full max-w-[1412px] flex-1 flex-col items-center overflow-hidden rounded-[28px] shadow-[0_10px_60px_-30px_rgb(15_23_42/0.18)] sm:rounded-[44px]">
       <motion.div
         aria-hidden
-        className="absolute inset-0 overflow-hidden rounded-[20px] bg-gradient-to-b from-[#cfe5f7] from-0% via-[#e8f1fa] via-35% to-white to-75%"
+        className="absolute inset-0 overflow-hidden rounded-[28px] bg-gradient-to-b from-[#cfe5f7] from-0% via-[#e8f1fa] via-35% to-white to-75% sm:rounded-[44px]"
         style={{
           scale: bgScale,
           opacity: stageOpacity,
@@ -87,7 +89,7 @@ export function PaperBackdrop({ children }: { children?: ReactNode }) {
         <motion.img
           alt=""
           aria-hidden
-          animate={{ x: ["-1%", "1.5%", "-1%"], y: ["0%", "-0.6%", "0%"] }}
+          animate={{ x: ["-2%", "2%", "-2%"] }}
           className="pointer-events-none absolute top-[2%] left-[78%] w-[18%] mix-blend-lighten select-none"
           src="/hero/cloud-halftone.png"
           transition={{
@@ -100,7 +102,7 @@ export function PaperBackdrop({ children }: { children?: ReactNode }) {
         <motion.img
           alt=""
           aria-hidden
-          animate={{ x: ["1%", "-1.2%", "1%"], y: ["-0.4%", "0.4%", "-0.4%"] }}
+          animate={{ x: ["1.5%", "-1.5%", "1.5%"] }}
           className="pointer-events-none absolute top-[16%] left-[60%] w-[40%] mix-blend-lighten select-none"
           src="/hero/cloud-halftone.png"
           transition={{
@@ -113,7 +115,7 @@ export function PaperBackdrop({ children }: { children?: ReactNode }) {
         <motion.img
           alt=""
           aria-hidden
-          animate={{ x: ["-0.8%", "1%", "-0.8%"], y: ["0.3%", "-0.5%", "0.3%"] }}
+          animate={{ x: ["-1.2%", "1.2%", "-1.2%"] }}
           className="pointer-events-none absolute top-[28%] -left-[8%] w-[36%] mix-blend-lighten select-none"
           src="/hero/cloud-halftone.png"
           transition={{
@@ -140,24 +142,32 @@ export function PaperBackdrop({ children }: { children?: ReactNode }) {
           <motion.div
             aria-hidden
             className="pointer-events-none absolute inset-0"
-            style={{ scale: cardsScale, transformOrigin: "50% 92%" }}
+            style={{
+              scale: cardsScale,
+              transformOrigin: `50% ${paper.paperOriginY}%`,
+            }}
           >
-            <img
+            <motion.img
               alt=""
               aria-hidden
               className="pointer-events-none absolute top-[var(--cards-top)] left-1/2 w-[var(--cards-width)] -translate-x-1/2 select-none"
               src="/hero/hero-cards-sketch.svg"
+              style={{ opacity: stageOpacity }}
             />
           </motion.div>
           <motion.div
             className="absolute inset-0"
-            style={{ scale: teacherScale, transformOrigin: "50% 92%" }}
+            style={{
+              scale: teacherScale,
+              transformOrigin: `50% ${paper.paperOriginY}%`,
+            }}
           >
-            <img
+            <motion.img
               alt=""
               aria-hidden
               className="pointer-events-none absolute top-[var(--teacher-top)] left-1/2 w-[var(--teacher-width)] -translate-x-1/2 select-none"
               src="/hero/hero-teacher-sketch.svg"
+              style={{ opacity: stageOpacity }}
             />
             <ProductScreen />
           </motion.div>

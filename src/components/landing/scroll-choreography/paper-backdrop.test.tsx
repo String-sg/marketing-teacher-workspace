@@ -70,6 +70,26 @@ describe("PaperBackdrop render shape", () => {
   })
 })
 
+describe("PaperBackdrop scenery opacity lock", () => {
+  it("teacher + cards sketches fade out by docked window end so they don't bleed over the docked product screen", () => {
+    const { container } = renderWithMockProgress(byId("docked").window[1])
+    const cards = container.querySelector(
+      "img[src='/hero/hero-cards-sketch.svg']"
+    ) as HTMLElement | null
+    const teacher = container.querySelector(
+      "img[src='/hero/hero-teacher-sketch.svg']"
+    ) as HTMLElement | null
+    expect(cards).not.toBeNull()
+    expect(teacher).not.toBeNull()
+
+    // The shared `stageOpacity` MotionValue applied to both SVG imgs reaches
+    // 0 at any progress >= opacityFadeEnd (0.63 default). docked.window[1]
+    // (0.98) is well past that, so both sketches must be fully transparent.
+    expect(cards?.style.opacity).toBe("0")
+    expect(teacher?.style.opacity).toBe("0")
+  })
+})
+
 describe("PaperBackdrop motion-value-driven shape (CHOREO-06 / MIGRATE-02)", () => {
   it("renders motion-value-driven inline styles on the per-layer scale wrappers", () => {
     const { container } = renderWithMockProgress(byId("wow").window[1])

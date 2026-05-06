@@ -15,16 +15,10 @@ import { ScrollChoreographyContext } from "./context"
 import {
   DevFlowProvider,
   useFlowStages,
-  usePaperCardConfig,
   useScrollHeightVh,
 } from "./dev-flow-context"
 import { DevFlowPanel } from "./dev-flow-panel"
-import {
-  EASE_HERO_TO_WOW,
-  EASE_OUT_EXIT,
-  EASE_WOW_TO_DOCKED,
-  LINEAR,
-} from "./eases"
+import { EASE_OUT_EXIT, LINEAR, SCALE_EASES } from "./eases"
 import { PaperBackdrop } from "./paper-backdrop"
 import { StageCopy } from "./stage-copy"
 import { STAGES } from "./stages"
@@ -99,7 +93,7 @@ function ChoreographyTree({
     <DevFlowProvider>
       <ChoreographyContextShell scrollYProgress={scrollYProgress}>
         <ChoreographySection sectionRef={sectionRef}>
-          <div className="sticky top-0 flex h-svh items-stretch overflow-hidden p-3">
+          <div className="sticky top-0 flex h-svh items-stretch overflow-hidden px-5 py-3 sm:px-8">
             <PaperBackdrop>
               <div className="relative z-10 flex w-full flex-col">
                 <div className="px-4 pt-4 sm:px-6 sm:pt-6">
@@ -110,7 +104,7 @@ function ChoreographyTree({
                   style={{ opacity: copyOpacity, y: copyY }}
                 >
                   <h1
-                    className="font-heading text-[clamp(2.25rem,5.5vw,3.75rem)] leading-[1.1] font-bold tracking-[-0.025em] text-balance text-[#0F1B33]"
+                    className="font-heading text-[clamp(2.25rem,5.5vw,3.75rem)] leading-[1.1] font-medium tracking-[-0.025em] text-balance text-[#0F1B33]"
                     id="hero-title"
                   >
                     {hero.headline}
@@ -149,47 +143,43 @@ function ChoreographyContextShell({
   children: ReactNode
 }) {
   const stages = useFlowStages()
-  const paper = usePaperCardConfig()
-  const heroHoldEnd = stages.find((s) => s.id === "hero")?.window[1] ?? 0.15
-  const dockedStart = stages.find((s) => s.id === "docked")?.window[0] ?? 0.3
 
-  // Each layer reaches scaleMidValue at its own progress, then converges
-  // to scaleEndValue by scaleEndAt. scaleEndAt is the later of dockedStart
-  // and the layer's own midProgress + epsilon — guarantees monotonic
-  // keyframes when the user drags a midProgress past dockedStart.
-  //
-  // Ease shape per layer (4 segments): hold(LINEAR) →
-  // ramp1(EASE_HERO_TO_WOW) → ramp2(EASE_WOW_TO_DOCKED) → hold(LINEAR).
-  // Camera moving through the scene = on-screen movement → ease-in-out.
-  // Decelerating WOW→DOCKED ease lands the layer cleanly into the 5.2x
-  // hold instead of crashing into it. Matches the product-screen morph's
-  // segment-by-segment ease so layer scales and screen scale move on
-  // the same beat.
-  const layerEases = [LINEAR, EASE_HERO_TO_WOW, EASE_WOW_TO_DOCKED, LINEAR]
-  const bgScaleEndAt = Math.max(dockedStart, paper.bgMidProgress + 0.0001)
-  const bgScale = useTransform(
+  // Lock scenery scale (bg + cards + teacher) to the product-screen scale
+  // by ratio. The hero baseline ratio is screen=STAGES[0].scale (0.05) /
+  // teacher=1, so dividing the screen scale curve by HERO_SCREEN_SCALE
+  // yields a teacher curve that grows in lock-step with the screen and
+  // keeps the screen visually glued to the laptop drawn into the SVG
+  // (compensatedScale = scale / teacherScale collapses to a constant
+  // HERO_SCREEN_SCALE — see product-screen.tsx).
+  const HERO_SCREEN_SCALE = stages[0].scale
+  const screenScale = useTransform(
     scrollYProgress,
-    [0, heroHoldEnd, paper.bgMidProgress, bgScaleEndAt, 1],
-    [1, 1, paper.scaleMidValue, paper.scaleEndValue, paper.scaleEndValue],
-    { ease: layerEases }
-  )
-  const cardsScaleEndAt = Math.max(dockedStart, paper.cardsMidProgress + 0.0001)
-  const cardsScale = useTransform(
-    scrollYProgress,
-    [0, heroHoldEnd, paper.cardsMidProgress, cardsScaleEndAt, 1],
-    [1, 1, paper.scaleMidValue, paper.scaleEndValue, paper.scaleEndValue],
-    { ease: layerEases }
-  )
-  const teacherScaleEndAt = Math.max(
-    dockedStart,
-    paper.teacherMidProgress + 0.0001
+    [
+      stages[0].window[0],
+      stages[0].window[1],
+      stages[1].window[0],
+      stages[1].window[1],
+      stages[2].window[0],
+      stages[2].window[1],
+    ],
+    [
+      stages[0].scale,
+      stages[0].scale,
+      stages[1].scale,
+      stages[1].scale,
+      stages[2].scale,
+      stages[2].scale,
+    ],
+    { ease: SCALE_EASES }
   )
   const teacherScale = useTransform(
-    scrollYProgress,
-    [0, heroHoldEnd, paper.teacherMidProgress, teacherScaleEndAt, 1],
-    [1, 1, paper.scaleMidValue, paper.scaleEndValue, paper.scaleEndValue],
-    { ease: layerEases }
+    screenScale,
+    (s) => s / HERO_SCREEN_SCALE
   )
+  // bg + cards live on the same plane as the teacher under the lock —
+  // any other choice breaks the "screen glued to laptop" invariant.
+  const bgScale = teacherScale
+  const cardsScale = teacherScale
 
   return (
     <ScrollChoreographyContext.Provider

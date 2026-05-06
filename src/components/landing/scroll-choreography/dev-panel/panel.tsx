@@ -16,7 +16,7 @@ import { useScrollChoreography } from "../context"
 import { useFlowControls } from "../dev-flow-context"
 import { KeyframeInspector } from "./keyframe-inspector"
 import { LayoutGroup } from "./layout-group"
-import { LayerScaleLane, OpacityLane } from "./paper-group"
+import { FocalPointField, OpacityLane } from "./paper-group"
 import { PanelHeader } from "./panel-header"
 import { PROPERTY_ADAPTERS } from "./property-adapters"
 import { PropertyTrack } from "./property-track"
@@ -85,7 +85,6 @@ function PanelShell({
   onCopy: () => void
 }) {
   const { setSelection } = useSelection()
-  const heroHoldEnd = controls.stages[0]?.window[1] ?? 0.12
 
   // Esc anywhere clears selection
   useEffect(() => {
@@ -135,17 +134,6 @@ function PanelShell({
                 />
               ))}
               <div className="h-px bg-black/5" />
-              {(["bg", "cards", "teacher"] as const).map((layer) => (
-                <LayerScaleLane
-                  key={layer}
-                  layer={layer}
-                  paper={controls.paperCard}
-                  setPaperCard={controls.setPaperCard}
-                  heroHoldEnd={heroHoldEnd}
-                  view={controls.view}
-                  progress={progress}
-                />
-              ))}
               <OpacityLane
                 paper={controls.paperCard}
                 setPaperCard={controls.setPaperCard}
@@ -168,6 +156,11 @@ function PanelShell({
             <LayoutGroup
               config={controls.sketches}
               onChange={controls.setSketches}
+            />
+
+            <FocalPointField
+              paper={controls.paperCard}
+              setPaperCard={controls.setPaperCard}
             />
 
             <div className="flex gap-2">

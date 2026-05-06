@@ -20,12 +20,12 @@ export function PaperHero() {
   return (
     <section
       aria-labelledby="hero-title-static"
-      className="relative min-h-svh overflow-hidden p-3"
+      className="relative min-h-svh overflow-hidden px-5 py-3 sm:px-8"
     >
-      <div className="paper-card relative mx-auto flex w-full max-w-[110rem] flex-1 flex-col items-center overflow-hidden rounded-[20px] shadow-[0_10px_60px_-30px_rgb(15_23_42/0.18)]">
+      <div className="paper-card relative mx-auto flex w-full max-w-[1412px] flex-1 flex-col items-center overflow-hidden rounded-[28px] shadow-[0_10px_60px_-30px_rgb(15_23_42/0.18)] sm:rounded-[44px]">
         <div
           aria-hidden
-          className="absolute inset-0 overflow-hidden rounded-[20px] bg-gradient-to-b from-[#cfe5f7] from-0% via-[#e8f1fa] via-35% to-white to-75%"
+          className="absolute inset-0 overflow-hidden rounded-[28px] bg-gradient-to-b from-[#cfe5f7] from-0% via-[#e8f1fa] via-35% to-white to-75% sm:rounded-[44px]"
         >
           {/* Halftone cloud overlays — match Paper "Hero V2 — Cloud Notes". */}
           <img
@@ -70,7 +70,7 @@ export function PaperHero() {
           </div>
           <div className="mx-auto mt-12 flex w-fit flex-col items-center px-4 text-center sm:mt-16">
             <h1
-              className="font-heading text-[clamp(2.25rem,5.5vw,3.75rem)] leading-[1.1] font-bold tracking-[-0.025em] text-balance text-[#0F1B33]"
+              className="font-heading text-[clamp(2.25rem,5.5vw,3.75rem)] leading-[1.1] font-medium tracking-[-0.025em] text-balance text-[#0F1B33]"
               id="hero-title-static"
             >
               {hero.headline}

@@ -33,41 +33,32 @@ export type StageRectPatch = Partial<{
 }>
 
 /**
- * Paper-card (cartoon video) zoom envelope. Drives three per-layer scale
- * curves applied as inner wrappers in PaperBackdrop, plus the background
- * opacity fade. Each layer (background, cards, teacher) has its own
- * `*MidProgress` so the user can stagger when each depth layer reaches
- * the shared mid-scale, producing a cinematic camera-into-the-scene
- * effect. All three layers converge to the same `scaleEndValue` so the
- * illustration recomposes coherently at the docked stage.
+ * Paper-card scenery opacity fade + focal-point Y. The scenery layer
+ * scales (bg, cards, teacher) are no longer tunable per-layer — they're
+ * locked to the product-screen scale curve at ratio STAGES.scale /
+ * STAGES[0].scale (see ChoreographyContextShell in
+ * scroll-choreography.tsx) so the screen stays visually glued to the
+ * laptop drawn into the SVG. Only the shared opacity fade window and
+ * the layered scenery's transform-origin Y (the "focal point" the
+ * camera dollies into) remain user-adjustable here.
  *
- *   scale<layer>: [0, heroHoldEnd, <layer>MidProgress, scaleEndAt, 1]
- *              -> [1, 1,           scaleMidValue,      scaleEndValue, scaleEndValue]
- *   opacity:     [0, opacityFadeStart, opacityFadeEnd, 1]
- *              -> [1, 1,                0,              0]
- *
- * heroHoldEnd auto-tracks STAGES[hero].window[1] so every layer stays at
- * scale 1 throughout the hero hold and only starts zooming once the
- * UI begins its hero→wow morph.
+ *   opacity: [0, opacityFadeStart, opacityFadeEnd, 1]
+ *         -> [1, 1,                0,              0]
+ *   paperOriginY: percentage of frame height for the cards + teacher
+ *                 transform-origin (50% on x). Default 68 puts the
+ *                 origin on the laptop in the SVG, so the laptop stays
+ *                 in viewport as teacher scales.
  */
 export type PaperCardConfig = {
-  readonly bgMidProgress: number
-  readonly cardsMidProgress: number
-  readonly teacherMidProgress: number
-  readonly scaleMidValue: number
-  readonly scaleEndValue: number
   readonly opacityFadeStart: number
   readonly opacityFadeEnd: number
+  readonly paperOriginY: number
 }
 
 export const PAPER_CARD_DEFAULTS: PaperCardConfig = {
-  bgMidProgress: 0.3,
-  cardsMidProgress: 0.43,
-  teacherMidProgress: 0.63,
-  scaleMidValue: 4.1,
-  scaleEndValue: 19.1,
   opacityFadeStart: 0.37,
   opacityFadeEnd: 0.63,
+  paperOriginY: 68,
 }
 
 export type PaperCardPatch = Partial<PaperCardConfig>
@@ -181,16 +172,14 @@ export function DevFlowProvider({ children }: { children: ReactNode }) {
   const setPaperCard = useCallback((patch: PaperCardPatch) => {
     setPaperCardState((prev) => {
       const next = { ...prev, ...patch }
-      // Clamp progress-based fields to [0, 1]; keep scale/opacity values
-      // free-form (negative/large values are nonsense but easy to spot in
-      // tuning so we don't second-guess the dev).
+      // Clamp the progress-based fade window to [0, 1] so out-of-range
+      // input from the dev panel can't produce non-monotonic keyframes.
+      // Clamp paperOriginY to [0, 100] so it stays a valid CSS percent.
       return {
         ...next,
-        bgMidProgress: clamp01(next.bgMidProgress),
-        cardsMidProgress: clamp01(next.cardsMidProgress),
-        teacherMidProgress: clamp01(next.teacherMidProgress),
         opacityFadeStart: clamp01(next.opacityFadeStart),
         opacityFadeEnd: clamp01(next.opacityFadeEnd),
+        paperOriginY: Math.min(Math.max(next.paperOriginY, 0), 100),
       }
     })
   }, [])

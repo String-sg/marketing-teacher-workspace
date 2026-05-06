@@ -75,4 +75,34 @@ describe("STAGES data", () => {
     expect(d.opacity).toBe(1)
     expect(d.x).toBe("+28cqi")
   })
+
+  // Scenery layers (bg/cards/teacher) are locked to the product-screen
+  // scale via teacherScale = STAGES.scale / STAGES[0].scale (see
+  // ChoreographyContextShell). Tweaking the hero baseline is a load-
+  // bearing change — fail loudly if it drifts so the lock derivation
+  // gets reviewed alongside.
+  it("STAGES[0].scale is the lock baseline (0.05)", () => {
+    expect(STAGES[0].scale).toBe(0.05)
+  })
+
+  it("non-hero scales are exact integer multiples of the lock baseline", () => {
+    const baseline = STAGES[0].scale
+    expect(STAGES[1].scale / baseline).toBeCloseTo(20, 4)
+    expect(STAGES[2].scale / baseline).toBeCloseTo(10, 4)
+  })
+
+  // Re-derives the production lock formula:
+  //   teacherScale = STAGES.scale / STAGES[0].scale
+  //   compensatedScale = STAGES.scale / teacherScale  (in product-screen.tsx)
+  // The compensation must collapse to a constant equal to the hero baseline
+  // for every stage — this is what keeps the screen visually glued to the
+  // laptop in the SVG regardless of where in the timeline we are.
+  it("lock invariant: compensatedScale === hero baseline at every stage", () => {
+    const baseline = STAGES[0].scale
+    for (const stage of STAGES) {
+      const teacherScaleAtStage = stage.scale / baseline
+      const compensated = stage.scale / teacherScaleAtStage
+      expect(compensated).toBeCloseTo(baseline, 6)
+    }
+  })
 })

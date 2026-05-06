@@ -36,21 +36,10 @@ export function PanelHeader({
   const span = Math.max(view.end - view.start, 1e-6)
 
   const fitView = (): TimelineView => {
-    const earliestLayer = Math.min(
-      paper.bgMidProgress,
-      paper.cardsMidProgress,
-      paper.teacherMidProgress
-    )
-    const latestLayer = Math.max(
-      paper.bgMidProgress,
-      paper.cardsMidProgress,
-      paper.teacherMidProgress
-    )
-    const lo = Math.min(stages[0].window[0], earliestLayer)
+    const lo = stages[0].window[0]
     const hi = Math.max(
       stages[stages.length - 1].window[1],
-      paper.opacityFadeEnd,
-      latestLayer
+      paper.opacityFadeEnd
     )
     const margin = Math.max((hi - lo) * 0.08, 0.01)
     return { start: clamp01(lo - margin), end: clamp01(hi + margin) }

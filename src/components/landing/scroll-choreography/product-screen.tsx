@@ -1,50 +1,55 @@
-// Product-UI shared element — 3-stage scroll-driven morph.
-import { easeOut } from "motion"
+// Product-UI shared element — single mount across the 3-stage morph.
+//
+// The screen lives inside the teacher motion.div which carries
+// teacherScale and transformOrigin "50% paperOriginY%" (default 68%,
+// the laptop position in the SVG). Under the choreography lock
+// (teacherScale = screenScale / HERO_SCREEN_SCALE), the laptop's
+// viewport position is invariant under teacher scaling because it sits
+// at the transform origin. So compensating the screen's translate +
+// scale to undo teacher's transform places it in viewport space, and
+// at hero+wow the viewport target (from HERO.x / HERO.y) coincides
+// with the laptop — i.e. the screen is glued to the laptop while
+// scaling together with the teacher illustration.
+//
+// Through hero+wow the position holds at HERO local (laptop). At the
+// wow→docked seam, x/y morph to DOCKED local — landing the screen on
+// the right of the viewport at scale 0.5 alongside the docked feature
+// copy. The screen scale interpolates HERO.scale → WOW.scale →
+// DOCKED.scale across all three windows, driving teacher's lock-step
+// scaling and the cinematic zoom into the laptop.
 import { motion, useTransform } from "motion/react"
 
 import { useScrollChoreography } from "./context"
-import { useFlowStages } from "./dev-flow-context"
-import { EASE_HERO_TO_WOW, EASE_WOW_TO_DOCKED, LINEAR } from "./eases"
+import { useFlowStages, usePaperCardConfig } from "./dev-flow-context"
+import { EASE_WOW_TO_DOCKED, LINEAR, SCALE_EASES } from "./eases"
 
 import { TEACHER_WORKSPACE_APP_URL } from "@/content/landing"
 
-const SCALE_EASES = [
+const POSITION_EASES = [
   LINEAR, // hero hold
-  EASE_HERO_TO_WOW, // hero→wow morph
-  LINEAR, // wow hold
   EASE_WOW_TO_DOCKED, // wow→docked morph
-  LINEAR, // docked hold
-]
-
-const X_EASES = [
-  LINEAR, // hero hold
-  easeOut, // hero→wow
-  LINEAR, // wow hold
-  EASE_WOW_TO_DOCKED, // wow→docked
   LINEAR, // docked hold
 ]
 
 const OPACITY_EASES = [
   LINEAR, // hero hold
-  easeOut, // hero→wow
+  LINEAR, // hero→wow
   LINEAR, // wow hold
   LINEAR, // wow→docked
   LINEAR, // docked hold
 ]
 
-// Vertical distance from teacher-layer center to its transform-origin (50%, 92%),
-// expressed in cqi (frame-width-relative). The frame is locked 16:10, so 42%
-// of frame_height = 42 * (10/16) = 26.25 cqi. Using cqi instead of vh keeps
-// the compensation viewport-stable: the SVG illustration is laid out in
-// cqi/% of frame, and the product screen rides the same ruler. Must stay
-// in lock-step with PaperBackdrop's teacher-layer transformOrigin.
-const TEACHER_LAYER_ORIGIN_Y_OFFSET_CQI = 26.25
+// Frame is aspect-locked 16:10. Frame width = 100cqi, frame height =
+// 62.5cqi. Frame vertical center is at 31.25cqi.
+const FRAME_HEIGHT_CQI = 62.5
+const FRAME_CENTER_Y_CQI = FRAME_HEIGHT_CQI / 2
 
 function parseCssLength(value: string): number {
   const match = value.match(/^([+-]?\d+(?:\.\d+)?)/)
   return match ? parseFloat(match[1]) : 0
 }
 
+// compensatedX = xCqi / scale. At St=1 collapses to xCqi.
 function divideCssLength(value: string, scale: number): string {
   if (scale === 0 || !Number.isFinite(scale)) return value
   const match = value.match(/^([+-]?\d+(?:\.\d+)?)([a-z%]*)$/i)
@@ -57,14 +62,20 @@ function divideCssLength(value: string, scale: number): string {
   return `${rounded}${unit}`
 }
 
-// ty = 26.25*(1 - 1/St) + yCqi/St — compensates child translate for both
-// teacher-layer scale St and its off-center transform-origin (50%, 92%).
-// At St = 1 reduces to yCqi (no-op). All y values in STAGES are cqi.
-function compensateYTranslate(yStr: string, scale: number): string {
+// compensatedY = (originY_cqi - centerY_cqi)*(1 - 1/St) + yCqi/St.
+// This formula composes with the parent scale + transformOrigin so
+// visual_y = frameCenterY + yCqi at every St. yCqi inputs are stage
+// y values (offset from frame center). At St=1 collapses to yCqi.
+function compensateYTranslate(
+  yStr: string,
+  scale: number,
+  paperOriginYPct: number
+): string {
   if (scale === 0 || !Number.isFinite(scale)) return yStr
   const yCqi = parseCssLength(yStr)
-  const tyCqi =
-    TEACHER_LAYER_ORIGIN_Y_OFFSET_CQI * (1 - 1 / scale) + yCqi / scale
+  const originYCqi = (paperOriginYPct / 100) * FRAME_HEIGHT_CQI
+  const originOffsetFromCenter = originYCqi - FRAME_CENTER_Y_CQI
+  const tyCqi = originOffsetFromCenter * (1 - 1 / scale) + yCqi / scale
   const rounded = Math.round(tyCqi * 10000) / 10000
   return `${rounded}cqi`
 }
@@ -72,94 +83,80 @@ function compensateYTranslate(yStr: string, scale: number): string {
 export function ProductScreen() {
   const { scrollYProgress, teacherScale } = useScrollChoreography()
   const STAGES = useFlowStages()
+  const paper = usePaperCardConfig()
+  const HERO = STAGES[0]
+  const WOW = STAGES[1]
+  const DOCKED = STAGES[2]
 
+  // Position held at HERO through wow.end; morphs to DOCKED across the
+  // wow→docked seam. Keeps the screen glued to the laptop through hero
+  // and wow plateaus.
+  const x = useTransform(
+    scrollYProgress,
+    [HERO.window[0], WOW.window[1], DOCKED.window[0], DOCKED.window[1]],
+    [HERO.x, HERO.x, DOCKED.x, DOCKED.x],
+    { ease: POSITION_EASES }
+  )
+  const y = useTransform(
+    scrollYProgress,
+    [HERO.window[0], WOW.window[1], DOCKED.window[0], DOCKED.window[1]],
+    [HERO.y, HERO.y, DOCKED.y, DOCKED.y],
+    { ease: POSITION_EASES }
+  )
+
+  // Scale interpolates across all 3 stage windows so the screen + locked
+  // teacher scale grow together (camera dolly) and settle at docked.
   const scale = useTransform(
     scrollYProgress,
     [
-      STAGES[0].window[0],
-      STAGES[0].window[1],
-      STAGES[1].window[0],
-      STAGES[1].window[1],
-      STAGES[2].window[0],
-      STAGES[2].window[1],
+      HERO.window[0],
+      HERO.window[1],
+      WOW.window[0],
+      WOW.window[1],
+      DOCKED.window[0],
+      DOCKED.window[1],
     ],
     [
-      STAGES[0].scale,
-      STAGES[0].scale,
-      STAGES[1].scale,
-      STAGES[1].scale,
-      STAGES[2].scale,
-      STAGES[2].scale,
+      HERO.scale,
+      HERO.scale,
+      WOW.scale,
+      WOW.scale,
+      DOCKED.scale,
+      DOCKED.scale,
     ],
     { ease: SCALE_EASES }
   )
 
-  const x = useTransform(
-    scrollYProgress,
-    [
-      STAGES[0].window[0],
-      STAGES[0].window[1],
-      STAGES[1].window[0],
-      STAGES[1].window[1],
-      STAGES[2].window[0],
-      STAGES[2].window[1],
-    ],
-    [
-      STAGES[0].x,
-      STAGES[0].x,
-      STAGES[1].x,
-      STAGES[1].x,
-      STAGES[2].x,
-      STAGES[2].x,
-    ],
-    { ease: X_EASES }
-  )
-
-  const y = useTransform(
-    scrollYProgress,
-    [
-      STAGES[0].window[0],
-      STAGES[0].window[1],
-      STAGES[1].window[0],
-      STAGES[1].window[1],
-      STAGES[2].window[0],
-      STAGES[2].window[1],
-    ],
-    [
-      STAGES[0].y,
-      STAGES[0].y,
-      STAGES[1].y,
-      STAGES[1].y,
-      STAGES[2].y,
-      STAGES[2].y,
-    ],
-    { ease: X_EASES }
-  )
-
-  // clamp:false: prevents motion's WAAPI path from hijacking scroll-linked opacity.
+  // clamp:false: prevents motion's WAAPI accelerate path from hijacking
+  // scroll-linked opacity (see paper-backdrop.tsx for the same).
   const opacity = useTransform(
     scrollYProgress,
     [
-      STAGES[0].window[0],
-      STAGES[0].window[1],
-      STAGES[1].window[0],
-      STAGES[1].window[1],
-      STAGES[2].window[0],
-      STAGES[2].window[1],
+      HERO.window[0],
+      HERO.window[1],
+      WOW.window[0],
+      WOW.window[1],
+      DOCKED.window[0],
+      DOCKED.window[1],
     ],
     [
-      STAGES[0].opacity,
-      STAGES[0].opacity,
-      STAGES[1].opacity,
-      STAGES[1].opacity,
-      STAGES[2].opacity,
-      STAGES[2].opacity,
+      HERO.opacity,
+      HERO.opacity,
+      WOW.opacity,
+      WOW.opacity,
+      DOCKED.opacity,
+      DOCKED.opacity,
     ],
     { ease: OPACITY_EASES, clamp: false }
   )
 
-  // Trigger off scrollYProgress and .get() the others: motion's typed
-  // multi-input overload doesn't accept mixed [string, number] tuples.
+  // Compensation undoes parent (teacher) scale + off-center origin so
+  // the screen sits in viewport space at every stage. With paperOriginY
+  // at the laptop, the laptop is invariant under scaling, so HERO local
+  // (the laptop) and DOCKED local (right side) are both viewport-stable
+  // anchors. Triggers off scrollYProgress and reads the dependents via
+  // .get() because motion's typed multi-input overload doesn't accept
+  // mixed [string, number] tuples.
   const compensatedScale = useTransform(scrollYProgress, () => {
     const s = scale.get()
     const ts = teacherScale.get()
@@ -169,7 +166,7 @@ export function ProductScreen() {
     divideCssLength(x.get(), teacherScale.get())
   )
   const compensatedY = useTransform(scrollYProgress, () =>
-    compensateYTranslate(y.get(), teacherScale.get())
+    compensateYTranslate(y.get(), teacherScale.get(), paper.paperOriginY)
   )
 
   return (
