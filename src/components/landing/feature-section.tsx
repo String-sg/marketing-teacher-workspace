@@ -83,9 +83,26 @@ export function FeatureSection(props: FeatureSectionProps) {
                     {bullet.title}
                   </p>
                   {idx === active ? (
-                    <p className="mt-2 text-[15px] leading-[24px] text-[color:var(--paper-muted)]">
-                      {bullet.body}
-                    </p>
+                    <>
+                      <p className="mt-2 text-[15px] leading-[24px] text-[color:var(--paper-muted)]">
+                        {bullet.body}
+                      </p>
+                      <div className="mt-4 lg:hidden">
+                        <div className="paper-card relative overflow-hidden rounded-xl border border-black/10 bg-white">
+                          <div className="flex items-center gap-2 border-b border-black/5 bg-[#f7f7f5] px-3 py-2">
+                            <span className="size-2 rounded-full bg-[#ff5f57]" />
+                            <span className="size-2 rounded-full bg-[#febc2e]" />
+                            <span className="size-2 rounded-full bg-[#28c840]" />
+                          </div>
+                          <img
+                            alt=""
+                            aria-hidden
+                            className="block h-auto w-full select-none"
+                            src="/hero/profiles-screen.png"
+                          />
+                        </div>
+                      </div>
+                    </>
                   ) : null}
                 </div>
               </button>
