@@ -3,7 +3,6 @@ import { createFileRoute } from "@tanstack/react-router"
 import { SiteFooter } from "@/components/landing/footer"
 import { ScrollChoreography } from "@/components/landing/scroll-choreography/scroll-choreography"
 
-// imageSizes must byte-match the <picture> sizes attr in product-screen.tsx.
 export const Route = createFileRoute("/")({
   component: HomePage,
   head: () => ({

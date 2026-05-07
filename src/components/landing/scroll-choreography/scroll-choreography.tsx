@@ -209,8 +209,8 @@ function ChoreographySection({
   children: ReactNode
 }) {
   const heightVh = useScrollHeightVh()
-  // Bind height through a CSS custom property: PERF-04's literal-style check
-  // rejects template literals on `height`, but accepts the literal var(...).
+  // Height binds through a CSS custom property so the literal-style audit
+  // (no template literals on layout properties) sees a constant `var(...)`.
   return (
     <section
       aria-labelledby="hero-title"

@@ -6,10 +6,9 @@ import {
   TEACHER_WORKSPACE_APP_URL,
 } from "@/content/landing"
 
-// Static-fallback hero (rendered by StaticChoreographyFallback when the user
-// prefers reduced motion or is on mobile per D-02). The choreography path in
-// scroll-choreography.tsx renders its own hero stage; both must stay in
-// visual lock-step so reduced-motion users see the same brand impression.
+// Static-fallback hero. The choreography path in scroll-choreography.tsx
+// renders its own hero stage; both must stay in visual lock-step so
+// reduced-motion users see the same brand impression.
 export function PaperHero() {
   const heroEntry = stages.find((s) => s.id === "hero")
   if (!heroEntry || heroEntry.id !== "hero") {

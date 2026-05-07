@@ -1,44 +1,29 @@
 /**
- * Paper-card backdrop subscriber. Owns the paper-card stage frame,
- * the lush-hill hero backdrop, the hand-drawn sketch overlays, and
- * the aspect-locked hero stage frame that anchors the product-screen
- * morph to the same ruler the SVGs live on.
+ * Paper-card backdrop. Owns the hero-stage frame (16:10, container-type
+ * inline-size), the hill backdrop, and the hand-drawn sketch overlays
+ * that the product-screen morph aligns against. Rendered only on the
+ * choreography path; <StaticChoreographyFallback /> handles the rest.
  *
- * Rendered ONLY in choreography mode (the orchestrator early-returns
- * <StaticChoreographyFallback /> when reduced/mobile per D-02).
+ * Layer stack (back-to-front):
+ *   - Background (absolute inset-0): carries `bgScale` + the wow-plateau
+ *     `stageOpacity` fade + full-bleed hill + dark gradient overlay.
+ *   - Hero stage frame (absolute, centered, 16:10). Inside, two scale
+ *     wrappers split the illustration into depth planes that share
+ *     transformOrigin `50% ${paperOriginY}%` so they scale around the
+ *     laptop in the SVG (keeping the screen-on-laptop in viewport):
+ *       · Cards layer — carries `cardsScale`, holds hero-cards-sketch.svg.
+ *       · Teacher layer — carries `teacherScale`, holds
+ *         hero-teacher-sketch.svg + <ProductScreen>. The screen
+ *         counter-scales against `teacherScale` so it lands in viewport
+ *         space while still riding the same depth plane as the teacher.
+ *   - Caller-supplied `children` render on top (z 10+), unaffected by
+ *     layer scale/opacity — SiteHeader and hero copy live there.
  *
- * Bundle architecture:
- *   - Outer div is now structural-only (no scale). Children stay in
- *     place rather than scaling out of view with the master zoom.
- *   - Background motion.div (absolute inset-0): carries `bgScale` +
- *     `opacity` (the wow-plateau fade) + the full-bleed hill image and
- *     dark gradient overlay. Earliest layer in the stagger.
- *   - Hero stage frame (absolute, centered, aspect 16:10, container-type
- *     inline-size). Inside, two scale wrappers split the illustration
- *     into depth layers:
- *       · Cards motion.div carries `cardsScale` and contains
- *         hero-cards-sketch.svg (the row of wall paintings).
- *       · Teacher motion.div carries `teacherScale` and contains
- *         hero-teacher-sketch.svg (the teacher at desk) together with
- *         <ProductScreen> — they zoom together as one depth plane.
- *     The cards + teacher layers share transformOrigin `50% ${paperOriginY}%`
- *     (default 68%, tunable via the dev panel) so the layered scenery
- *     scales around the laptop in the SVG and the screen-on-laptop stays
- *     in viewport at every teacher scale.
- *   - Caller-supplied `children` render on top (z-index 10+) and are
- *     unaffected by any layer scale/opacity — SiteHeader and hero copy
- *     live there.
+ * Only transform/opacity animate — no width/height/top/left writes.
  *
- * `bgScale` / `cardsScale` / `teacherScale` are computed at the
- * orchestrator level (ChoreographyTree) so the same MotionValue
- * instances are shared with <ProductScreen> (which counter-scales
- * against `teacherScale` since the screen now lives inside that layer).
- *
- * Other invariants:
- *   - PERF-04: transform/opacity only — no width/height/top/left
- *
- * The opacityFadeStart / opacityFadeEnd values come from
- * usePaperCardConfig() so the dev tuner can live-edit the fade window.
+ * `bgScale` / `cardsScale` / `teacherScale` come from the orchestrator
+ * (ChoreographyTree) as shared MotionValues. opacityFadeStart/End come
+ * from usePaperCardConfig() so the dev tuner can live-edit the fade.
  */
 import { motion, useTransform } from "motion/react"
 import type { ReactNode } from "react"
