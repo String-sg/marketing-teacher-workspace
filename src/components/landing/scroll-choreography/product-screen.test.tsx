@@ -67,7 +67,7 @@ describe("ProductScreen mount stability (CHOREO-01)", () => {
 describe("ProductScreen motion-value shape (CHOREO-06 / D-10)", () => {
   it("renders inline styles carrying motion-value-driven opacity, x (outer) and scale (inner)", () => {
     // Probe at progress=0.6 — inside the wow→docked morph zone where scale
-    // interpolates 1.0→0.5 and x interpolates 0→+28cqi, so both axes
+    // interpolates 1.0→0.6 and x interpolates 0→+28cqi, so both axes
     // are guaranteed to emit non-identity transform values into the
     // inline style attribute.
     const { container } = renderWithMockProgress(0.6)

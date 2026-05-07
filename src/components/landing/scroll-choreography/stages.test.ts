@@ -57,8 +57,8 @@ describe("STAGES data", () => {
 
   it("STAGES window endpoints match the current schedule", () => {
     expect(byId("hero").window).toEqual([0, 0.21])
-    expect(byId("wow").window).toEqual([0.57, 0.62])
-    expect(byId("docked").window).toEqual([0.7, 0.98])
+    expect(byId("wow").window).toEqual([0.52, 0.62])
+    expect(byId("docked").window).toEqual([0.66, 0.98])
   })
 
   it("wow rect — centered full-viewport reveal", () => {
@@ -69,9 +69,9 @@ describe("STAGES data", () => {
     expect(w.y).toBe("0cqi")
   })
 
-  it("docked rect — positive-rightward sign, scale 0.5", () => {
+  it("docked rect — positive-rightward sign, scale 0.6", () => {
     const d = byId("docked")
-    expect(d.scale).toBe(0.5)
+    expect(d.scale).toBe(0.6)
     expect(d.opacity).toBe(1)
     expect(d.x).toBe("+28cqi")
   })
@@ -88,7 +88,7 @@ describe("STAGES data", () => {
   it("non-hero scales are exact integer multiples of the lock baseline", () => {
     const baseline = STAGES[0].scale
     expect(STAGES[1].scale / baseline).toBeCloseTo(20, 4)
-    expect(STAGES[2].scale / baseline).toBeCloseTo(10, 4)
+    expect(STAGES[2].scale / baseline).toBeCloseTo(12, 4)
   })
 
   // Re-derives the production lock formula:

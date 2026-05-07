@@ -83,7 +83,7 @@ describe("PaperBackdrop scenery opacity lock", () => {
     expect(teacher).not.toBeNull()
 
     // The shared `stageOpacity` MotionValue applied to both SVG imgs reaches
-    // 0 at any progress >= opacityFadeEnd (0.63 default). docked.window[1]
+    // 0 at any progress >= opacityFadeEnd (0.5 default). docked.window[1]
     // (0.98) is well past that, so both sketches must be fully transparent.
     expect(cards?.style.opacity).toBe("0")
     expect(teacher?.style.opacity).toBe("0")

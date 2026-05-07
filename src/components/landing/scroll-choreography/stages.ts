@@ -21,7 +21,7 @@ export const STAGES = [
   },
   {
     id: "wow",
-    window: [0.57, 0.62] as const,
+    window: [0.52, 0.62] as const,
     scale: 1,
     x: "0cqi",
     y: "0cqi",
@@ -29,8 +29,8 @@ export const STAGES = [
   },
   {
     id: "docked",
-    window: [0.7, 0.98] as const,
-    scale: 0.5,
+    window: [0.66, 0.98] as const,
+    scale: 0.6,
     x: "+28cqi",
     y: "0cqi",
     opacity: 1,
