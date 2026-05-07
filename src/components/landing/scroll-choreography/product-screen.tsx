@@ -186,7 +186,7 @@ export function ProductScreen() {
   const innerScale = useTransform(
     scrollYProgress,
     [WOW.window[1], DOCKED.window[0]],
-    [1, 1.35]
+    [1, 1.55]
   )
   const sidebarWidth = useTransform(
     scrollYProgress,

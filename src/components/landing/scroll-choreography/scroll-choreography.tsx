@@ -1,14 +1,16 @@
 // Split into <ScrollChoreography> (mode pick) + <ChoreographyTree> (calls
 // useScroll) so useScroll only mounts in the choreography branch — rules of
 // hooks forbid conditional calls.
+import { ChevronDownIcon } from "lucide-react"
 import {
   motion,
+  useMotionValueEvent,
   useReducedMotion,
   useScroll,
   useTransform,
 } from "motion/react"
 import type { MotionValue } from "motion/react"
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import type { ReactNode, RefObject } from "react"
 
 import { ScrollChoreographyContext } from "./context"
@@ -89,34 +91,39 @@ function ChoreographyTree({
     ["0px", HERO_COPY_LIFT_TRAVEL_PX, HERO_COPY_LIFT_TRAVEL_PX],
     { ease: [EASE_OUT_EXIT, LINEAR] }
   )
+  const [scrollHintHidden, setScrollHintHidden] = useState(false)
+  useMotionValueEvent(scrollYProgress, "change", (v) => {
+    const shouldHide = v > 0.001
+    if (shouldHide !== scrollHintHidden) setScrollHintHidden(shouldHide)
+  })
 
   return (
     <DevFlowProvider>
       <ChoreographyContextShell scrollYProgress={scrollYProgress}>
         <ChoreographySection sectionRef={sectionRef}>
           <ProductTabProvider>
-            <div className="sticky top-0 flex h-svh items-stretch overflow-hidden px-5 py-3 sm:px-8">
+            <div className="sticky top-0 flex h-svh items-stretch overflow-hidden">
               <PaperBackdrop>
                 <div className="relative z-10 flex w-full flex-col">
-                  <div className="px-4 pt-4 sm:px-6 sm:pt-6">
+                  <div className="px-4 pt-4 sm:px-8 sm:pt-6">
                     <SiteHeader />
                   </div>
                   <motion.div
-                    className="mx-auto mt-12 flex w-fit flex-col items-center px-4 text-center sm:mt-16"
+                    className="mx-auto mt-12 flex w-full flex-col items-center px-4 text-center sm:mt-16"
                     style={{ opacity: copyOpacity, y: copyY }}
                   >
                     <h1
-                      className="font-heading text-[clamp(2.25rem,5.5vw,3.75rem)] leading-[1.1] font-medium tracking-[-0.025em] text-balance text-[#0F1B33]"
+                      className="font-heading text-[clamp(2.25rem,5.5vw,3.75rem)] leading-[1.1] font-medium tracking-[-0.025em] text-[#0F1B33]"
                       id="hero-title"
                     >
                       {hero.headline}
                     </h1>
-                    <p className="mt-5 text-[14px] text-[color:var(--paper-muted)]">
-                      {siteCtaCopy.access}
+                    <p className="mt-5 max-w-[42rem] text-base leading-[1.6] text-balance text-[color:var(--paper-muted)] sm:text-lg">
+                      {hero.description} {siteCtaCopy.access}.
                     </p>
                     <Button
                       asChild
-                      className="mt-5 h-10 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-[var(--paper-shadow-cta)] transition-all duration-200 ease-out hover:-translate-y-px hover:bg-primary/90 hover:shadow-[var(--paper-shadow-cta-hover)]"
+                      className="mt-5 h-10 rounded-full border-0 bg-primary bg-clip-border px-5 text-sm font-semibold text-primary-foreground shadow-[var(--paper-shadow-cta)] transition-all duration-200 ease-out hover:-translate-y-px hover:bg-primary/90 hover:shadow-[var(--paper-shadow-cta-hover)]"
                     >
                       <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
                         {siteCtaCopy.primary}
@@ -124,6 +131,28 @@ function ChoreographyTree({
                     </Button>
                   </motion.div>
                 </div>
+                {scrollHintHidden ? null : (
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute bottom-6 left-1/2 z-20 -translate-x-1/2"
+                  >
+                    <div className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 shadow-[0_0_0_1px_rgb(15_23_42/0.04),0_2px_6px_-1px_rgb(15_23_42/0.06),0_12px_32px_-8px_rgb(15_23_42/0.18)]">
+                      <span className="text-[13px] font-medium text-[color:var(--paper-ink)]">
+                        Scroll to learn more
+                      </span>
+                      <motion.span
+                        animate={{ y: [0, 3, 0] }}
+                        transition={{
+                          duration: 1.6,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        }}
+                      >
+                        <ChevronDownIcon className="size-4 text-[color:var(--paper-muted)]" />
+                      </motion.span>
+                    </div>
+                  </div>
+                )}
               </PaperBackdrop>
               <StageCopy stage="docked" />
             </div>

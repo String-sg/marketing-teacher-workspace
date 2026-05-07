@@ -175,6 +175,7 @@
     @apply font-sans;
     scroll-behavior: smooth;
     position: relative;
+    background-color: var(--paper);
     }
 }
 
@@ -187,17 +188,18 @@
     background-color: var(--paper-card);
   }
 
-  .hero-stage-bg {
+  .hero-sky-bg {
     background-image: image-set(
-      url("/hero/hill-1280.webp") 1x,
-      url("/hero/hill-1600.webp") 1.5x
+      url("/hero/hero-bg.avif") type("image/avif"),
+      url("/hero/hero-bg.webp") type("image/webp")
     );
     background-image: -webkit-image-set(
-      url("/hero/hill-1280.webp") 1x,
-      url("/hero/hill-1600.webp") 1.5x
+      url("/hero/hero-bg.avif") type("image/avif"),
+      url("/hero/hero-bg.webp") type("image/webp")
     );
     background-size: cover;
-    background-position: center;
+    background-position: top center;
+    background-repeat: no-repeat;
   }
 
   .nav-pill {
@@ -223,6 +225,11 @@
 @keyframes cloud-drift-c {
   from { transform: translate3d(-12%, 0, 0); }
   to   { transform: translate3d(12%, 0, 0); }
+}
+
+@keyframes scroll-hint {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(4px); }
 }
 
 @media (prefers-reduced-motion: reduce) {

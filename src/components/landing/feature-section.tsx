@@ -1,3 +1,5 @@
+import { ChevronRightIcon } from "lucide-react"
+import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { useState } from "react"
 
 import type {
@@ -36,6 +38,7 @@ export function FeatureSection(props: FeatureSectionProps) {
   const sectionId =
     props.id ?? (props.stage === "docked" ? "features" : undefined)
   const [active, setActive] = useState(0)
+  const reduce = useReducedMotion()
 
   return (
     <section
@@ -64,58 +67,67 @@ export function FeatureSection(props: FeatureSectionProps) {
             {content.bullets.map((bullet, idx) => (
               <button
                 aria-expanded={idx === active}
-                className="flex w-full gap-4 border-b border-[color:var(--paper-rule)] py-6 text-left transition-colors hover:bg-[color:var(--paper-ink)]/[0.02] focus-visible:outline-none focus-visible:bg-[color:var(--paper-ink)]/[0.03]"
+                className={[
+                  "group/bullet flex w-full items-start gap-4 border-b border-[color:var(--paper-rule)] px-4 py-6 text-left transition-colors focus-visible:outline-none",
+                  idx === active
+                    ? "bg-[color:var(--paper-ink)]/[0.03]"
+                    : "hover:bg-[color:var(--paper-ink)]/[0.02] focus-visible:bg-[color:var(--paper-ink)]/[0.03]",
+                ].join(" ")}
                 key={bullet.title}
                 onClick={() => setActive(idx)}
                 type="button"
               >
-                <span
-                  aria-hidden
-                  className={[
-                    "mt-[10px] size-2 shrink-0 rounded-full transition-colors",
-                    idx === active
-                      ? "bg-primary"
-                      : "border border-[color:var(--paper-ink)]/25",
-                  ].join(" ")}
-                />
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <p className="text-[17px] leading-[26px] font-semibold tracking-[-0.005em] text-[color:var(--paper-ink)]">
                     {bullet.title}
                   </p>
-                  {idx === active ? (
-                    <>
-                      <p className="mt-2 text-[15px] leading-[24px] text-[color:var(--paper-muted)]">
-                        {bullet.body}
-                      </p>
-                      <div className="mt-4 lg:hidden">
-                        <div className="paper-card relative overflow-hidden rounded-xl border border-black/10 bg-white">
-                          <div className="flex items-center gap-2 border-b border-black/5 bg-[#f7f7f5] px-3 py-2">
-                            <span className="size-2 rounded-full bg-[#ff5f57]" />
-                            <span className="size-2 rounded-full bg-[#febc2e]" />
-                            <span className="size-2 rounded-full bg-[#28c840]" />
+                  <AnimatePresence initial={false}>
+                    {idx === active ? (
+                      <motion.div
+                        key="body"
+                        initial={{ height: 0, opacity: 0, y: -4 }}
+                        animate={{ height: "auto", opacity: 1, y: 0 }}
+                        exit={{ height: 0, opacity: 0, y: -4 }}
+                        transition={{
+                          duration: reduce ? 0 : 0.22,
+                          ease: [0.215, 0.61, 0.355, 1],
+                        }}
+                        style={{ overflow: "hidden" }}
+                      >
+                        <p className="mt-2 text-[15px] leading-[24px] text-[color:var(--paper-muted)]">
+                          {bullet.body}
+                        </p>
+                        <div className="mt-4 lg:hidden">
+                          <div className="paper-card relative overflow-hidden rounded-xl border border-black/10 bg-white">
+                            <div className="flex items-center gap-2 border-b border-black/5 bg-[#f7f7f5] px-3 py-2">
+                              <span className="size-2 rounded-full bg-[#ff5f57]" />
+                              <span className="size-2 rounded-full bg-[#febc2e]" />
+                              <span className="size-2 rounded-full bg-[#28c840]" />
+                            </div>
+                            <img
+                              alt=""
+                              aria-hidden
+                              className="block h-auto w-full select-none"
+                              src="/hero/profiles-screen.png"
+                            />
                           </div>
-                          <img
-                            alt=""
-                            aria-hidden
-                            className="block h-auto w-full select-none"
-                            src="/hero/profiles-screen.png"
-                          />
                         </div>
-                      </div>
-                    </>
-                  ) : null}
+                      </motion.div>
+                    ) : null}
+                  </AnimatePresence>
                 </div>
+                <ChevronRightIcon
+                  aria-hidden
+                  className={[
+                    "mt-[6px] size-5 shrink-0 transition-transform",
+                    idx === active
+                      ? "rotate-90 text-[color:var(--paper-ink)]/55"
+                      : "text-[color:var(--paper-ink)]/30 group-hover/bullet:text-[color:var(--paper-ink)]/55",
+                  ].join(" ")}
+                />
               </button>
             ))}
           </div>
-
-          <a
-            className="mt-7 inline-block text-[15px] leading-[22px] font-semibold text-[color:var(--paper-ink)] underline underline-offset-[6px] decoration-[color:var(--paper-ink)]/40 transition-colors hover:decoration-[color:var(--paper-ink)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/40"
-            href={content.cta.href}
-            rel="noreferrer"
-          >
-            {content.cta.label}
-          </a>
         </div>
 
         <div

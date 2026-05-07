@@ -34,7 +34,7 @@ export function AudienceColumns() {
             return (
               <RevealOnScroll delay={i * 100} key={column.label}>
                 <article
-                  className="group/audience relative flex h-[640px] flex-col items-center overflow-clip rounded-[28px] px-8 pt-10 transition-transform duration-300 ease-out hover:-translate-y-1"
+                  className="group/audience relative flex h-[520px] flex-col items-center overflow-clip rounded-[28px] px-8 pt-10"
                   style={{ backgroundColor: CARD_BG[i] }}
                 >
                   <h3 className="text-center font-heading text-[clamp(1.5rem,2.2vw,2rem)] leading-[1.12] font-medium tracking-tight text-[color:var(--paper-ink)]">
@@ -43,7 +43,7 @@ export function AudienceColumns() {
                   <p className="mt-4 max-w-[280px] text-center text-base leading-[26px] text-[color:var(--paper-muted)]">
                     {column.body}
                   </p>
-                  <div className="mt-auto h-[300px] w-full max-w-[440px] transition-transform duration-300 ease-out group-hover/audience:translate-y-[-4px]">
+                  <div className="mt-auto h-[260px] w-full max-w-[440px]">
                     <Peek />
                   </div>
                 </article>

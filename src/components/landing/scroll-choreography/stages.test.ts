@@ -44,7 +44,7 @@ describe("STAGES data", () => {
   })
 
   it("byId('wow').window[1] is the wow plateau end", () => {
-    expect(byId("wow").window[1]).toBeCloseTo(0.62, 2)
+    expect(byId("wow").window[1]).toBeCloseTo(0.53, 2)
   })
 
   it("STAGES windows are monotonic non-overlapping (D-02)", () => {
@@ -57,8 +57,8 @@ describe("STAGES data", () => {
 
   it("STAGES window endpoints match the current schedule", () => {
     expect(byId("hero").window).toEqual([0, 0.21])
-    expect(byId("wow").window).toEqual([0.52, 0.62])
-    expect(byId("docked").window).toEqual([0.66, 0.98])
+    expect(byId("wow").window).toEqual([0.43, 0.53])
+    expect(byId("docked").window).toEqual([0.61, 1])
   })
 
   it("wow rect — centered full-viewport reveal", () => {
@@ -69,11 +69,11 @@ describe("STAGES data", () => {
     expect(w.y).toBe("0cqi")
   })
 
-  it("docked rect — positive-rightward sign, scale 0.6", () => {
+  it("docked rect — positive-rightward sign, scale 0.7", () => {
     const d = byId("docked")
-    expect(d.scale).toBe(0.6)
+    expect(d.scale).toBe(0.7)
     expect(d.opacity).toBe(1)
-    expect(d.x).toBe("+28cqi")
+    expect(d.x).toBe("+24cqi")
   })
 
   // Scenery layers (bg/cards/teacher) are locked to the product-screen
@@ -88,7 +88,7 @@ describe("STAGES data", () => {
   it("non-hero scales are exact integer multiples of the lock baseline", () => {
     const baseline = STAGES[0].scale
     expect(STAGES[1].scale / baseline).toBeCloseTo(20, 4)
-    expect(STAGES[2].scale / baseline).toBeCloseTo(12, 4)
+    expect(STAGES[2].scale / baseline).toBeCloseTo(14, 4)
   })
 
   // Re-derives the production lock formula:

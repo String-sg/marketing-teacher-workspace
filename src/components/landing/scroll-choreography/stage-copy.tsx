@@ -15,7 +15,14 @@
  * clamp:false on opacity disables motion 12's WAAPI accelerate path that
  * otherwise hijacks scroll-linked opacity (see paper-backdrop.tsx).
  */
-import { motion, useTransform } from "motion/react"
+import { ChevronRightIcon } from "lucide-react"
+import {
+  AnimatePresence,
+  motion,
+  useMotionValueEvent,
+  useReducedMotion,
+  useTransform,
+} from "motion/react"
 
 import { useScrollChoreography } from "./context"
 import { useFlowStages } from "./dev-flow-context"
@@ -36,11 +43,13 @@ export function StageCopy({ stage }: StageCopyProps) {
   if (!entry || entry.id !== "docked") {
     throw new Error(`StageCopy: unknown stage "${stage}"`)
   }
-  const { heading, bullets, cta } = entry.copy
+  const { heading, bullets } = entry.copy
   const { activeTab, setActiveTab } = useProductTab()
+  const reduce = useReducedMotion()
 
   const fadeInStart = byFlowId("wow")!.window[1]
   const holdStart = byFlowId("docked")!.window[0]
+  const dockedEnd = byFlowId("docked")!.window[1]
 
   const opacity = useTransform(
     scrollYProgress,
@@ -48,6 +57,17 @@ export function StageCopy({ stage }: StageCopyProps) {
     [0, 0, 1, 1],
     { clamp: false }
   )
+
+  // Advance the active bullet as the user scrolls through the docked
+  // window. Splits [holdStart, dockedEnd] into thirds — one segment per
+  // bullet. Click still works (sets activeTab directly); next scroll move
+  // re-syncs to the scroll position.
+  useMotionValueEvent(scrollYProgress, "change", (v) => {
+    if (v < holdStart || v > dockedEnd) return
+    const segment = (dockedEnd - holdStart) / 3
+    const idx = Math.min(2, Math.floor((v - holdStart) / segment)) as ProductTabIndex
+    if (idx !== activeTab) setActiveTab(idx)
+  })
 
   return (
     <motion.div
@@ -63,41 +83,52 @@ export function StageCopy({ stage }: StageCopyProps) {
           {bullets.map((bullet, idx) => (
             <button
               aria-expanded={idx === activeTab}
-              className="flex w-full gap-4 border-b border-[color:var(--paper-rule)] py-6 text-left transition-colors duration-200 ease-out hover:bg-[color:var(--paper-hover-bg)] focus-visible:bg-[color:var(--paper-hover-bg)] focus-visible:outline-none"
+              className={[
+                "group/bullet flex w-full items-start gap-4 border-b border-[color:var(--paper-rule)] px-4 py-6 text-left transition-colors duration-200 ease-out focus-visible:outline-none",
+                idx === activeTab
+                  ? "bg-[color:var(--paper-hover-bg)]"
+                  : "hover:bg-[color:var(--paper-hover-bg)] focus-visible:bg-[color:var(--paper-hover-bg)]",
+              ].join(" ")}
               key={bullet.title}
               onClick={() => setActiveTab(idx as ProductTabIndex)}
               type="button"
             >
-              <span
-                aria-hidden
-                className={[
-                  "mt-[10px] size-2 shrink-0 rounded-full transition-colors duration-200 ease-out",
-                  idx === activeTab
-                    ? "bg-primary"
-                    : "border border-[color:var(--paper-ink)]/25",
-                ].join(" ")}
-              />
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <p className="text-[17px] leading-[26px] font-semibold tracking-[-0.005em] text-[color:var(--paper-ink)]">
                   {bullet.title}
                 </p>
-                {idx === activeTab ? (
-                  <p className="mt-2 text-[15px] leading-[24px] text-[color:var(--paper-muted)]">
-                    {bullet.body}
-                  </p>
-                ) : null}
+                <AnimatePresence initial={false}>
+                  {idx === activeTab ? (
+                    <motion.div
+                      key="body"
+                      initial={{ height: 0, opacity: 0, y: -4 }}
+                      animate={{ height: "auto", opacity: 1, y: 0 }}
+                      exit={{ height: 0, opacity: 0, y: -4 }}
+                      transition={{
+                        duration: reduce ? 0 : 0.22,
+                        ease: [0.215, 0.61, 0.355, 1],
+                      }}
+                      style={{ overflow: "hidden" }}
+                    >
+                      <p className="mt-2 text-[15px] leading-[24px] text-[color:var(--paper-muted)]">
+                        {bullet.body}
+                      </p>
+                    </motion.div>
+                  ) : null}
+                </AnimatePresence>
               </div>
+              <ChevronRightIcon
+                aria-hidden
+                className={[
+                  "mt-[6px] size-5 shrink-0 transition-transform duration-200 ease-out",
+                  idx === activeTab
+                    ? "rotate-90 text-[color:var(--paper-ink)]/55"
+                    : "text-[color:var(--paper-ink)]/30 group-hover/bullet:text-[color:var(--paper-ink)]/55",
+                ].join(" ")}
+              />
             </button>
           ))}
         </div>
-
-        <a
-          className="mt-7 inline-block rounded-sm text-[15px] leading-[22px] font-semibold text-[color:var(--paper-ink)] underline underline-offset-[6px] decoration-[color:var(--paper-ink)]/40 transition-colors duration-200 ease-out hover:decoration-[color:var(--paper-ink)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/40"
-          href={cta.href}
-          rel="noreferrer"
-        >
-          {cta.label}
-        </a>
       </div>
     </motion.div>
   )

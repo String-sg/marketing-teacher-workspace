@@ -18,7 +18,9 @@ export const stages: readonly StageCopyContent[] = [
   {
     id: "hero",
     copy: {
-      headline: "Every student's full picture, one view.",
+      headline: "See the full picture of every student",
+      description:
+        "View key student data in one view. Save hours on scattered data.",
     },
   },
   {
@@ -34,16 +36,16 @@ export const stages: readonly StageCopyContent[] = [
         "Find the cohort in seconds — the moment it changes, you'll know.",
       bullets: [
         {
-          title: "Quick filters.",
-          body: "FAS, SEN, low attendance, peer isolation, pre-LTA. Name it. See it. Find the cohort in seconds — the moment it changes, you'll know.",
+          title: "Quick filters",
+          body: "Low attendance, low mood, FAS, learning support — identify students in seconds",
         },
         {
-          title: "Saved groups.",
-          body: "Define a cohort. Instantly review it anytime.",
+          title: "Saved groups",
+          body: "Track and monitor groups of students easily",
         },
         {
-          title: "One source of truth.",
-          body: "Form Teachers, Year Heads and School Leaders — same view, same evidence. (Data access control applies.)",
+          title: "One source of truth",
+          body: "Form Teachers, Year Heads and School Leaders — same view, same evidence (data access control applies)",
         },
       ],
       cta: { label: "Take a closer look", href: TEACHER_WORKSPACE_APP_URL },
@@ -102,7 +104,7 @@ export const audienceCopy = {
   columns: [
     {
       label: "Form Teachers",
-      body: "Walk in fluent in your class. The context is already on the profile.",
+      body: "Engage students and parents confidently. Context is already on the profile.",
     },
     {
       label: "Year Heads & SDT",
@@ -118,11 +120,11 @@ export const audienceCopy = {
 export const finalCtaCopy = {
   headline: "Know every student before tomorrow's bell.",
   subtitle:
-    "Bring attendance, behaviour, notes home, and SEN context into a single view your whole school can read at a glance.",
+    "View behaviour, wellbeing and academic data in one place to understand each student at a glance.",
 } as const
 
 export const footerCopy = {
-  copyright: "© 2026",
+  copyright: "© MOE 2026",
   brand: "Teacher Workspace",
   feedbackUrl: "https://go.gov.sg/teacherworkspace-feedback",
   feedbackLabel: "Send feedback",

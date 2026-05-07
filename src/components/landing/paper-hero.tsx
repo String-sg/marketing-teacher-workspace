@@ -1,3 +1,5 @@
+import { ChevronDownIcon } from "lucide-react"
+
 import { SiteHeader } from "@/components/landing/site-header"
 import { Button } from "@/components/ui/button"
 import {
@@ -19,12 +21,12 @@ export function PaperHero() {
   return (
     <section
       aria-labelledby="hero-title-static"
-      className="relative overflow-hidden px-5 py-3 sm:min-h-svh sm:px-8"
+      className="relative overflow-hidden sm:min-h-svh"
     >
-      <div className="paper-card relative mx-auto flex w-full max-w-[1412px] flex-1 flex-col items-center overflow-hidden rounded-[28px] shadow-[0_10px_60px_-30px_rgb(15_23_42/0.18)] sm:rounded-[44px]">
+      <div className="paper-card relative flex w-full flex-1 flex-col items-center overflow-hidden">
         <div
           aria-hidden
-          className="absolute inset-0 overflow-hidden rounded-[28px] bg-gradient-to-b from-[#cfe5f7] from-0% via-[#e8f1fa] via-35% to-white to-75% sm:rounded-[44px]"
+          className="hero-sky-bg absolute inset-0 overflow-hidden"
         >
           {/* Halftone cloud overlays — match Paper "Hero V2 — Cloud Notes".
               Gentle left/right drift via CSS keyframes; each cloud uses a
@@ -83,15 +85,15 @@ export function PaperHero() {
           <div className="px-4 pt-4 sm:px-6 sm:pt-6">
             <SiteHeader />
           </div>
-          <div className="mx-auto mt-8 flex w-fit flex-col items-center px-4 text-center sm:mt-16">
+          <div className="mx-auto mt-8 flex w-full flex-col items-center px-4 text-center sm:mt-16">
             <h1
-              className="font-heading text-[clamp(2.25rem,5.5vw,3.75rem)] leading-[1.1] font-medium tracking-[-0.025em] text-balance text-[#0F1B33]"
+              className="font-heading text-[clamp(2.25rem,5.5vw,3.75rem)] leading-[1.1] font-medium tracking-[-0.025em] text-[#0F1B33]"
               id="hero-title-static"
             >
               {hero.headline}
             </h1>
-            <p className="mt-5 text-[14px] text-[color:var(--paper-muted)]">
-              {siteCtaCopy.access}
+            <p className="mt-5 max-w-[42rem] text-base leading-[1.6] text-balance text-[color:var(--paper-muted)] sm:text-lg">
+              {hero.description} {siteCtaCopy.access}.
             </p>
             <Button
               asChild
@@ -103,6 +105,18 @@ export function PaperHero() {
             </Button>
           </div>
           <div className="h-[26vh] sm:h-[48vh]" aria-hidden />
+        </div>
+
+        <div
+          aria-hidden
+          className="pointer-events-none absolute bottom-6 left-1/2 z-20 -translate-x-1/2"
+        >
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 shadow-[0_0_0_1px_rgb(15_23_42/0.04),0_2px_6px_-1px_rgb(15_23_42/0.06),0_12px_32px_-8px_rgb(15_23_42/0.18)]">
+            <span className="text-[13px] font-medium text-[color:var(--paper-ink)]">
+              Scroll to learn more
+            </span>
+            <ChevronDownIcon className="size-4 text-[color:var(--paper-muted)] motion-safe:animate-[scroll-hint_1.6s_ease-in-out_infinite]" />
+          </div>
         </div>
       </div>
     </section>

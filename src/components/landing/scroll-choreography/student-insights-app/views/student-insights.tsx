@@ -112,11 +112,15 @@ export function StudentInsightsView({
             <button
               type="button"
               onClick={() =>
-                onChangeFilter({ ...filter, attentionTag: null })
+                onChangeFilter({
+                  ...filter,
+                  attentionTag: null,
+                  savedLabel: null,
+                })
               }
               className="inline-flex h-7 items-center gap-1.5 rounded-full border border-[color:var(--cta-blue)]/30 bg-[color:var(--cta-blue)]/10 px-2.5 text-[11px] font-medium text-[color:var(--cta-blue)] hover:bg-[color:var(--cta-blue)]/15"
             >
-              Saved: {filter.attentionTag}
+              Saved: {filter.savedLabel ?? filter.attentionTag}
               <span aria-hidden>✕</span>
             </button>
           ) : null}
@@ -148,7 +152,7 @@ export function StudentInsightsView({
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-auto rounded-lg border border-black/10 bg-white">
+      <div className="pointer-events-none min-h-0 flex-1 overflow-hidden rounded-lg border border-black/10 bg-white">
         <table className="w-full border-collapse text-left">
           <thead className="sticky top-0 bg-white">
             <tr className="border-b border-black/10 text-[10px] tracking-wider text-black/55">

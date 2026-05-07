@@ -66,8 +66,8 @@ export function StudentProfileView({
         </div>
       </div>
 
-      <div className="grid min-h-0 flex-1 grid-cols-[1fr_140px] gap-3 overflow-hidden">
-        <div className="min-h-0 overflow-auto pr-1">
+      <div className="pointer-events-none grid min-h-0 flex-1 grid-cols-[1fr_140px] gap-3 overflow-hidden">
+        <div className="min-h-0 overflow-hidden pr-1">
           <div className="flex flex-col gap-3">
             <section className="flex items-center gap-3 rounded-xl border border-black/10 bg-white px-3 py-3">
               <div className="grid size-12 place-items-center rounded-full bg-black/[0.04] text-black/40">

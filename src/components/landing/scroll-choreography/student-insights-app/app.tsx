@@ -1,4 +1,4 @@
-import { motion } from "motion/react"
+import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import type { MotionValue } from "motion/react"
 import { useEffect, useMemo, useState } from "react"
 
@@ -33,6 +33,7 @@ export function StudentInsightsApp({
   const [filter, setFilter] = useState<FilterState>(EMPTY_FILTER)
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null)
   const [filterOpen, setFilterOpen] = useState(false)
+  const reduce = useReducedMotion()
 
   useEffect(() => {
     if (activeTab === 0) {
@@ -43,7 +44,11 @@ export function StudentInsightsApp({
     } else if (activeTab === 1) {
       setRoute("students")
       setSelectedStudentId(null)
-      setFilter({ ...EMPTY_FILTER, attentionTag: "FAS" })
+      setFilter({
+        ...EMPTY_FILTER,
+        attentionTag: "FAS",
+        savedLabel: "Students for support",
+      })
       setFilterOpen(false)
     } else {
       setRoute("students")
@@ -92,31 +97,51 @@ export function StudentInsightsApp({
       <div className="grid min-w-0 flex-1 grid-rows-[auto_1fr]">
         <TopBar heading={heading} />
         <main className="min-h-0 overflow-hidden">
-          {route === "students" ? (
-            selectedStudent ? (
-              <StudentProfileView
-                student={selectedStudent}
-                onBack={() => setSelectedStudentId(null)}
-                onPrev={() => cycleStudent(-1)}
-                onNext={() => cycleStudent(1)}
-              />
-            ) : (
-              <StudentInsightsView
-                classId={classId}
-                onChangeClass={(id) => {
-                  setClassId(id)
-                  setFilter(EMPTY_FILTER)
-                }}
-                filter={filter}
-                onChangeFilter={setFilter}
-                onSelectStudent={setSelectedStudentId}
-                filterOpen={filterOpen}
-                onFilterOpenChange={setFilterOpen}
-              />
-            )
-          ) : (
-            <PlaceholderView title={HEADINGS[route]} />
-          )}
+          <AnimatePresence initial={false} mode="wait">
+            <motion.div
+              key={
+                route !== "students"
+                  ? `route-${route}`
+                  : selectedStudent
+                    ? `profile-${selectedStudent.id}`
+                    : `insights-${filter.savedLabel ?? filter.attentionTag ?? "all"}`
+              }
+              className="h-full"
+              initial={{ opacity: 0, y: reduce ? 0 : 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: reduce ? 0 : -6 }}
+              transition={{
+                duration: reduce ? 0 : 0.2,
+                ease: [0.215, 0.61, 0.355, 1],
+              }}
+            >
+              {route === "students" ? (
+                selectedStudent ? (
+                  <StudentProfileView
+                    student={selectedStudent}
+                    onBack={() => setSelectedStudentId(null)}
+                    onPrev={() => cycleStudent(-1)}
+                    onNext={() => cycleStudent(1)}
+                  />
+                ) : (
+                  <StudentInsightsView
+                    classId={classId}
+                    onChangeClass={(id) => {
+                      setClassId(id)
+                      setFilter(EMPTY_FILTER)
+                    }}
+                    filter={filter}
+                    onChangeFilter={setFilter}
+                    onSelectStudent={setSelectedStudentId}
+                    filterOpen={filterOpen}
+                    onFilterOpenChange={setFilterOpen}
+                  />
+                )
+              ) : (
+                <PlaceholderView title={HEADINGS[route]} />
+              )}
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
     </div>

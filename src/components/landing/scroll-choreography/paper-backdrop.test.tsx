@@ -37,20 +37,19 @@ function renderWithMockProgress(progress = 0) {
 }
 
 describe("PaperBackdrop render shape", () => {
-  it("renders the sky-gradient backdrop on the bgScale layer", () => {
+  it("renders the sky-image backdrop on the bgScale layer", () => {
     const { container } = renderWithMockProgress(0)
-    // Sky gradient lives on the same motion.div that carries bgScale —
-    // identifiable as the wrapper of the cards-sketch's parent path. The
-    // outer rounded layer carries Tailwind's bg-gradient-to-b utility plus
-    // arbitrary-value sky stops.
-    const root = container.querySelector(".paper-card") as HTMLElement | null
+    // Sky background lives on the same motion.div that carries bgScale.
+    // The sky image (image-set with AVIF + WebP) is applied via the
+    // hero-sky-bg utility class defined in styles.css.
+    const root = container.querySelector(
+      "[data-testid='paper-backdrop']"
+    ) as HTMLElement | null
     const bgLayer = root?.firstElementChild as HTMLElement | null
     expect(bgLayer).not.toBeNull()
     const cls = bgLayer?.className ?? ""
-    expect(cls).toMatch(/bg-gradient-to-b/)
-    expect(cls).toMatch(/from-/)
-    expect(cls).toMatch(/to-/)
-    // Hill picture must be gone — sky gradient replaces the photographic
+    expect(cls).toMatch(/hero-sky-bg/)
+    // Hill picture must be gone — sky image replaces the photographic
     // backdrop entirely. Scope to the bg layer; ProductScreen has its own
     // <picture> deeper in the tree.
     expect(bgLayer?.querySelector("picture")).toBeNull()
@@ -83,8 +82,8 @@ describe("PaperBackdrop scenery opacity lock", () => {
     expect(teacher).not.toBeNull()
 
     // The shared `stageOpacity` MotionValue applied to both SVG imgs reaches
-    // 0 at any progress >= opacityFadeEnd (0.5 default). docked.window[1]
-    // (0.98) is well past that, so both sketches must be fully transparent.
+    // 0 at any progress >= opacityFadeEnd (0.48 default). docked.window[1]
+    // (1.0) is well past that, so both sketches must be fully transparent.
     expect(cards?.style.opacity).toBe("0")
     expect(teacher?.style.opacity).toBe("0")
   })
@@ -93,7 +92,9 @@ describe("PaperBackdrop scenery opacity lock", () => {
 describe("PaperBackdrop motion-value-driven shape (CHOREO-06 / MIGRATE-02)", () => {
   it("renders motion-value-driven inline styles on the per-layer scale wrappers", () => {
     const { container } = renderWithMockProgress(byId("wow").window[1])
-    const root = container.querySelector(".paper-card") as HTMLElement | null
+    const root = container.querySelector(
+      "[data-testid='paper-backdrop']"
+    ) as HTMLElement | null
     expect(root).not.toBeNull()
 
     // After the layer-zoom refactor, scale lives on three inner motion.divs

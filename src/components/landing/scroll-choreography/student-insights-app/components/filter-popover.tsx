@@ -8,12 +8,14 @@ export type FilterState = {
   cca: string | null
   lateComingMin: number | null
   attentionTag: AttentionTag | null
+  savedLabel: string | null
 }
 
 export const EMPTY_FILTER: FilterState = {
   cca: null,
   lateComingMin: null,
   attentionTag: null,
+  savedLabel: null,
 }
 
 export function FilterPopover({
