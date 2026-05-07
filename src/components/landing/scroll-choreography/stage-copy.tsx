@@ -51,7 +51,7 @@ export function StageCopy({ stage }: StageCopyProps) {
 
   return (
     <motion.div
-      className="pointer-events-none absolute inset-0 z-30 flex items-center justify-start px-4 sm:px-10 lg:px-16"
+      className="pointer-events-none absolute inset-0 z-30 mx-auto flex w-full max-w-[1412px] items-center justify-start px-4 sm:px-10 lg:px-16"
       style={{ opacity }}
     >
       <div className="pointer-events-auto w-full max-w-xl px-4 sm:px-6 lg:w-[40%] lg:max-w-[520px] lg:px-8">
