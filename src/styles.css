@@ -62,13 +62,14 @@
 }
 
 :root {
+    --masthead-h: 28px;
     --background: var(--mauve-1);
     --foreground: var(--mauve-12);
     --card: var(--mauve-1);
     --card-foreground: var(--mauve-12);
     --popover: var(--mauve-1);
     --popover-foreground: var(--mauve-12);
-    --primary: #245adb;
+    --primary: #0066ff;
     --primary-foreground: white;
     --secondary: var(--mauve-3);
     --secondary-foreground: var(--mauve-12);

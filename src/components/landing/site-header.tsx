@@ -34,10 +34,10 @@ function handleHashClick(
 
 export function SiteHeader() {
   return (
-    <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-8 sm:pt-6">
+    <header className="pointer-events-none fixed inset-x-0 top-[var(--masthead-h,0px)] z-50 px-4 pt-4 transition-[top] duration-200 ease-out sm:px-8">
       <nav
         aria-label="Primary navigation"
-        className="nav-pill mx-auto flex w-full max-w-[940px] items-center justify-between gap-6 rounded-full border border-[#CBD5E1] py-2.5 pr-2.5 pl-5 sm:gap-12"
+        className="nav-pill pointer-events-auto mx-auto flex w-full max-w-[940px] items-center justify-between gap-6 rounded-full py-2.5 pr-2.5 pl-5 shadow-[0_0_0_1px_rgb(15_23_42/0.04),0_2px_6px_-1px_rgb(15_23_42/0.06)] sm:gap-12"
       >
         <a
           className="flex items-center gap-2.5 rounded-full font-heading text-[color:var(--paper-ink)] transition-opacity duration-200 hover:opacity-80 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/40"

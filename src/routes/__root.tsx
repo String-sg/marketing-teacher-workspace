@@ -2,6 +2,7 @@ import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router"
 
 import appCss from "../styles.css?url"
 import { SkipLink } from "@/components/landing/skip-link"
+import { MastheadSg } from "@/components/landing/masthead-sg"
 import { lazy, Suspense } from 'react'
 
 const DirectEdit = lazy(() =>
@@ -70,6 +71,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <SkipLink />
+        <MastheadSg />
         {children}
         <Scripts />
         {import.meta.env.DEV && typeof window !== 'undefined' && (
