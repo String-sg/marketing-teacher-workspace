@@ -1,6 +1,9 @@
-import { ArrowRightIcon } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { finalCtaCopy, siteCtaCopy, TEACHER_WORKSPACE_APP_URL } from "@/content/landing"
 
 import { RevealOnScroll } from "./reveal-on-scroll"
@@ -19,19 +22,21 @@ export function FinalCta() {
           <p className="max-w-[34rem] text-base leading-[1.7] text-balance text-[color:var(--paper-muted)] sm:text-lg">
             {finalCtaCopy.subtitle}
           </p>
-          <Button
-            asChild
-            className="group/cta mt-2 h-10 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground transition-[background-color,translate,scale] duration-200 ease-out hover:-translate-y-px hover:bg-primary/90 active:scale-[0.96]"
-          >
-            <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
-              {siteCtaCopy.primary}
-              <ArrowRightIcon
-                aria-hidden
-                className="transition-transform duration-200 ease-out group-hover/cta:translate-x-0.5"
-                data-icon="inline-end"
-              />
-            </a>
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                asChild
+                className="mt-2 h-10 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground transition-[background-color,translate,scale] duration-200 ease-out hover:-translate-y-px hover:bg-primary/90 active:scale-[0.96]"
+              >
+                <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
+                  {siteCtaCopy.primary}
+                </a>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              Accessible on MOE-issued devices
+            </TooltipContent>
+          </Tooltip>
         </div>
       </RevealOnScroll>
     </section>

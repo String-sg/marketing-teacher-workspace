@@ -34,6 +34,11 @@ import { SchoolsToday } from "@/components/landing/schools-today"
 import { SiteHeader } from "@/components/landing/site-header"
 import { Button } from "@/components/ui/button"
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import {
   siteCtaCopy,
   stages,
   TEACHER_WORKSPACE_APP_URL,
@@ -122,14 +127,24 @@ function ChoreographyTree({
                     <p className="mt-5 max-w-[42rem] text-base leading-[1.6] text-balance text-[color:var(--paper-muted)] sm:text-lg">
                       {hero.description} {siteCtaCopy.access}.
                     </p>
-                    <Button
-                      asChild
-                      className="mt-5 h-10 rounded-full border-0 bg-primary bg-clip-border px-5 text-sm font-semibold text-primary-foreground transition-[background-color,translate,scale] duration-200 ease-out hover:-translate-y-px hover:bg-primary/90 active:scale-[0.96]"
-                    >
-                      <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
-                        {siteCtaCopy.primary}
-                      </a>
-                    </Button>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          asChild
+                          className="mt-5 h-10 rounded-full border-0 bg-primary bg-clip-border px-5 text-sm font-semibold text-primary-foreground transition-[background-color,translate,scale] duration-200 ease-out hover:-translate-y-px hover:bg-primary/90 active:scale-[0.96]"
+                        >
+                          <a
+                            href={TEACHER_WORKSPACE_APP_URL}
+                            rel="noreferrer"
+                          >
+                            {siteCtaCopy.primary}
+                          </a>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">
+                        Accessible on MOE-issued devices
+                      </TooltipContent>
+                    </Tooltip>
                   </motion.div>
                 </div>
                 {scrollHintHidden ? null : (

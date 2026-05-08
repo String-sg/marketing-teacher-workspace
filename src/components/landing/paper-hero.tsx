@@ -2,6 +2,11 @@ import { ChevronDownIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import {
   siteCtaCopy,
   stages,
   TEACHER_WORKSPACE_APP_URL,
@@ -94,14 +99,21 @@ export function PaperHero() {
             <p className="mt-5 max-w-[42rem] text-base leading-[1.6] text-balance text-[color:var(--paper-muted)] sm:text-lg">
               {hero.description} {siteCtaCopy.access}.
             </p>
-            <Button
-              asChild
-              className="mt-5 h-10 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground transition-[background-color,translate,scale] duration-200 ease-out hover:-translate-y-px hover:bg-primary/90 active:scale-[0.96]"
-            >
-              <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
-                {siteCtaCopy.primary}
-              </a>
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  asChild
+                  className="mt-5 h-10 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground transition-[background-color,translate,scale] duration-200 ease-out hover:-translate-y-px hover:bg-primary/90 active:scale-[0.96]"
+                >
+                  <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
+                    {siteCtaCopy.primary}
+                  </a>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                Accessible on MOE-issued devices
+              </TooltipContent>
+            </Tooltip>
           </div>
           <div className="h-[26vh] sm:h-[48vh]" aria-hidden />
         </div>

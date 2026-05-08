@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button"
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import {
@@ -69,22 +68,22 @@ export function SiteHeader() {
           ))}
         </div>
 
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                asChild
-                className="h-10 rounded-full border-primary bg-transparent px-5 text-sm font-semibold text-primary transition-[background-color,scale] duration-200 ease-out hover:bg-primary/[0.06] active:scale-[0.96]"
-                variant="outline"
-              >
-                <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
-                  {siteCtaCopy.primary}
-                </a>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Accessible on MOE-issued devices</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              asChild
+              className="h-10 rounded-full border-primary bg-transparent px-5 text-sm font-semibold text-primary transition-[background-color,scale] duration-200 ease-out hover:bg-primary/[0.06] active:scale-[0.96]"
+              variant="outline"
+            >
+              <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
+                {siteCtaCopy.primary}
+              </a>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            Accessible on MOE-issued devices
+          </TooltipContent>
+        </Tooltip>
       </nav>
     </header>
   )
