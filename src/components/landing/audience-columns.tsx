@@ -40,7 +40,7 @@ export function AudienceColumns() {
                   <h3 className="text-center font-heading text-[clamp(1.5rem,2.2vw,2rem)] leading-[1.12] font-medium tracking-tight text-[color:var(--paper-ink)]">
                     {column.label}
                   </h3>
-                  <p className="mt-4 max-w-[280px] text-center text-base leading-[26px] text-[color:var(--paper-muted)]">
+                  <p className="mt-4 max-w-[280px] text-center text-base leading-[26px] text-pretty text-[color:var(--paper-muted)]">
                     {column.body}
                   </p>
                   <div className="mt-auto h-[260px] w-full max-w-[440px]">

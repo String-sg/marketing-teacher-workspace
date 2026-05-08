@@ -199,6 +199,24 @@ export function ProductScreen() {
     [1, 0]
   )
 
+  // Reveal blur on the wow→docked morph. Peaks at the midpoint and
+  // returns to 0 at the docked plateau, so the screen lands crisp.
+  // Kept ≤ 6px (Safari-safe, GPU-composited via filter). Paired with
+  // EASE_WOW_TO_DOCKED so it shares timing with the position/scale morph.
+  const FRAME_BLUR_MID_PROGRESS =
+    (WOW.window[1] + DOCKED.window[0]) / 2
+  const FRAME_BLUR_MAX_PX = 6
+  const frameBlurPx = useTransform(
+    scrollYProgress,
+    [WOW.window[1], FRAME_BLUR_MID_PROGRESS, DOCKED.window[0]],
+    [0, FRAME_BLUR_MAX_PX, 0],
+    { ease: [EASE_WOW_TO_DOCKED, EASE_WOW_TO_DOCKED] }
+  )
+  const frameFilter = useTransform(
+    frameBlurPx,
+    (v) => `blur(${v}px)`
+  )
+
   return (
     <motion.div
       data-testid="product-screen-outer"
@@ -208,7 +226,7 @@ export function ProductScreen() {
       <motion.div
         data-testid="product-screen-frame"
         className="relative w-full max-w-[1280px] overflow-hidden rounded-2xl border border-black/10 bg-white"
-        style={{ scale: compensatedScale }}
+        style={{ scale: compensatedScale, filter: frameFilter }}
       >
         <div className="flex items-center gap-2 border-b border-black/5 bg-[#f7f7f5] px-4 py-2.5">
           <span className="size-3 rounded-full bg-[#ff5f57]" />

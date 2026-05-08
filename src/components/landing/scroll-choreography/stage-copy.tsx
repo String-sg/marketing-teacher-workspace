@@ -26,6 +26,7 @@ import {
 
 import { useScrollChoreography } from "./context"
 import { useFlowStages } from "./dev-flow-context"
+import { EASE_OUT_EXIT } from "./eases"
 import { useProductTab } from "./product-tab-context"
 import type { ProductTabIndex } from "./product-tab-context"
 
@@ -58,6 +59,19 @@ export function StageCopy({ stage }: StageCopyProps) {
     { clamp: false }
   )
 
+  // Reveal blur. Enter animation (Emil: ease-out for elements entering
+  // the viewport). Blurry → crisp (4px → 0px) over the same window the
+  // copy fades in, so the focus pull is paired with the opacity fade.
+  // Filter blur is GPU-composited and stays well under the 20px Safari
+  // expense ceiling.
+  const blurPx = useTransform(
+    scrollYProgress,
+    [fadeInStart, holdStart],
+    [4, 0],
+    { ease: EASE_OUT_EXIT }
+  )
+  const filter = useTransform(blurPx, (v) => `blur(${v}px)`)
+
   // Advance the active bullet as the user scrolls through the docked
   // window. Splits [holdStart, dockedEnd] into thirds — one segment per
   // bullet. Click still works (sets activeTab directly); next scroll move
@@ -72,10 +86,10 @@ export function StageCopy({ stage }: StageCopyProps) {
   return (
     <motion.div
       className="pointer-events-none absolute inset-0 z-30 mx-auto flex w-full max-w-[1412px] items-center justify-start px-4 sm:px-10 lg:px-16"
-      style={{ opacity }}
+      style={{ opacity, filter }}
     >
       <div className="pointer-events-auto w-full max-w-xl px-4 sm:px-6 lg:w-[40%] lg:max-w-[520px] lg:px-8">
-        <h2 className="font-heading text-[clamp(2rem,3.6vw,3.5rem)] leading-[1.21] font-medium tracking-tight whitespace-pre-line text-[color:var(--paper-ink)]">
+        <h2 className="font-heading text-[clamp(2rem,3.6vw,3.5rem)] leading-[1.21] font-medium tracking-tight text-balance whitespace-pre-line text-[color:var(--paper-ink)]">
           {heading}
         </h2>
 
@@ -110,7 +124,7 @@ export function StageCopy({ stage }: StageCopyProps) {
                       }}
                       style={{ overflow: "hidden" }}
                     >
-                      <p className="mt-2 text-[15px] leading-[24px] text-[color:var(--paper-muted)]">
+                      <p className="mt-2 text-[15px] leading-[24px] text-pretty text-[color:var(--paper-muted)]">
                         {bullet.body}
                       </p>
                     </motion.div>

@@ -87,7 +87,7 @@ export function PaperHero() {
           </div>
           <div className="mx-auto mt-8 flex w-full flex-col items-center px-4 text-center sm:mt-16">
             <h1
-              className="font-heading text-[clamp(2.25rem,5.5vw,3.75rem)] leading-[1.1] font-medium tracking-[-0.025em] text-[#0F1B33]"
+              className="font-heading text-[clamp(2.25rem,5.5vw,3.75rem)] leading-[1.1] font-medium tracking-[-0.025em] text-balance text-[#0F1B33]"
               id="hero-title-static"
             >
               {hero.headline}
@@ -97,7 +97,7 @@ export function PaperHero() {
             </p>
             <Button
               asChild
-              className="mt-5 h-10 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-[var(--paper-shadow-cta)] transition-all duration-200 ease-out hover:-translate-y-px hover:bg-primary/90 hover:shadow-[var(--paper-shadow-cta-hover)]"
+              className="mt-5 h-10 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground transition-[background-color,translate,scale] duration-200 ease-out hover:-translate-y-px hover:bg-primary/90 active:scale-[0.96]"
             >
               <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
                 {siteCtaCopy.primary}

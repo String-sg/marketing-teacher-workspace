@@ -1,9 +1,33 @@
+import type { MouseEvent as ReactMouseEvent } from "react"
+
 import { Button } from "@/components/ui/button"
 import {
   navItems,
   siteCtaCopy,
   TEACHER_WORKSPACE_APP_URL,
 } from "@/content/landing"
+
+// Hash links inside the long pinned choreography (~220lvh) get hijacked by
+// CSS smooth-scroll, leaving users settled mid-flight on the docked stage
+// with the wrong bullet highlighted. Force "instant" — not "auto" — so the
+// jump bypasses the CSS smooth-scroll default and lands cleanly on the
+// target section.
+function handleHashClick(
+  event: ReactMouseEvent<HTMLAnchorElement>,
+  href: string
+) {
+  if (!href.startsWith("#")) return
+  const id = href.slice(1)
+  if (!id) return
+  const target =
+    typeof document === "undefined" ? null : document.getElementById(id)
+  if (!target) return
+  event.preventDefault()
+  target.scrollIntoView({ behavior: "instant", block: "start" })
+  if (typeof history !== "undefined") {
+    history.replaceState(null, "", href)
+  }
+}
 
 export function SiteHeader() {
   return (
@@ -31,9 +55,10 @@ export function SiteHeader() {
         <div className="hidden items-center gap-8 text-sm font-semibold text-[color:var(--paper-ink)] md:flex">
           {navItems.map((item) => (
             <a
-              className="rounded-sm transition-colors duration-200 ease-out hover:text-primary focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/40"
+              className="inline-flex h-10 items-center rounded-sm transition-colors duration-200 ease-out hover:text-primary focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/40"
               href={item.href}
               key={item.label}
+              onClick={(event) => handleHashClick(event, item.href)}
             >
               {item.label}
             </a>
@@ -42,7 +67,7 @@ export function SiteHeader() {
 
         <Button
           asChild
-          className="h-10 rounded-full border-primary bg-transparent px-5 text-sm font-semibold text-primary transition-all duration-200 ease-out hover:bg-primary/[0.06]"
+          className="h-10 rounded-full border-primary bg-transparent px-5 text-sm font-semibold text-primary transition-[background-color,scale] duration-200 ease-out hover:bg-primary/[0.06] active:scale-[0.96]"
           variant="outline"
         >
           <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">

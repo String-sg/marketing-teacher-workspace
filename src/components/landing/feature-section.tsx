@@ -59,7 +59,7 @@ export function FeatureSection(props: FeatureSectionProps) {
             props.reverse ? "lg:order-2 lg:ml-auto" : "",
           ].join(" ")}
         >
-          <h2 className="font-heading text-[clamp(2rem,3.6vw,3.5rem)] leading-[1.21] font-medium tracking-tight whitespace-pre-line text-[color:var(--paper-ink)]">
+          <h2 className="font-heading text-[clamp(2rem,3.6vw,3.5rem)] leading-[1.21] font-medium tracking-tight text-balance whitespace-pre-line text-[color:var(--paper-ink)]">
             {content.heading}
           </h2>
 
@@ -94,7 +94,7 @@ export function FeatureSection(props: FeatureSectionProps) {
                         }}
                         style={{ overflow: "hidden" }}
                       >
-                        <p className="mt-2 text-[15px] leading-[24px] text-[color:var(--paper-muted)]">
+                        <p className="mt-2 text-[15px] leading-[24px] text-pretty text-[color:var(--paper-muted)]">
                           {bullet.body}
                         </p>
                         <div className="mt-4 lg:hidden">

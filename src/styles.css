@@ -170,6 +170,8 @@
     @apply bg-background text-foreground;
     min-width: 320px;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     }
   html {
     @apply font-sans;
