@@ -100,14 +100,15 @@ function ChoreographyTree({
   return (
     <DevFlowProvider>
       <ChoreographyContextShell scrollYProgress={scrollYProgress}>
+        <SiteHeader />
         <ChoreographySection sectionRef={sectionRef}>
           <ProductTabProvider>
             <div className="sticky top-0 flex h-svh items-stretch overflow-hidden">
               <PaperBackdrop>
                 <div className="relative z-10 flex w-full flex-col">
-                  <div className="px-4 pt-4 sm:px-8 sm:pt-6">
-                    <SiteHeader />
-                  </div>
+                  {/* Reserves the space the now-fixed SiteHeader used to
+                      occupy in flow, keeping hero copy at the same Y. */}
+                  <div aria-hidden className="h-[78px] sm:h-[86px]" />
                   <motion.div
                     className="mx-auto mt-12 flex w-full flex-col items-center px-4 text-center sm:mt-16"
                     style={{ opacity: copyOpacity, y: copyY }}

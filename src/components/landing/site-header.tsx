@@ -2,16 +2,20 @@ import type { MouseEvent as ReactMouseEvent } from "react"
 
 import { Button } from "@/components/ui/button"
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import {
   navItems,
   siteCtaCopy,
   TEACHER_WORKSPACE_APP_URL,
 } from "@/content/landing"
 
-// Hash links inside the long pinned choreography (~220lvh) get hijacked by
-// CSS smooth-scroll, leaving users settled mid-flight on the docked stage
-// with the wrong bullet highlighted. Force "instant" — not "auto" — so the
-// jump bypasses the CSS smooth-scroll default and lands cleanly on the
-// target section.
+// Force "instant" (not "auto") so hash jumps bypass the global CSS
+// smooth-scroll, which otherwise strands users mid-flight inside the
+// 220lvh pinned choreography.
 function handleHashClick(
   event: ReactMouseEvent<HTMLAnchorElement>,
   href: string
@@ -31,10 +35,10 @@ function handleHashClick(
 
 export function SiteHeader() {
   return (
-    <header className="relative z-30 w-full">
+    <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-8 sm:pt-6">
       <nav
         aria-label="Primary navigation"
-        className="nav-pill mx-auto flex w-full max-w-[940px] items-center justify-between gap-6 rounded-full border border-[#CBD5E1] px-3 py-2.5 sm:gap-12 sm:px-6"
+        className="nav-pill mx-auto flex w-full max-w-[940px] items-center justify-between gap-6 rounded-full border border-[#CBD5E1] py-2.5 pr-2.5 pl-5 sm:gap-12"
       >
         <a
           className="flex items-center gap-2.5 rounded-full font-heading text-[color:var(--paper-ink)] transition-opacity duration-200 hover:opacity-80 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/40"
@@ -65,15 +69,22 @@ export function SiteHeader() {
           ))}
         </div>
 
-        <Button
-          asChild
-          className="h-10 rounded-full border-primary bg-transparent px-5 text-sm font-semibold text-primary transition-[background-color,scale] duration-200 ease-out hover:bg-primary/[0.06] active:scale-[0.96]"
-          variant="outline"
-        >
-          <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
-            {siteCtaCopy.primary}
-          </a>
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                asChild
+                className="h-10 rounded-full border-primary bg-transparent px-5 text-sm font-semibold text-primary transition-[background-color,scale] duration-200 ease-out hover:bg-primary/[0.06] active:scale-[0.96]"
+                variant="outline"
+              >
+                <a href={TEACHER_WORKSPACE_APP_URL} rel="noreferrer">
+                  {siteCtaCopy.primary}
+                </a>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Accessible on MOE-issued devices</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </nav>
     </header>
   )
