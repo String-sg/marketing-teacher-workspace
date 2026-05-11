@@ -36,6 +36,11 @@ export function Popover({
 
   useEffect(() => {
     if (!isOpen) return
+    // When the popover is parent-controlled (demo mode), the parent owns
+    // open/close — skip click-outside + Escape, which would otherwise fight
+    // the parent (e.g. with pointer-events:none on an ancestor, event.target
+    // lands behind the wrapper and close() fires immediately).
+    if (isControlled) return
     const close = () => setIsOpenRef.current(false)
     const onClick = (event: MouseEvent) => {
       if (!wrapperRef.current) return
@@ -50,7 +55,7 @@ export function Popover({
       document.removeEventListener("mousedown", onClick)
       document.removeEventListener("keydown", onKey)
     }
-  }, [isOpen])
+  }, [isOpen, isControlled])
 
   return (
     <div ref={wrapperRef} className="relative inline-flex">

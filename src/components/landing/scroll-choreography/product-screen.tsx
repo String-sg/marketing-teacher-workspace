@@ -17,7 +17,8 @@
 // copy. The screen scale interpolates HERO.scale → WOW.scale →
 // DOCKED.scale across all three windows, driving teacher's lock-step
 // scaling and the cinematic zoom into the laptop.
-import { motion, useTransform } from "motion/react"
+import { motion, useMotionValueEvent, useTransform } from "motion/react"
+import { useState } from "react"
 
 import { useScrollChoreography } from "./context"
 import { useFlowStages, usePaperCardConfig } from "./dev-flow-context"
@@ -172,13 +173,15 @@ export function ProductScreen() {
     compensateYTranslate(y.get(), teacherScale.get(), paper.paperOriginY)
   )
 
-  // Pointer-events stay off during morphs so clicks don't land on a
-  // scaling/translating frame. Enable once the wow plateau begins so
-  // visitors can drive the embedded Student Insights demo at full size
-  // and through the docked hold.
-  const pointerEvents = useTransform(scrollYProgress, (v) =>
-    v >= WOW.window[0] ? "auto" : "none"
-  )
+  // Track whether scroll has crossed into the docked plateau. Used to
+  // gate the embedded filter popover so it only appears once the screen
+  // is docked at full size — not during hero/wow where it would render
+  // inside the tiny laptop preview.
+  const [dockedReached, setDockedReached] = useState(false)
+  useMotionValueEvent(scrollYProgress, "change", (v) => {
+    const next = v >= DOCKED.window[0]
+    setDockedReached((prev) => (prev === next ? prev : next))
+  })
 
   // Wow→docked transition: collapse sidebar + zoom inner content.
   // Holds 1.0/1/180 through wow plateau, transitions over [wow.end,
@@ -220,8 +223,8 @@ export function ProductScreen() {
   return (
     <motion.div
       data-testid="product-screen-outer"
-      className="absolute inset-0 z-20 flex items-center justify-center px-4 sm:px-10 lg:px-16"
-      style={{ opacity, x: compensatedX, y: compensatedY, pointerEvents }}
+      className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center px-4 sm:px-10 lg:px-16"
+      style={{ opacity, x: compensatedX, y: compensatedY, pointerEvents: "none" }}
     >
       <motion.div
         data-testid="product-screen-frame"
@@ -243,6 +246,7 @@ export function ProductScreen() {
           >
             <StudentInsightsApp
               activeTab={activeTab}
+              dockedReached={dockedReached}
               sidebarWidth={sidebarWidth}
               sidebarOpacity={sidebarOpacity}
             />

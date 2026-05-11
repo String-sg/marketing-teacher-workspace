@@ -7,7 +7,7 @@
  *   - 3-stage stitched morph (hero/wow/docked all emit visible state)
  *   - CHOREO-06 / D-10: visual props flow direct from useTransform into style
  *   - D-18 / VISUAL-02: browser-frame chrome (traffic lights + URL bar)
- *   - Pointer-events gate: disabled below the wow plateau, enabled at/after.
+ *   - Pointer-events: disabled at every stage so the embedded demo is non-interactive.
  */
 import { describe, expect, it } from "vitest"
 import { render } from "@testing-library/react"
@@ -104,23 +104,17 @@ describe("ProductScreen browser-frame chrome (D-18 / VISUAL-02)", () => {
   })
 })
 
-describe("ProductScreen pointer-events gate", () => {
-  it("disables pointer-events before the wow plateau", () => {
-    const { container } = renderWithMockProgress(0.1)
-    const outer = container.querySelector(
-      '[data-testid="product-screen-outer"]'
-    )
-    const style = outer?.getAttribute("style") ?? ""
-    expect(style).toMatch(/pointer-events:\s*none/)
-  })
-
-  it("enables pointer-events once the wow plateau begins", () => {
-    const { container } = renderWithMockProgress(STAGES[1].window[0])
-    const outer = container.querySelector(
-      '[data-testid="product-screen-outer"]'
-    )
-    const style = outer?.getAttribute("style") ?? ""
-    expect(style).toMatch(/pointer-events:\s*auto/)
+describe("ProductScreen pointer-events", () => {
+  it("disables pointer-events on the embedded demo at every stage", () => {
+    for (const progress of [0.1, STAGES[1].window[0], 0.8]) {
+      const { container, unmount } = renderWithMockProgress(progress)
+      const outer = container.querySelector(
+        '[data-testid="product-screen-outer"]'
+      )
+      const style = outer?.getAttribute("style") ?? ""
+      expect(style).toMatch(/pointer-events:\s*none/)
+      unmount()
+    }
   })
 })
 

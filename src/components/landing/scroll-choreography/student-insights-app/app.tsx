@@ -21,10 +21,12 @@ const SAVED_GROUP_STUDENT_ID = "s3-01"
 
 export function StudentInsightsApp({
   activeTab = 0,
+  dockedReached = false,
   sidebarWidth,
   sidebarOpacity,
 }: {
   activeTab?: 0 | 1 | 2
+  dockedReached?: boolean
   sidebarWidth?: MotionValue<number>
   sidebarOpacity?: MotionValue<number>
 } = {}) {
@@ -40,7 +42,9 @@ export function StudentInsightsApp({
       setRoute("students")
       setSelectedStudentId(null)
       setFilter(EMPTY_FILTER)
-      setFilterOpen(true)
+      // Hold the popover closed until scroll reaches the docked plateau,
+      // so it doesn't render inside the tiny hero/wow laptop preview.
+      setFilterOpen(dockedReached)
     } else if (activeTab === 1) {
       setRoute("students")
       setSelectedStudentId(null)
@@ -55,7 +59,7 @@ export function StudentInsightsApp({
       setSelectedStudentId(SAVED_GROUP_STUDENT_ID)
       setFilterOpen(false)
     }
-  }, [activeTab])
+  }, [activeTab, dockedReached])
 
   const cls = getClassById(classId)
   const selectedStudent = useMemo(
@@ -79,7 +83,7 @@ export function StudentInsightsApp({
   }
 
   return (
-    <div className="flex h-full min-h-0 bg-[#fafafa] text-[color:var(--paper-ink)]">
+    <div className="pointer-events-none flex h-full min-h-0 bg-[#fafafa] text-[color:var(--paper-ink)]">
       <motion.aside
         className="h-full shrink-0 overflow-hidden"
         style={{ width: sidebarWidth ?? 180, opacity: sidebarOpacity ?? 1 }}

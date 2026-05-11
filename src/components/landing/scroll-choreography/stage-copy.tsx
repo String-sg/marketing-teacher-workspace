@@ -95,17 +95,14 @@ export function StageCopy({ stage }: StageCopyProps) {
 
         <div className="mt-8 border-t border-[color:var(--paper-rule)]">
           {bullets.map((bullet, idx) => (
-            <button
-              aria-expanded={idx === activeTab}
+            <div
               className={[
-                "group/bullet flex w-full items-start gap-4 border-b border-[color:var(--paper-rule)] px-4 py-6 text-left transition-colors duration-200 ease-out focus-visible:outline-none",
+                "flex w-full items-start gap-4 border-b border-[color:var(--paper-rule)] px-4 py-6 text-left transition-colors duration-200 ease-out",
                 idx === activeTab
                   ? "bg-[color:var(--paper-hover-bg)]"
-                  : "hover:bg-[color:var(--paper-hover-bg)] focus-visible:bg-[color:var(--paper-hover-bg)]",
+                  : "",
               ].join(" ")}
               key={bullet.title}
-              onClick={() => setActiveTab(idx as ProductTabIndex)}
-              type="button"
             >
               <div className="min-w-0 flex-1">
                 <p className="text-[17px] leading-[26px] font-semibold tracking-[-0.005em] text-[color:var(--paper-ink)]">
@@ -137,10 +134,10 @@ export function StageCopy({ stage }: StageCopyProps) {
                   "mt-[6px] size-5 shrink-0 transition-transform duration-200 ease-out",
                   idx === activeTab
                     ? "rotate-90 text-[color:var(--paper-ink)]/55"
-                    : "text-[color:var(--paper-ink)]/30 group-hover/bullet:text-[color:var(--paper-ink)]/55",
+                    : "text-[color:var(--paper-ink)]/30",
                 ].join(" ")}
               />
-            </button>
+            </div>
           ))}
         </div>
       </div>
