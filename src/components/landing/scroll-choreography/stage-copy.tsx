@@ -31,6 +31,7 @@ import { useProductTab } from "./product-tab-context"
 import type { ProductTabIndex } from "./product-tab-context"
 
 import { stages } from "@/content/landing"
+import { cn } from "@/lib/utils"
 
 type StageCopyProps = { stage: "docked" }
 
@@ -74,8 +75,8 @@ export function StageCopy({ stage }: StageCopyProps) {
 
   // Advance the active bullet as the user scrolls through the docked
   // window. Splits [holdStart, dockedEnd] into thirds — one segment per
-  // bullet. Click still works (sets activeTab directly); next scroll move
-  // re-syncs to the scroll position.
+  // bullet. Scroll is the sole driver; bullets are display-only so the
+  // embedded demo reads as scroll-narrated, not click-driven.
   useMotionValueEvent(scrollYProgress, "change", (v) => {
     if (v < holdStart || v > dockedEnd) return
     const segment = (dockedEnd - holdStart) / 3
@@ -96,12 +97,10 @@ export function StageCopy({ stage }: StageCopyProps) {
         <div className="mt-8 border-t border-[color:var(--paper-rule)]">
           {bullets.map((bullet, idx) => (
             <div
-              className={[
-                "flex w-full items-start gap-4 border-b border-[color:var(--paper-rule)] px-4 py-6 text-left transition-colors duration-200 ease-out",
-                idx === activeTab
-                  ? "bg-[color:var(--paper-hover-bg)]"
-                  : "",
-              ].join(" ")}
+              className={cn(
+                "flex w-full items-start gap-4 border-b border-[color:var(--paper-rule)] px-4 py-6 transition-colors duration-200 ease-out",
+                idx === activeTab && "bg-[color:var(--paper-hover-bg)]"
+              )}
               key={bullet.title}
             >
               <div className="min-w-0 flex-1">
@@ -130,12 +129,12 @@ export function StageCopy({ stage }: StageCopyProps) {
               </div>
               <ChevronRightIcon
                 aria-hidden
-                className={[
+                className={cn(
                   "mt-[6px] size-5 shrink-0 transition-transform duration-200 ease-out",
                   idx === activeTab
                     ? "rotate-90 text-[color:var(--paper-ink)]/55"
-                    : "text-[color:var(--paper-ink)]/30",
-                ].join(" ")}
+                    : "text-[color:var(--paper-ink)]/30"
+                )}
               />
             </div>
           ))}

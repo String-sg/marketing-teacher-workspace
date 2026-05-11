@@ -179,8 +179,7 @@ export function ProductScreen() {
   // inside the tiny laptop preview.
   const [dockedReached, setDockedReached] = useState(false)
   useMotionValueEvent(scrollYProgress, "change", (v) => {
-    const next = v >= DOCKED.window[0]
-    setDockedReached((prev) => (prev === next ? prev : next))
+    setDockedReached(v >= DOCKED.window[0])
   })
 
   // Wow→docked transition: collapse sidebar + zoom inner content.
